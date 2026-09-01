@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Account - CD Shopping Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+  body { font-family: 'Karla', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen flex flex-col pb-24">
+<header class="bg-surface shadow-sm sticky top-0 z-50 flex items-center px-container-margin h-tap-target">
+  <h1 class="font-headline-md text-headline-md font-bold text-primary">Account</h1>
+</header>
+
+<main class="flex-1 max-w-2xl w-full mx-auto p-container-margin space-y-lg">
+  <section class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_12px_rgba(0,0,0,0.04)] flex items-center gap-md">
+    <div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container flex-shrink-0">
+      <span class="material-symbols-outlined text-[28px]">person</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-sm">
+        <h2 class="font-headline-sm text-headline-sm truncate" id="nameDisplay">—</h2>
+        <button class="text-on-surface-variant" id="editNameBtn"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+      </div>
+      <p class="font-body-sm text-body-sm text-on-surface-variant" id="phoneDisplay"></p>
+    </div>
+  </section>
+
+  <form class="hidden bg-surface-container-lowest rounded-xl p-md shadow-[0px_4px_12px_rgba(0,0,0,0.04)] flex gap-sm" id="nameForm">
+    <input class="flex-1 border border-outline-variant rounded-lg px-md py-sm" id="nameInput" placeholder="Your name" type="text"/>
+    <button class="px-md py-sm bg-primary text-on-primary rounded-lg font-label-lg text-label-lg" type="submit">Save</button>
+  </form>
+
+  <section class="space-y-sm">
+    <div class="flex justify-between items-center">
+      <h2 class="font-headline-sm text-headline-sm">Saved Addresses</h2>
+      <button class="text-primary font-label-lg text-label-lg flex items-center gap-xs" id="addAddressBtn">
+        <span class="material-symbols-outlined text-[18px]">add</span> Add New
+      </button>
+    </div>
+    <div id="addressList" class="space-y-sm"></div>
+    <p class="text-on-surface-variant font-body-sm text-body-sm hidden" id="noAddressMsg">No saved addresses yet.</p>
+  </section>
+
+  <button class="w-full py-sm border border-error text-error rounded-lg font-label-lg text-label-lg" id="logoutBtn">Log Out</button>
+</main>
+
+<!-- Add Address Modal -->
+<div class="fixed inset-0 bg-black/40 hidden items-start justify-center p-container-margin overflow-y-auto z-50" id="addressModalBackdrop">
+  <div class="bg-surface-container-lowest rounded-xl max-w-md w-full p-lg mt-xl">
+    <h3 class="font-headline-sm text-headline-sm mb-md">Add Address</h3>
+    <form class="space-y-sm" id="addressForm">
+      <input class="w-full border border-outline-variant rounded-lg px-md py-sm" name="label" placeholder="Label (e.g. Home, Work)" type="text"/>
+      <input class="w-full border border-outline-variant rounded-lg px-md py-sm" name="line1" placeholder="House / Flat, Street" required="" type="text"/>
+      <input class="w-full border border-outline-variant rounded-lg px-md py-sm" name="line2" placeholder="Landmark (optional)" type="text"/>
+      <input class="w-full border border-outline-variant rounded-lg px-md py-sm" name="city" placeholder="City" required="" type="text"/>
+      <input class="w-full border border-outline-variant rounded-lg px-md py-sm" name="state" placeholder="State" required="" type="text"/>
+      <input class="w-full border border-outline-variant rounded-lg px-md py-sm" name="pincode" placeholder="Pincode" required="" type="text"/>
+      <div class="flex gap-sm mt-md">
+        <button class="flex-1 py-sm border border-outline-variant rounded-lg" id="cancelAddressBtn" type="button">Cancel</button>
+        <button class="flex-1 py-sm bg-primary text-on-primary rounded-lg" type="submit">Save Address</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface border-t border-outline-variant shadow-[0px_-4px_12px_rgba(0,0,0,0.04)]">
+  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="home.html">
+    <span class="material-symbols-outlined">home</span>
+    <span class="font-label-lg text-label-lg text-[10px]">Home</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 relative" href="cart.html">
+    <span class="material-symbols-outlined">shopping_cart</span>
+    <span class="font-label-lg text-label-lg text-[10px]">Cart</span>
+    <span class="hidden absolute top-0 right-1 bg-error text-on-error text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center" id="cartBadge"></span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1" href="orders.html">
+    <span class="material-symbols-outlined">receipt_long</span>
+    <span class="font-label-lg text-label-lg text-[10px]">Orders</span>
+  </a>
+  <a class="flex flex-col items-center justify-center bg-primary-container text-white rounded-full px-4 py-1" href="account.html">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+    <span class="font-label-lg text-label-lg text-[10px]">Account</span>
+  </a>
+</nav>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/account.js"></script>
+</body>
+</html>

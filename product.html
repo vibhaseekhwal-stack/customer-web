@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Product - CD Shopping Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+  body { font-family: 'Karla', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen pb-28">
+<header class="bg-surface shadow-sm sticky top-0 z-50 flex items-center px-container-margin h-tap-target">
+  <button class="w-tap-target h-tap-target -ml-sm flex items-center justify-center" onclick="history.back()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </button>
+  <h1 class="font-headline-sm text-headline-sm font-bold text-primary">Product</h1>
+</header>
+
+<main class="max-w-2xl mx-auto p-container-margin" id="productContent">
+  <div class="text-center text-on-surface-variant py-xl">Loading…</div>
+</main>
+
+<div class="fixed bottom-0 w-full bg-surface border-t border-outline-variant p-container-margin hidden" id="actionBar">
+  <div class="max-w-2xl mx-auto flex items-center gap-md">
+    <div class="flex items-center border border-primary rounded-lg overflow-hidden">
+      <button class="w-11 h-11 flex items-center justify-center text-primary" id="decrementBtn"><span class="material-symbols-outlined">remove</span></button>
+      <span class="w-8 text-center font-label-lg text-label-lg" id="quantityDisplay">1</span>
+      <button class="w-11 h-11 flex items-center justify-center text-primary" id="incrementBtn"><span class="material-symbols-outlined">add</span></button>
+    </div>
+    <button class="flex-1 h-tap-target bg-primary text-on-primary rounded-lg font-label-lg text-label-lg" id="addToCartBtn">Add to Cart</button>
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/product.js"></script>
+</body>
+</html>

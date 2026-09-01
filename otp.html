@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Verify OTP - CD Shopping Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="js/tailwind-config.js"></script>
+<style>
+  body { font-family: 'Karla', sans-serif; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+</style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center px-container-margin">
+  <div class="w-full max-w-sm">
+    <button class="flex items-center gap-xs text-on-surface-variant font-label-lg text-label-lg mb-md" id="backBtn" type="button">
+      <span class="material-symbols-outlined text-[18px]">arrow_back</span> Change number
+    </button>
+
+    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.04)] p-lg">
+      <h2 class="font-headline-sm text-headline-sm mb-xs">Enter the code</h2>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">Sent to <span id="phoneDisplay" class="font-semibold text-on-surface"></span></p>
+
+      <div id="devHint" class="hidden bg-primary-container/10 border border-primary text-primary text-body-sm rounded-lg p-sm mb-md"></div>
+      <div id="errorBox" class="hidden bg-error-container text-on-error-container text-body-sm rounded-lg p-sm mb-md"></div>
+
+      <form id="otpForm">
+        <input class="w-full text-center tracking-[0.5em] text-2xl font-bold px-md py-sm border border-outline-variant rounded-lg mb-md outline-none focus:border-primary" id="code" inputmode="numeric" maxlength="6" placeholder="------" required type="text"/>
+        <button class="w-full h-tap-target bg-primary text-on-primary rounded-lg font-label-lg text-label-lg" id="verifyBtn" type="submit">Verify &amp; Continue</button>
+      </form>
+
+      <button class="w-full text-center font-label-lg text-label-lg text-primary mt-md disabled:text-on-surface-variant" disabled="" id="resendBtn" type="button">Resend OTP (<span id="resendTimer">30</span>s)</button>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/otp.js"></script>
+</body>
+</html>
