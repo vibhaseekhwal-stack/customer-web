@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import {
   requestOtp,
   PENDING_PHONE_KEY,
@@ -13,20 +14,24 @@ function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault()
 
     setError('')
 
-    const cleanPhone = phone.replace(/\D/g, '')
+    const cleanPhone = phone.trim()
 
-    if (cleanPhone.length !== 10) {
-      setError('Please enter a valid 10-digit mobile number.')
+    // Validate Indian mobile number
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      setError('Enter a valid 10-digit mobile number.')
       return
     }
 
+    setLoading(true)
+
     try {
-      setLoading(true)
+      // Request OTP from backend
+      const data = await requestOtp(cleanPhone)
 
       // Save phone for OTP page
       localStorage.setItem(
@@ -34,106 +39,89 @@ function Login() {
         cleanPhone
       )
 
-      /*
-       * Try backend OTP
-       */
-      const result = await requestOtp(cleanPhone)
-
-      // If backend returns a development OTP
-      if (result?.otp) {
-        localStorage.setItem(
+      // Save development OTP if backend provides it
+      if (data?.devOnlyOtp) {
+        sessionStorage.setItem(
           DEV_OTP_KEY,
-          String(result.otp)
+          String(data.devOnlyOtp)
         )
       }
 
+      // Go to OTP page
       navigate('/otp')
+
     } catch (err) {
       console.error('OTP error:', err)
 
-      /*
-       * Development fallback
-       * Backend unavailable hone par dummy OTP use hoga
-       */
-      localStorage.setItem(
-        DEV_OTP_KEY,
-        '1234'
+      setError(
+        err?.message || 'Could not send OTP'
       )
-
-      navigate('/otp')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="min-h-screen bg-background px-4 py-8 flex items-center justify-center">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-[384px]">
 
-        {/* Logo */}
+        {/* Brand */}
         <div className="mb-8 text-center">
-
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
-            <span className="text-3xl">
-              🥬
-            </span>
-          </div>
-
-          <h1 className="font-display text-3xl font-bold text-primary">
-            VegGo
+          <h1 className="font-display text-[24px] font-bold leading-[30px] text-primary">
+            CD Shopping Hub
           </h1>
 
-          <p className="mt-1 text-sm text-ink-soft">
-            Fresh groceries, delivered to your door
+          <p className="mt-1 text-body-sm text-on-surface-variant">
+            Fresh groceries, delivered from your neighbourhood shop.
           </p>
-
         </div>
 
-        {/* Card */}
-        <div className="rounded-xl bg-white p-6 shadow-md sm:p-8">
+        {/* Login Card */}
+        <div className="rounded-xl bg-surface-container-lowest p-6 shadow-sm sm:p-8">
 
-          <h2 className="font-display text-2xl font-bold text-ink">
-            Welcome back!
+          <h2 className="font-display text-headline-sm font-bold text-ink">
+            Log in with your phone
           </h2>
 
-          <p className="mt-2 text-sm text-ink-soft">
-            Enter your mobile number to continue
+          <p className="mt-1 text-body-sm text-ink-soft">
+            We'll send you a one-time code to verify.
           </p>
 
           <form
             onSubmit={handleSubmit}
-            className="mt-6"
+            className="mt-5"
           >
 
-            {/* Phone */}
+            {/* Mobile Number */}
             <label
               htmlFor="phone"
-              className="mb-2 block text-sm font-semibold text-ink"
+              className="mb-2 block text-label-lg text-ink"
             >
               Mobile Number
             </label>
 
             <div
-              className={`flex overflow-hidden rounded-lg border ${
+              className={`flex h-12 overflow-hidden rounded-lg border ${
                 error
                   ? 'border-error'
                   : 'border-outline-variant focus-within:border-primary'
               }`}
             >
-
-              <div className="flex items-center border-r border-outline-variant bg-surface px-3 text-sm font-semibold text-ink">
+              <div className="flex w-[58px] shrink-0 items-center justify-center border-r border-outline-variant bg-surface-container-low text-body-sm text-on-surface-variant">
                 +91
               </div>
 
               <input
                 id="phone"
+                name="phone"
                 type="tel"
                 inputMode="numeric"
+                autoComplete="tel"
                 maxLength={10}
                 value={phone}
-                onChange={(e) => {
-                  const value = e.target.value.replace(
+                onChange={(event) => {
+                  const value = event.target.value.replace(
                     /\D/g,
                     ''
                   )
@@ -141,53 +129,46 @@ function Login() {
                   setPhone(value)
                   setError('')
                 }}
-                placeholder="Enter mobile number"
-                className="w-full bg-white px-4 py-3 text-ink outline-none placeholder:text-ink-soft"
+                placeholder="98765 43210"
+                className="w-full bg-white px-4 text-body-sm text-ink outline-none placeholder:text-ink-soft"
               />
-
             </div>
 
             {/* Error */}
             {error && (
-              <p className="mt-2 text-sm text-error">
+              <p className="mt-2 text-body-sm text-error">
                 {error}
               </p>
             )}
 
-            {/* Button */}
+            {/* Send OTP */}
             <button
               type="submit"
               disabled={loading}
-              className="mt-6 w-full rounded-lg bg-primary px-4 py-3 font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-5 h-12 w-full rounded-lg bg-primary font-body text-label-lg text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading
-                ? 'Sending OTP...'
-                : 'Send OTP'}
+              {loading ? 'Sending…' : 'Send OTP'}
             </button>
 
           </form>
 
-          {/* Dummy OTP */}
-          <div className="mt-5 rounded-lg bg-orange-50 p-3 text-center">
-            <p className="text-xs text-ink-soft">
-              Development OTP
-            </p>
-
-            <p className="mt-1 font-display text-lg font-bold text-accent">
-              1234
-            </p>
-          </div>
-
+          {/* Terms */}
           <p className="mt-6 text-center text-xs leading-5 text-ink-soft">
-            By continuing, you agree to our Terms &
-            Conditions and Privacy Policy.
+            By continuing, you agree to our{' '}
+            <span className="font-semibold text-primary">
+              Terms & Conditions
+            </span>{' '}
+            and{' '}
+            <span className="font-semibold text-primary">
+              Privacy Policy
+            </span>
+            .
           </p>
 
         </div>
-
       </div>
 
-    </div>
+    </main>
   )
 }
 
