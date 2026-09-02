@@ -1,45 +1,13 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Login - CD Shopping Hub</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Karla:wght@400;600;700&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script src="js/tailwind-config.js"></script>
-<style>
-  body { font-family: 'Karla', sans-serif; }
-  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-</style>
-</head>
-<body class="bg-surface text-on-surface min-h-screen flex items-center justify-center px-container-margin">
-  <div class="w-full max-w-sm">
-    <div class="flex flex-col items-center mb-xl text-center">
-      <span class="material-symbols-outlined text-primary text-[48px] mb-sm">storefront</span>
-      <h1 class="font-headline-md text-headline-md font-bold text-primary">CD Shopping Hub</h1>
-      <p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Fresh groceries, delivered from your neighbourhood shop.</p>
-    </div>
-
-    <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.04)] p-lg">
-      <h2 class="font-headline-sm text-headline-sm mb-xs">Log in with your phone</h2>
-      <p class="font-body-sm text-body-sm text-on-surface-variant mb-md">We'll send you a one-time code to verify.</p>
-
-      <div id="errorBox" class="hidden bg-error-container text-on-error-container text-body-sm rounded-lg p-sm mb-md"></div>
-
-      <form id="loginForm">
-        <label class="font-label-lg text-label-lg text-on-surface-variant block mb-xs" for="phone">Mobile Number</label>
-        <div class="flex items-center border border-outline-variant rounded-lg overflow-hidden mb-md focus-within:border-primary">
-          <span class="px-md py-sm bg-surface-container text-on-surface-variant font-body-md text-body-md border-r border-outline-variant">+91</span>
-          <input class="flex-1 px-md py-sm font-body-md text-body-md outline-none bg-transparent" id="phone" inputmode="numeric" maxlength="10" pattern="[6-9][0-9]{9}" placeholder="98765 43210" required type="text"/>
-        </div>
-        <button class="w-full h-tap-target bg-primary text-on-primary rounded-lg font-label-lg text-label-lg" id="sendOtpBtn" type="submit">Send OTP</button>
-      </form>
-    </div>
-  </div>
-
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/login.js"></script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>CD Shopping Hub</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

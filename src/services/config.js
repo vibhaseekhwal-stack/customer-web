@@ -1,2 +1,2 @@
 // Change this when the backend is deployed somewhere other than localhost.
-const API_BASE_URL = 'https://api.cdshoppinghub.com';
+export const API_BASE_URL = 'https://2np24kf8-3000.inc1.devtunnels.ms';
