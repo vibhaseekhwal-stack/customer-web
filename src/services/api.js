@@ -267,7 +267,7 @@ export async function cancelOrder(orderId) {
 
 export async function startOrderPayment(orderId) {
   return apiFetch(
-    `/orders/${orderId}/pay`,
+    `/payments/${orderId}/initiate`,
     {
       method: 'POST',
     }
