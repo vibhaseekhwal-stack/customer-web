@@ -23,7 +23,7 @@ function PersonalCare() {
       id: 201,
       name: 'Dove Hair Fall Rescue Shampoo',
       category: 'Hair Care',
-      imageUrl: 'https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://i5.walmartimages.com/asr/2a489592-433b-4c94-b84e-5795b8f86b9a.72465c004236bea9ec74e2efa1296c11.jpeg',
       badge: 'Bestseller',
       rating: 4.8,
       variants: [
@@ -35,7 +35,7 @@ function PersonalCare() {
       id: 202,
       name: 'L-Oreal Paris Total Repair 5 Shampoo',
       category: 'Hair Care',
-      imageUrl: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://images.apollo247.in/pub/media/catalog/product/l/o/lor0267_1_.jpg',
       badge: 'Popular',
       rating: 4.7,
       variants: [
@@ -46,7 +46,7 @@ function PersonalCare() {
       id: 203,
       name: 'Ponds Super Light Gel Moisturizer',
       category: 'Skin Care',
-      imageUrl: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://newassets.apollo247.com/pub/media/catalog/product/p/o/pon0263_2.jpg',
       badge: 'Top Rated',
       rating: 4.9,
       variants: [
@@ -58,7 +58,7 @@ function PersonalCare() {
       id: 204,
       name: 'Mamaearth Ubtan Face Wash with Turmeric',
       category: 'Skin Care',
-      imageUrl: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://sugari.lk/cdn/shop/files/mamaearthubtanfw.jpg?v=1694083536&width=1445',
       badge: 'Natural',
       rating: 4.6,
       variants: [
@@ -69,7 +69,7 @@ function PersonalCare() {
       id: 205,
       name: 'Colgate MaxFresh Red Gel Toothpaste',
       category: 'Oral Care',
-      imageUrl: 'https://images.unsplash.com/photo-1559563458-527698bf5295?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://cdn.osudpotro.com/medicine/COLGATE-MAXFRESH-80-GM-1611640226741.webp',
       badge: 'Essential',
       rating: 4.8,
       variants: [
@@ -80,7 +80,7 @@ function PersonalCare() {
       id: 206,
       name: 'Sensodyne Fresh Gel Toothpaste',
       category: 'Oral Care',
-      imageUrl: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://cdn.dmart.in/images/products/SEP140000713xx0SEP25vvG150g_7_B.jpg',
       badge: 'Recommended',
       rating: 4.9,
       variants: [
@@ -91,7 +91,7 @@ function PersonalCare() {
       id: 207,
       name: 'Nivea Fresh Powerfruit Deodorant Roll On',
       category: 'Bath & Body',
-      imageUrl: 'https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://ecombe.nahdionline.com/media/catalog/product/1/0/100907363_a9eb0b8d03ad022aa_39645.png',
       badge: 'Fresh',
       rating: 4.7,
       variants: [
@@ -102,7 +102,7 @@ function PersonalCare() {
       id: 208,
       name: 'Lux Velvet Glow Soap Bar Pack of 4',
       category: 'Bath & Body',
-      imageUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://www.bbassets.com/media/uploads/p/xl/40285702_1-lux-velvet-glow-soap-with-jasmine-vitamin-e.jpg',
       badge: 'Value Pack',
       rating: 4.6,
       variants: [
@@ -113,7 +113,7 @@ function PersonalCare() {
       id: 209,
       name: 'Gillette Mach3 Sensitive Razor Blade',
       category: 'Shaving & Grooming',
-      imageUrl: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://images.migrosone.com/macrocenter/product/34151312/34151312-e66bf1-1650x1650.jpg',
       badge: 'Smooth',
       rating: 4.9,
       variants: [
@@ -124,7 +124,7 @@ function PersonalCare() {
       id: 210,
       name: 'Beardo Activated Charcoal Peel Off Mask',
       category: 'Shaving & Grooming',
-      imageUrl: 'https://images.unsplash.com/photo-1567306226416-28f0efdc884f?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://cdn.shopify.com/s/files/1/1857/6931/products/mnIikp0kny.jpg?v=1627007858',
       badge: 'Grooming',
       rating: 4.5,
       variants: [

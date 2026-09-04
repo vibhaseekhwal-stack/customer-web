@@ -23,7 +23,7 @@ function Staples() {
       id: 101,
       name: 'Aashirvaad Superior MP Sharbati Atta',
       category: 'Atta & Flour',
-      imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://dukaan.b-cdn.net/700x700/webp/media/48d9b697-ab5b-4edd-b649-844177ce1fd7.jpeg',
       badge: 'Bestseller',
       rating: 4.8,
       variants: [
@@ -35,7 +35,7 @@ function Staples() {
       id: 102,
       name: 'Fortune Suvidha Multigrain Atta',
       category: 'Atta & Flour',
-      imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://www.fortunefoods.com/wp-content/uploads/2026/07/Chakki-Fresh-Multigrain-Atta-5kg_FOP_ff-copy-1-scaled.webp',
       badge: 'Healthy',
       rating: 4.6,
       variants: [
@@ -46,7 +46,7 @@ function Staples() {
       id: 103,
       name: 'Fortune Sunite Refined Sunflower Oil',
       category: 'Oils & Ghee',
-      imageUrl: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://dms.mydukaan.io/original/jpeg/media/7ff4e06f-099e-4a70-9979-a42ac8c5feaa.png',
       badge: 'Best Value',
       rating: 4.7,
       variants: [
@@ -58,7 +58,7 @@ function Staples() {
       id: 104,
       name: 'Amul Pure Cow Ghee Glass Jar',
       category: 'Oils & Ghee',
-      imageUrl: 'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://www.fairmartonline.co.uk/cdn/shop/files/Amul_Cow_Ghee_Jar_200ml.webp?crop=center&height=1200&v=1760031720&width=1200',
       badge: 'Premium',
       rating: 4.9,
       variants: [
@@ -70,7 +70,7 @@ function Staples() {
       id: 105,
       name: 'Organic Premium Unpolished Toor Dal',
       category: 'Dals & Pulses',
-      imageUrl: 'https://images.unsplash.com/photo-1585670149967-b4f4da88cc9f?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://garudalife.in/cache/original/product/81382/GRBCA326SFS0e.webp',
       badge: 'Organic',
       rating: 4.6,
       variants: [
@@ -81,7 +81,7 @@ function Staples() {
       id: 106,
       name: 'Tata Sampann Unpolished Moong Dal',
       category: 'Dals & Pulses',
-      imageUrl: 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://instamart-media-assets.swiggy.com/swiggy/image/upload/fl_lossy%2Cf_auto%2Cq_auto%2Ch_600/NI_CATALOG/IMAGES/ciw/2025/12/16/819bf1d2-ad38-47b2-a51f-9da6f3fc5ed8_CWJRBA8SCS_MN_15122025.png',
       badge: 'High Protein',
       rating: 4.7,
       variants: [
@@ -92,7 +92,7 @@ function Staples() {
       id: 107,
       name: 'Daawat Rozana Super Basmati Rice',
       category: 'Rice & Poha',
-      imageUrl: 'https://images.unsplash.com/photo-1586201375676-b0079dc17f84?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://www.mustore.mv/web/image/product.template/2139/image_1024?unique=0edb0e0',
       badge: 'Top Rated',
       rating: 4.8,
       variants: [
@@ -104,7 +104,7 @@ function Staples() {
       id: 108,
       name: 'Indore Thick Poha Flaked Rice',
       category: 'Rice & Poha',
-      imageUrl: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://instamart-media-assets.swiggy.com/swiggy/image/upload/fl_lossy%2Cf_auto%2Cq_auto/NI_CATALOG/IMAGES/ciw/2025/12/16/d66ce009-a32c-451e-a2b1-ad327a02029b_3WDJPQ4N8K_MN_16122025.png',
       badge: 'Fresh',
       rating: 4.7,
       variants: [
@@ -115,7 +115,7 @@ function Staples() {
       id: 109,
       name: 'Tata Salt Iodized Vacuum Evaporated',
       category: 'Salt & Sugar',
-      imageUrl: 'https://images.unsplash.com/photo-1518115456355-6b6f799276ac?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://i5.walmartimages.com/seo/Tata-Salt-1-kg-1000-grams-pack-35-27-oz-India-Vacuum-evaporated-iodised-salt-Vegetarian_1adaeb8b-12df-4a5a-a2dd-44ee836fd5d4.0370de4e2add5e7714333e86c586edc9.jpeg',
       badge: 'Essential',
       rating: 4.9,
       variants: [
@@ -126,7 +126,7 @@ function Staples() {
       id: 110,
       name: 'Madhur Pure Sulphurless Sugar',
       category: 'Salt & Sugar',
-      imageUrl: 'https://images.unsplash.com/photo-1581441363689-1f3c3c34c0e5?auto=format&fit=crop&q=80&w=500',
+      imageUrl: 'https://cdn.grofers.com/cdn-cgi/image/f%3Dauto%2Cfit%3Dscale-down%2Cq%3D70%2Cmetadata%3Dnone%2Cw%3D1080/da/cms-assets/cms/product/39accb8f-7237-42dd-bdce-5ac2d168824e.png?bg_token=color.background.quaternary',
       badge: 'Pure',
       rating: 4.7,
       variants: [
