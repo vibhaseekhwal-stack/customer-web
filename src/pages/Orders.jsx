@@ -11,6 +11,8 @@ const STATUS_LABELS = {
   CONFIRMED: 'Confirmed',
   PACKED: 'Packed',
   READY: 'Ready',
+  OUT_FOR_DELIVERY: 'Out for Delivery',
+  DELIVERED: 'Delivered',
   COMPLETED: 'Completed',
   CANCELLED: 'Cancelled',
 }
@@ -23,6 +25,7 @@ function Orders() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [reorderingId, setReorderingId] = useState(null)
+  const [activeTab, setActiveTab] = useState('ACTIVE')
 
   useEffect(() => {
     loadOrders()
@@ -48,23 +51,31 @@ function Orders() {
   }
 
   function getStatusClasses(status) {
-    if (status === 'PENDING_PAYMENT') {
+    if (status === 'PENDING_PAYMENT' || status === 'CANCELLED') {
       return 'bg-red-100 text-red-700'
     }
-
+    if (status === 'OUT_FOR_DELIVERY' || status === 'READY') {
+      return 'bg-orange-100 text-orange-700'
+    }
     if (
       status === 'CONFIRMED' ||
-      status === 'PACKED'
+      status === 'PACKED' ||
+      status === 'DELIVERED' ||
+      status === 'COMPLETED'
     ) {
       return 'bg-green-100 text-green-700'
     }
-
-    if (status === 'READY') {
-      return 'bg-orange-100 text-orange-700'
-    }
-
     return 'bg-gray-100 text-gray-600'
   }
+
+  function isOrderActive(status) {
+    return !['DELIVERED', 'COMPLETED', 'CANCELLED'].includes(status)
+  }
+
+  const filteredOrders = orders.filter((order) => {
+    const active = isOrderActive(order.status)
+    return activeTab === 'ACTIVE' ? active : !active
+  })
 
   async function handleReorder(order) {
     setReorderingId(order.id)
@@ -78,7 +89,6 @@ function Orders() {
           item.variantId,
           item.quantity
         )
-
         succeeded += 1
       } catch {
         failed.push(item.productName)
@@ -108,9 +118,7 @@ function Orders() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f8f4]">
-        <p className="text-gray-500">
-          Loading orders...
-        </p>
+        <p className="text-gray-500">Loading orders...</p>
       </div>
     )
   }
@@ -119,10 +127,7 @@ function Orders() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f8f4] px-4">
         <div className="text-center">
-          <p className="mb-4 text-red-500">
-            {error}
-          </p>
-
+          <p className="mb-4 text-red-500">{error}</p>
           <button
             onClick={loadOrders}
             className="rounded-lg bg-green-700 px-5 py-2 font-semibold text-white"
@@ -136,114 +141,159 @@ function Orders() {
 
   return (
     <div className="min-h-screen bg-[#f7f8f4] pb-24">
-      <header className="sticky top-0 z-50 flex h-14 items-center bg-[#faf9f5] px-4 shadow-sm">
-        <h1 className="font-display text-xl font-bold text-green-700">
-          Order History
-        </h1>
+      <header className="sticky top-0 z-50 bg-[#faf9f5] px-4 shadow-sm">
+        <div className="flex h-14 items-center">
+          <h1 className="font-display text-xl font-bold text-green-700">
+            Order History
+          </h1>
+        </div>
+
+        {/* Tabs: Active / Past */}
+        <div className="flex border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('ACTIVE')}
+            className={`flex-1 pb-3 text-center font-semibold transition relative ${
+              activeTab === 'ACTIVE' ? 'text-green-800' : 'text-gray-400'
+            }`}
+          >
+            Active
+            {activeTab === 'ACTIVE' && (
+              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-green-800 rounded-t-full" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('PAST')}
+            className={`flex-1 pb-3 text-center font-semibold transition relative ${
+              activeTab === 'PAST' ? 'text-green-800' : 'text-gray-400'
+            }`}
+          >
+            Past
+            {activeTab === 'PAST' && (
+              <div className="absolute bottom-0 left-0 right-0 h-[3px] bg-green-800 rounded-t-full" />
+            )}
+          </button>
+        </div>
       </header>
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-4 px-4 py-6">
-        {orders.length === 0 ? (
+        {filteredOrders.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center py-20 text-center">
             <span className="material-symbols-outlined text-[48px] text-gray-400">
               receipt_long
             </span>
-
             <p className="mt-2 text-sm text-gray-500">
-              No orders yet.
+              No {activeTab.toLowerCase()} orders found.
             </p>
-
-            <button
-              onClick={() => navigate('/')}
-              className="mt-4 rounded-lg bg-green-700 px-6 py-3 font-semibold text-white transition hover:bg-green-800"
-            >
-              Start Shopping
-            </button>
+            {activeTab === 'ACTIVE' && (
+              <button
+                onClick={() => navigate('/')}
+                className="mt-4 rounded-lg bg-green-700 px-6 py-3 font-semibold text-white transition hover:bg-green-800"
+              >
+                Start Shopping
+              </button>
+            )}
           </div>
         ) : (
-          orders.map((order) => {
-            const itemCount = (order.items || []).reduce(
-              (sum, item) =>
-                sum + Number(item.quantity || 0),
-              0
-            )
-
-            const itemsSummary = (order.items || [])
-              .map((item) => item.productName)
-              .join(', ')
-
-            const isReordering =
-              reorderingId === order.id
+          filteredOrders.map((order) => {
+            const isReordering = reorderingId === order.id
+            const items = order.items || []
+            const maxVisibleThumbnails = 3
+            const visibleItems = items.slice(0, maxVisibleThumbnails)
+            const extraCount = items.length - maxVisibleThumbnails
 
             return (
               <article
                 key={order.id}
-                className="space-y-3 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]"
+                className="space-y-4 rounded-2xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]"
               >
+                {/* Top Row: Order ID & Price / Status */}
                 <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
+                  <div>
                     <h3 className="font-display text-lg font-bold text-gray-900">
-                      Order #{order.orderNumber}
+                      #{order.orderNumber}
                     </h3>
-
                     <p className="text-sm text-gray-500">
-                      {new Date(
-                        order.createdAt
-                      ).toLocaleDateString('en-IN', {
+                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
                         day: 'numeric',
                         month: 'short',
-                        year: 'numeric',
+                      })}
+                      , {new Date(order.createdAt).toLocaleTimeString('en-IN', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true,
                       })}
                     </p>
                   </div>
 
-                  <span
-                    className={`shrink-0 rounded-full px-2 py-1 text-[11px] font-bold ${getStatusClasses(
-                      order.status
-                    )}`}
-                  >
-                    {STATUS_LABELS[order.status] ||
-                      order.status}
-                  </span>
+                  <div className="text-right">
+                    <span className="font-display text-lg font-bold text-gray-900">
+                      ₹{Number(order.total).toFixed(0)}
+                    </span>
+                    <div className="mt-1">
+                      <span
+                        className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-bold ${getStatusClasses(
+                          order.status
+                        )}`}
+                      >
+                        {STATUS_LABELS[order.status] || order.status}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <p className="text-sm text-gray-500">
-                  {itemCount} item
-                  {itemCount === 1 ? '' : 's'} ·{' '}
-                  {itemsSummary}
-                </p>
-
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                  <span className="font-display text-xl font-bold text-green-700">
-                    ₹{Number(order.total).toFixed(2)}
-                  </span>
-
-                  <div className="flex gap-2">
-                    {order.status !== 'CANCELLED' && (
-                      <button
-                        disabled={isReordering}
-                        onClick={() =>
-                          handleReorder(order)
-                        }
-                        className="rounded-lg border border-green-700 px-3 py-1.5 text-xs font-bold text-green-700 transition hover:bg-green-50 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {isReordering
-                          ? 'Adding...'
-                          : 'Reorder'}
-                      </button>
-                    )}
-
-                    <button
-                      onClick={() =>
-                        navigate(
-                          `/order-detail?orderId=${order.id}`
-                        )
-                      }
-                      className="rounded-lg bg-green-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-green-800"
+                {/* Thumbnail Previews */}
+                <div className="flex items-center gap-2.5 overflow-x-auto pt-1 pb-1">
+                  {visibleItems.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gray-100 p-1 border border-gray-100 overflow-hidden"
                     >
-                      Track
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.productName}
+                          className="h-full w-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <span className="material-symbols-outlined text-gray-400 text-xl">
+                          inventory_2
+                        </span>
+                      )}
+                    </div>
+                  ))}
+
+                  {extraCount > 0 && (
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-sm font-bold text-gray-600 border border-gray-100">
+                      +{extraCount}
+                    </div>
+                  )}
+                </div>
+
+                <hr className="border-gray-100" />
+
+                {/* Bottom Actions Row */}
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    onClick={() =>
+                      navigate(`/order-detail?orderId=${order.id}`)
+                    }
+                    className="text-sm font-semibold text-green-700 hover:text-green-800"
+                  >
+                    Track Order
+                  </button>
+
+                  {order.status !== 'CANCELLED' && (
+                    <button
+                      disabled={isReordering}
+                      onClick={() => handleReorder(order)}
+                      className="flex items-center gap-1.5 rounded-xl bg-green-800 px-4 py-2 text-xs font-bold text-white transition hover:bg-green-900 disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-sm">
+                        refresh
+                      </span>
+                      {isReordering ? 'Adding...' : 'Reorder'}
                     </button>
-                  </div>
+                  )}
                 </div>
               </article>
             )
@@ -251,65 +301,7 @@ function Orders() {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 z-50 flex w-full items-center justify-around border-t border-gray-200 bg-[#faf9f5] px-4 py-2 shadow-[0px_-4px_12px_rgba(0,0,0,0.04)]">
-        <button
-          onClick={() => navigate('/')}
-          className="flex flex-col items-center justify-center px-4 py-1 text-gray-500"
-        >
-          <span className="material-symbols-outlined">
-            home
-          </span>
-
-          <span className="text-[10px]">
-            Home
-          </span>
-        </button>
-
-        <button
-          onClick={() => navigate('/cart')}
-          className="relative flex flex-col items-center justify-center px-4 py-1 text-gray-500"
-        >
-          <span className="material-symbols-outlined">
-            shopping_cart
-          </span>
-
-          <span className="text-[10px]">
-            Cart
-          </span>
-
-          {cartCount > 0 && (
-            <span className="absolute right-1 top-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-              {cartCount}
-            </span>
-          )}
-        </button>
-
-        <button
-          onClick={() => navigate('/orders')}
-          className="flex flex-col items-center justify-center rounded-full bg-green-700 px-4 py-1 text-white"
-        >
-          <span className="material-symbols-outlined">
-            receipt_long
-          </span>
-
-          <span className="text-[10px]">
-            Orders
-          </span>
-        </button>
-
-        <button
-          onClick={() => navigate('/account')}
-          className="flex flex-col items-center justify-center px-4 py-1 text-gray-500"
-        >
-          <span className="material-symbols-outlined">
-            person
-          </span>
-
-          <span className="text-[10px]">
-            Account
-          </span>
-        </button>
-      </nav>
+     
     </div>
   )
 }

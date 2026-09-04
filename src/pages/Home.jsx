@@ -1,349 +1,667 @@
-import React, { useEffect, useState } from 'react'
-import { getCategories, getProducts } from '../services/api'
+import React, { useEffect, useMemo, useState } from 'react'
+import {
+  getCategories,
+  getCategory,
+  getBrands,
+  getProducts,
+  getProduct,
+} from '../services/api'
+
+// Sample banner images for the automatic slider
+const HERO_BANNERS = [
+  {
+    image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1800&q=90',
+    badge: 'Fresh & Healthy',
+    title: 'Fresh Groceries\nDelivered to Your Door',
+    subtitle: 'Quality groceries, fresh fruits, vegetables and everyday essentials delivered right to your doorstep.',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?auto=format&fit=crop&w=1800&q=90',
+    badge: 'Super Savers',
+    title: 'Daily Staples\nat Lowest Prices',
+    subtitle: 'Stock up your pantry with high quality grains, pulses, oils, and kitchen necessities.',
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=1800&q=90',
+    badge: 'Organic & Pure',
+    title: 'Farm Fresh Organic\nFruits & Vegetables',
+    subtitle: 'Handpicked directly from local farmers to ensure maximum nutrition and taste.',
+  },
+]
+
+// Blinkit style dummy fallback grocery images pool featuring Amul milk / dairy imagery
+const DUMMY_PRODUCT_IMAGES = [
+  'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=600&q=80', // Amul / fresh milk packet vibe
+  'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=600&q=80', // Fresh milk glass / dairy vibe
+  'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=600&q=80', // Amul butter / dairy packet vibe
+  'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=600&q=80', // Sunflower Oil vibe
+  'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80', // Atta / Flour Bag vibe
+  'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=600&q=80', // Crystal Salt packet vibe
+]
+
+// Dummy categories matching your layout reference
+const DUMMY_CATEGORIES = [
+  { id: 'dc-1', name: 'Groceries', icon: '🛒' },
+  { id: 'dc-2', name: 'Fruits & Veg', icon: '🍎' },
+  { id: 'dc-3', name: 'Dairy', icon: '🥛' },
+  { id: 'dc-4', name: 'Snacks', icon: '🥐' },
+  { id: 'dc-5', name: 'Cold Drinks', icon: '🧃' },
+  { id: 'dc-6', name: 'Bakery', icon: '🍞' },
+]
+
+// Specific popular brand logo / image pool containing Amul, Mother Dairy style imagery and others
+const POPULAR_BRAND_IMAGES = [
+  'https://images.unsplash.com/photo-1628088062854-d1870b4553da?auto=format&fit=crop&w=600&q=80', // Amul-like Dairy/Butter vibe
+  'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=600&q=80', // Mother Dairy-like milk/fresh vibe
+  'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=600&q=80', // Nestle-like packaged food
+  'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=600&q=80', // Britannia-like biscuits/bakery
+  'https://images.unsplash.com/photo-1599488615731-7e5c2823ff26?auto=format&fit=crop&w=600&q=80', // Tata-like essentials
+  'https://images.unsplash.com/photo-1621939514649-280e2ee25f60?auto=format&fit=crop&w=600&q=80', // Haldiram-like snacks
+]
 
 function Home() {
   const [categories, setCategories] = useState([])
+  const [brands, setBrands] = useState([])
   const [products, setProducts] = useState([])
+
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [selectedProduct, setSelectedProduct] = useState(null)
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Hero Slider Active Index State
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Automatic Slider Effect (Left to Right)
   useEffect(() => {
-    const loadData = async () => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_BANNERS.length)
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [])
+
+  // HOME API CALLS
+  useEffect(() => {
+    const loadHomeData = async () => {
       try {
-        const [categoriesData, productsData] = await Promise.all([
+        setLoading(true)
+        setError('')
+
+        const [
+          categoriesData,
+          brandsData,
+          productsData,
+        ] = await Promise.all([
           getCategories(),
+          getBrands(),
           getProducts(),
         ])
 
-        // Same as old HTML/JS:
-        // categoriesCache = categories.filter((c) => c.isActive)
-        const activeCategories = (categoriesData || []).filter(
-          (category) => category.isActive
+        const categoryList = Array.isArray(categoriesData)
+          ? categoriesData
+          : categoriesData?.items || []
+
+        const brandList = Array.isArray(brandsData)
+          ? brandsData
+          : brandsData?.items || []
+
+        const productList = Array.isArray(productsData)
+          ? productsData
+          : productsData?.items || []
+
+        const activeCategories = categoryList.filter(
+          (category) => category?.isActive !== false
         )
 
-        // Old API response was:
-        // productResult.items
-        const productList = productsData?.items || productsData || []
+        const activeBrands = brandList.filter(
+          (brand) => brand?.isActive !== false
+        )
 
-        // Same as old HTML/JS:
-        // p.isActive && p.variants.some((v) => v.isActive)
         const activeProducts = productList.filter(
           (product) =>
-            product.isActive &&
-            product.variants?.some((variant) => variant.isActive)
+            product?.isActive !== false &&
+            product?.variants?.some(
+              (variant) => variant?.isActive !== false
+            )
         )
 
         setCategories(activeCategories)
+        setBrands(activeBrands)
         setProducts(activeProducts)
       } catch (err) {
         console.error('Home API error:', err)
-
-        setError(
-          err?.message || 'Unable to load products'
-        )
+        setError(err?.message || 'Unable to load home data')
       } finally {
         setLoading(false)
       }
     }
 
-    loadData()
+    loadHomeData()
   }, [])
+
+  // CATEGORY DETAIL API
+  const handleCategoryClick = async (category) => {
+    try {
+      if (category.id.startsWith('dc-')) {
+        setSelectedCategory(category)
+        return
+      }
+      const data = await getCategory(category.id)
+      setSelectedCategory(data)
+    } catch (err) {
+      console.error('Category detail API error:', err)
+    }
+  }
+
+  // PRODUCT DETAIL API
+  const handleProductClick = async (product) => {
+    try {
+      const data = await getProduct(product.id)
+      setSelectedProduct(data)
+    } catch (err) {
+      console.error('Product detail API error:', err)
+    }
+  }
+
+  // BEST DEALS
+  const bestDeals = useMemo(() => {
+    return [...products]
+      .sort((a, b) => {
+        const getDiscount = (product) => {
+          const variants =
+            product?.variants?.filter(
+              (variant) =>
+                variant?.isActive !== false
+            ) || []
+
+          if (!variants.length) return 0
+
+          const variant = variants.reduce(
+            (min, item) =>
+              Number(item.sellingPrice) <
+              Number(min.sellingPrice)
+                ? item
+                : min,
+            variants[0]
+          )
+
+          const mrp = Number(variant?.mrp || 0)
+          const selling = Number(
+            variant?.sellingPrice || 0
+          )
+
+          return mrp > selling
+            ? ((mrp - selling) / mrp) * 100
+            : 0
+        }
+
+        return getDiscount(b) - getDiscount(a)
+      })
+      .slice(0, 12)
+  }, [products])
+
+  const displayCategories = categories.length > 0 ? categories : DUMMY_CATEGORIES
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-paper">
-        <p className="text-body-sm text-ink-soft">
-          Loading…
-        </p>
+      <div className="flex min-h-screen items-center justify-center bg-[#f7faf7]">
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-[#dcefe2] border-t-[#16823b]" />
+          <p className="mt-4 text-sm font-semibold text-gray-500">
+            Loading fresh groceries...
+          </p>
+        </div>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-paper px-4">
-        <p className="text-center text-body-sm text-error">
-          {error}
-        </p>
+      <div className="flex min-h-screen items-center justify-center bg-[#f7faf7] px-5">
+        <div className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-xl font-bold text-red-500">
+            !
+          </div>
+          <h2 className="mt-4 text-lg font-black text-gray-900">
+            Something went wrong
+          </h2>
+          <p className="mt-2 text-sm text-gray-500">{error}</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-paper text-ink">
-      
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-surface-container-lowest shadow-sm">
-        <div className="mx-auto max-w-2xl">
+    <main className="min-h-screen overflow-x-hidden bg-[#f7faf7] pb-20 text-[#172019]">
 
-          <div className="flex h-12 items-center justify-between px-4">
-            <h1 className="font-display text-[20px] font-bold text-primary">
-              CD Shopping Hub
-            </h1>
-
-            <button
-              type="button"
-              className="flex h-9 w-9 items-center justify-center rounded-full text-ink-soft"
-            >
-              Logout
-            </button>
-          </div>
-
-          {/* Search */}
-          <div className="px-4 pb-2">
-            <div className="flex h-10 items-center rounded-full bg-surface-container px-4">
-              <input
-                type="text"
-                placeholder="Search for atta, rice, milk…"
-                className="w-full bg-transparent px-2 text-[14px] text-ink outline-none placeholder:text-ink-soft"
-              />
-            </div>
-          </div>
-
-          {/* Categories */}
-          <div className="flex gap-3 overflow-x-auto px-4 pb-3">
-            <button
-              type="button"
-              className="flex shrink-0 flex-col items-center"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e9f3ed] text-[12px] font-bold text-primary">
-                All
-              </div>
-
-              <span className="mt-1 text-[10px] font-bold text-primary">
-                All
-              </span>
-            </button>
-
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                className="flex w-16 shrink-0 flex-col items-center"
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container text-[11px] font-semibold text-ink-soft">
-                  {category.name?.slice(0, 2)}
+      {/* HERO CAROUSEL SLIDER */}
+      <section className="w-full pt-0">
+        <div className="relative w-full overflow-hidden bg-black shadow-md">
+          <div 
+            className="flex transition-transform duration-700 ease-out"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {HERO_BANNERS.map((banner, index) => (
+              <div key={index} className="relative min-w-full flex-shrink-0">
+                <img
+                  src={banner.image}
+                  alt="Fresh groceries banner"
+                  className="h-[340px] w-full object-cover sm:h-[420px] lg:h-[500px] filter brightness-95"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-black/20" />
+                <div className="absolute inset-0 flex items-center">
+                  <div className="mx-auto w-full max-w-[1400px] px-6 sm:px-10 lg:px-16">
+                    <div className="max-w-xl">
+                      <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/95 backdrop-blur-md px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-[#16823b] shadow-lg">
+                        <span className="h-2 w-2 rounded-full bg-[#16823b] animate-pulse" />
+                        {banner.badge}
+                      </div>
+                      <h1 className="max-w-lg whitespace-pre-line text-2xl font-black leading-[1.18] tracking-tight text-white sm:text-4xl lg:text-5xl drop-shadow-lg">
+                        {banner.title}
+                      </h1>
+                      <p className="mt-3.5 max-w-md text-xs leading-relaxed text-gray-200 sm:text-sm drop-shadow">
+                        {banner.subtitle}
+                      </p>
+                      <button
+                        type="button"
+                        className="mt-6 rounded-xl bg-[#16823b] px-7 py-3.5 text-xs font-extrabold text-white shadow-xl shadow-green-900/50 transition-all hover:bg-[#116d30] active:scale-95"
+                      >
+                        Shop Now →
+                      </button>
+                    </div>
+                  </div>
                 </div>
-
-                <span className="mt-1 line-clamp-2 text-center text-[10px] leading-tight text-ink-soft">
-                  {category.name}
-                </span>
-              </button>
+              </div>
             ))}
           </div>
 
+          <div className="absolute bottom-5 right-8 z-10 flex gap-2">
+            {HERO_BANNERS.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-2 transition-all rounded-full ${
+                  currentSlide === index ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/70'
+                }`}
+                aria-label={`Slide ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
-      </header>
+      </section>
 
-      {/* Main */}
-      <main className="w-full">
-        <div className="mx-auto max-w-2xl px-4 py-4">
+      {/* CATEGORIES - MATCHING BLINKIT REFERENCE DESIGN */}
+      <section className="mx-auto max-w-[1400px] px-3 pt-10 sm:px-5 lg:px-8">
+        <SectionHeading
+          title="Shop by Category"
+        />
 
-          {categories.map((category) => {
-            const categoryProducts = products.filter(
-              (product) =>
-                product.categoryId === category.id
-            )
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          {displayCategories.map((category, idx) => (
+            <CategoryCard
+              key={category.id || idx}
+              category={category}
+              fallbackImage={DUMMY_PRODUCT_IMAGES[idx % DUMMY_PRODUCT_IMAGES.length]}
+              onClick={() => handleCategoryClick(category)}
+            />
+          ))}
+        </div>
+      </section>
 
-            if (categoryProducts.length === 0) {
-              return null
-            }
+      {/* BRANDS - WITH AMUL & MOTHER DAIRY STYLED BRAND CARDS */}
+      {brands.length > 0 && (
+        <section className="mx-auto max-w-[1400px] px-3 pt-10 sm:px-5 lg:px-8">
+          <SectionHeading
+            title="Popular Brands"
+            subtitle="Explore your favorite trusted brands like Amul, Mother Dairy & more"
+          />
 
-            return (
-              <section
-                key={category.id}
-                className="mb-6"
-              >
-                {/* Section Header */}
-                <div className="mb-2 flex items-center justify-between">
-                  <h2 className="font-display text-[16px] font-bold text-ink">
-                    {category.name}
-                  </h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            {brands.slice(0, 12).map((brand, idx) => (
+              <BrandCard 
+                key={brand.id} 
+                brand={brand} 
+                fallbackImage={POPULAR_BRAND_IMAGES[idx % POPULAR_BRAND_IMAGES.length]} 
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
-                  {categoryProducts.length > 8 && (
-                    <button
-                      type="button"
-                      className="text-[12px] font-bold text-primary"
-                    >
-                      see all ›
-                    </button>
+      {/* BEST DEALS - MATCHING REFERENCE SS DESIGN */}
+      <section className="mx-auto max-w-[1400px] px-3 pt-10 sm:px-5 lg:px-8">
+        <SectionHeading
+          title="Best Deals"
+          action="View All"
+        />
+
+        {bestDeals.length > 0 ? (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4">
+            {bestDeals.map((product, idx) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                fallbackImage={DUMMY_PRODUCT_IMAGES[idx % DUMMY_PRODUCT_IMAGES.length]}
+                onClick={() => handleProductClick(product)}
+              />
+            ))}
+          </div>
+        ) : (
+          <EmptyState text="No products available" />
+        )}
+      </section>
+
+      {/* CATEGORY DETAIL MODAL */}
+      {selectedCategory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-5 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl duration-200">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#f4f8f4] text-2xl shadow-sm">
+                  {selectedCategory?.imageUrl ? (
+                    <img src={selectedCategory.imageUrl} alt="" className="h-full w-full object-cover rounded-2xl" />
+                  ) : (
+                    selectedCategory?.icon || '🛒'
                   )}
                 </div>
-
-                {/* Products */}
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {categoryProducts
-                    .slice(0, 8)
-                    .map((product) => (
-                      <ProductCard
-                        key={product.id}
-                        product={product}
-                      />
-                    ))}
+                <div>
+                  <h3 className="text-lg font-black text-gray-900">
+                    {selectedCategory.name}
+                  </h3>
+                  {selectedCategory.description && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      {selectedCategory.description}
+                    </p>
+                  )}
                 </div>
-              </section>
-            )
-          })}
-
-          {products.length === 0 && (
-            <p className="py-10 text-center text-body-sm text-ink-soft">
-              No products found.
-            </p>
-          )}
-
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedCategory(null)}
+                className="rounded-full bg-gray-100 p-2 text-gray-500 transition hover:bg-gray-200"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
         </div>
-      </main>
+      )}
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 z-50 w-full border-t border-outline-variant bg-surface-container-lowest shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
-        <div className="mx-auto flex max-w-2xl items-center justify-around px-4 py-2">
+      {/* PRODUCT DETAIL MODAL */}
+      {selectedProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-5 backdrop-blur-sm">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl duration-200">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex gap-4">
+                <img
+                  src={selectedProduct.imageUrl || DUMMY_PRODUCT_IMAGES[0]}
+                  alt={selectedProduct.name}
+                  className="h-20 w-20 rounded-2xl bg-gray-50 object-cover p-1 shadow-sm"
+                />
+                <div>
+                  <h3 className="text-lg font-black text-gray-900">
+                    {selectedProduct.name}
+                  </h3>
+                  {selectedProduct.description && (
+                    <p className="mt-2 text-xs leading-5 text-gray-500">
+                      {selectedProduct.description}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedProduct(null)}
+                className="rounded-full bg-gray-100 p-2 text-gray-500 transition hover:bg-gray-200"
+              >
+                ✕
+              </button>
+            </div>
 
-          <button
-            type="button"
-            className="rounded-full bg-primary-container px-4 py-1 text-white"
-          >
-            <span className="block text-[11px] font-bold">
-              Home
-            </span>
-          </button>
-
-          <button
-            type="button"
-            className="px-4 py-1 text-[11px] text-ink-soft"
-          >
-            Cart
-          </button>
-
-          <button
-            type="button"
-            className="px-4 py-1 text-[11px] text-ink-soft"
-          >
-            Orders
-          </button>
-
-          <button
-            type="button"
-            className="px-4 py-1 text-[11px] text-ink-soft"
-          >
-            Account
-          </button>
-
+            {selectedProduct.variants?.length > 0 && (
+              <div className="mt-6 space-y-2">
+                {selectedProduct.variants.map((variant) => (
+                  <div
+                    key={variant.id}
+                    className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-4 transition hover:bg-gray-100/50"
+                  >
+                    <div>
+                      <p className="text-xs font-extrabold text-gray-800">
+                        {variant.weight} {variant.unit}
+                      </p>
+                      <p className="mt-1 text-[10px] text-gray-400">
+                        {variant.sku}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-base font-black text-gray-900">
+                        ₹{Number(variant.sellingPrice || 0).toFixed(0)}
+                      </p>
+                      {variant.mrp && (
+                        <p className="text-[10px] text-gray-400 line-through">
+                          ₹{Number(variant.mrp).toFixed(0)}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </nav>
+      )}
 
+    </main>
+  )
+}
+
+// SECTION HEADING
+function SectionHeading({ title, subtitle, action }) {
+  return (
+    <div className="mb-5 flex items-end justify-between gap-3">
+      <div>
+        <h2 className="text-xl font-black tracking-tight text-[#172019] sm:text-2xl">
+          {title}
+        </h2>
+        {subtitle && (
+          <p className="mt-1 text-[10px] text-gray-400 sm:text-xs">
+            {subtitle}
+          </p>
+        )}
+      </div>
+      {action && (
+        <button
+          type="button"
+          className="shrink-0 text-xs font-bold text-[#16823b] transition hover:text-[#0f632c]"
+        >
+          {action}
+        </button>
+      )}
     </div>
   )
 }
 
-/* Product Card */
-function ProductCard({ product }) {
+// CATEGORY CARD
+function CategoryCard({ category, fallbackImage, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex flex-col items-center justify-between rounded-2xl border border-gray-100 bg-white p-6 text-center shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-md hover:-translate-y-0.5"
+    >
+      <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100/80 text-xl transition group-hover:bg-gray-200/60">
+        {category?.imageUrl ? (
+          <img src={category.imageUrl} alt={category?.name} className="h-7 w-7 object-contain" />
+        ) : (
+          category?.icon || '🛒'
+        )}
+      </div>
+      <span className="line-clamp-1 text-xs font-bold text-gray-800">
+        {category?.name}
+      </span>
+    </button>
+  )
+}
+
+// BRAND CARD - ATTRACTIVE CARD DISPLAYING BRAND LOGO OR AMUL/MOTHER DAIRY INSPIRED IMAGERY
+function BrandCard({ brand, fallbackImage }) {
+  const brandImage = brand?.imageUrl || fallbackImage
+
+  return (
+    <div className="group relative overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1.5 cursor-pointer flex flex-col justify-between">
+      {/* Optional Top Badge */}
+      <div className="absolute top-3 left-3 z-20">
+        <span className="inline-block text-[9px] font-black tracking-wider text-white px-2.5 py-1 rounded-full shadow-md bg-[#16823b]">
+          FEATURED
+        </span>
+      </div>
+
+      {/* Brand Image Container with Gradient Overlay */}
+      <div className="relative h-40 w-full overflow-hidden bg-gray-50">
+        <img
+          src={brandImage}
+          alt={brand?.name || 'Popular Brand'}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 filter brightness-95"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+        
+        {/* Text inside image banner overlay */}
+        <div className="absolute bottom-3 left-4 right-4">
+          <h3 className="text-sm font-black text-white tracking-wide drop-shadow-sm line-clamp-1">
+            {brand?.name || 'Trusted Brand'}
+          </h3>
+          <p className="text-[10px] font-medium text-gray-200 drop-shadow">
+            Quality Assured
+          </p>
+        </div>
+      </div>
+
+      {/* Card Footer / Action Button */}
+      <div className="p-3 bg-white flex items-center justify-between">
+        <span className="text-[10px] font-bold text-gray-400 group-hover:text-[#16823b] transition-colors">
+          Explore Store
+        </span>
+        <div className="h-6 w-6 rounded-full bg-[#f4f8f4] flex items-center justify-center text-[#16823b] font-bold text-xs group-hover:bg-[#16823b] group-hover:text-white transition-all">
+          →
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// PRODUCT CARD - EXACT BLINKIT REFERENCE SS STYLE
+function ProductCard({ product, fallbackImage, onClick }) {
   const activeVariants =
-    product.variants?.filter(
-      (variant) => variant.isActive
+    product?.variants?.filter(
+      (variant) => variant?.isActive !== false
     ) || []
 
-  if (activeVariants.length === 0) {
+  if (!activeVariants.length) {
     return null
   }
 
-  // Same as old code:
-  // cheapest active variant
   const cheapest = activeVariants.reduce(
     (min, variant) =>
-      Number(variant.sellingPrice) <
-      Number(min.sellingPrice)
+      Number(variant.sellingPrice) < Number(min.sellingPrice)
         ? variant
         : min,
     activeVariants[0]
   )
 
-  const hasDiscount =
-    Number(cheapest.mrp) >
-    Number(cheapest.sellingPrice)
-
+  const sellingPrice = Number(cheapest?.sellingPrice || 0)
+  const mrp = Number(cheapest?.mrp || 0)
+  const hasDiscount = mrp > sellingPrice
   const discountPct = hasDiscount
-    ? Math.round(
-        (1 -
-          Number(cheapest.sellingPrice) /
-            Number(cheapest.mrp)) *
-          100
-      )
+    ? Math.round(((mrp - sellingPrice) / mrp) * 100)
     : 0
 
   const anyAvailable = activeVariants.some(
-    (variant) => variant.isAvailable
+    (variant) => variant?.isAvailable
   )
 
   return (
-    <div className="w-[118px] shrink-0 overflow-hidden rounded-lg border border-outline-variant/40 bg-surface-container-lowest">
+    <article
+      onClick={onClick}
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-200/85 bg-white p-3.5 shadow-sm transition-all duration-200 hover:shadow-md hover:border-gray-300 flex flex-col justify-between"
+    >
+      {/* Percentage Discount Badge top left */}
+      {hasDiscount && (
+        <div className="absolute left-3 top-3 z-10 rounded bg-[#e76f1c] px-2 py-0.5 text-[9px] font-black uppercase text-white shadow-sm">
+          {discountPct}% OFF
+        </div>
+      )}
 
-      {/* Image */}
-      <div className="relative aspect-square bg-surface-container">
-
-        {product.imageUrl ? (
-          <img
-            src={product.imageUrl}
-            alt={product.name}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-[11px] text-ink-soft">
-            No Image
-          </div>
-        )}
-
-        {hasDiscount && (
-          <span className="absolute left-1 top-1 rounded bg-accent px-1.5 py-0.5 text-[9px] font-bold text-white">
-            {discountPct}% OFF
-          </span>
-        )}
+      {/* Product Image Container */}
+      <div className="relative mx-auto mt-2 h-40 w-full overflow-hidden bg-white flex items-center justify-center">
+        <img
+          src={product?.imageUrl || fallbackImage}
+          alt={product?.name}
+          loading="lazy"
+          className="h-36 w-36 object-contain transition duration-300 group-hover:scale-105"
+        />
       </div>
 
-      {/* Content */}
-      <div className="flex min-h-[88px] flex-col p-1">
+      {/* Content Area */}
+      <div className="mt-3 flex flex-col flex-grow justify-between">
+        <div>
+          {/* Title */}
+          <h3 className="line-clamp-2 min-h-[36px] text-xs font-semibold leading-relaxed text-gray-800">
+            {product?.name}
+          </h3>
 
-        <p className="line-clamp-2 h-[30px] text-[12px] font-semibold leading-tight text-ink">
-          {product.name}
-        </p>
-
-        <p className="text-[10px] text-ink-soft">
-          {cheapest.weight}
-          {cheapest.unit}
-        </p>
-
-        <div className="mt-auto flex items-end justify-between gap-1 pt-1">
-
-          <div className="flex flex-col leading-none">
-            <span className="text-[13px] font-bold text-ink">
-              ₹{Number(
-                cheapest.sellingPrice
-              ).toFixed(0)}
+          {/* Weight / Quantity Unit */}
+          <div className="mt-1">
+            <span className="text-[11px] font-medium text-gray-400">
+              {cheapest?.weight} {cheapest?.unit}
             </span>
+          </div>
+        </div>
 
-            {hasDiscount && (
-              <span className="text-[9px] text-ink-soft line-through">
-                ₹{Number(
-                  cheapest.mrp
-                ).toFixed(0)}
+        {/* Pricing & Add Button Footer */}
+        <div className="mt-4 flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-extrabold text-gray-900">
+                ₹{sellingPrice.toFixed(0)}
               </span>
-            )}
+              {hasDiscount && (
+                <span className="text-[10px] text-gray-400 line-through font-normal">
+                  ₹{mrp.toFixed(0)}
+                </span>
+              )}
+            </div>
           </div>
 
           {!anyAvailable ? (
-            <span className="text-[9px] font-bold text-accent">
+            <span className="rounded-lg bg-red-50 px-2.5 py-1 text-[10px] font-bold text-red-500">
               Out
             </span>
           ) : (
             <button
               type="button"
-              className="rounded border border-primary px-2 py-0.5 text-[10px] font-bold text-primary"
+              onClick={(e) => {
+                e.stopPropagation()
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded-xl border border-[#16823b] bg-white text-base font-bold text-[#16823b] shadow-sm transition-all hover:bg-[#16823b] hover:text-white active:scale-95"
+              aria-label="Add item"
             >
-              ADD
+              +
             </button>
           )}
-
         </div>
       </div>
+    </article>
+  )
+}
+
+// EMPTY STATE
+function EmptyState({ text }) {
+  return (
+    <div className="rounded-2xl border border-dashed border-gray-200 bg-white py-14 text-center">
+      <div className="text-3xl text-gray-300">🛒</div>
+      <p className="mt-3 text-sm font-semibold text-gray-500">{text}</p>
     </div>
   )
 }

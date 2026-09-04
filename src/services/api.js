@@ -148,6 +148,28 @@ export async function getCategories() {
   return result.data || []
 }
 
+export async function getCategory(categoryId) {
+  return apiFetch(
+    `/categories/${categoryId}`
+  )
+}
+
+export async function getBrands() {
+  const response = await fetch(
+    `${API_BASE_URL}/brands`
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      'Failed to fetch brands'
+    )
+  }
+
+  const result = await response.json()
+
+  return result.data || []
+}
+
 export async function getProducts() {
   const response = await fetch(
     `${API_BASE_URL}/products?limit=100`
@@ -165,11 +187,15 @@ export async function getProducts() {
 }
 
 export async function getProduct(productId) {
-  return apiFetch(`/products/${productId}`)
+  return apiFetch(
+    `/products/${productId}`
+  )
 }
 
 export async function getAddresses() {
-  return apiFetch('/customers/me/addresses')
+  return apiFetch(
+    '/customers/me/addresses'
+  )
 }
 
 export async function updateCustomer(data) {
@@ -180,10 +206,23 @@ export async function updateCustomer(data) {
 }
 
 export async function addAddress(data) {
-  return apiFetch('/customers/me/addresses', {
-    method: 'POST',
-    body: JSON.stringify(data),
-  })
+  return apiFetch(
+    '/customers/me/addresses',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }
+  )
+}
+
+export async function updateAddress(addressId, data) {
+  return apiFetch(
+    `/customers/me/addresses/${addressId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }
+  )
 }
 
 export async function deleteAddress(addressId) {
@@ -199,7 +238,10 @@ export async function getCart() {
   return apiFetch('/cart')
 }
 
-export async function addToCart(variantId, quantity) {
+export async function addToCart(
+  variantId,
+  quantity
+) {
   return apiFetch('/cart/items', {
     method: 'POST',
     body: JSON.stringify({
@@ -209,7 +251,10 @@ export async function addToCart(variantId, quantity) {
   })
 }
 
-export async function updateCartItem(itemId, quantity) {
+export async function updateCartItem(
+  itemId,
+  quantity
+) {
   if (quantity <= 0) {
     return apiFetch(
       `/cart/items/${itemId}`,
@@ -226,6 +271,24 @@ export async function updateCartItem(itemId, quantity) {
       body: JSON.stringify({
         quantity,
       }),
+    }
+  )
+}
+
+export async function removeCartItem(itemId) {
+  return apiFetch(
+    `/cart/items/${itemId}`,
+    {
+      method: 'DELETE',
+    }
+  )
+}
+
+export async function clearCart() {
+  return apiFetch(
+    '/cart',
+    {
+      method: 'DELETE',
     }
   )
 }
@@ -253,13 +316,16 @@ export async function getOrder(orderId) {
   )
 }
 
-export async function cancelOrder(orderId) {
+export async function cancelOrder(
+  orderId,
+  reason = 'Cancelled by customer'
+) {
   return apiFetch(
     `/orders/${orderId}/cancel`,
     {
       method: 'POST',
       body: JSON.stringify({
-        reason: 'Cancelled by customer',
+        reason,
       }),
     }
   )
@@ -267,7 +333,7 @@ export async function cancelOrder(orderId) {
 
 export async function startOrderPayment(orderId) {
   return apiFetch(
-    `/payments/${orderId}/initiate`,
+    `/orders/${orderId}/pay`,
     {
       method: 'POST',
     }

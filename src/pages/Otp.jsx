@@ -1,5 +1,7 @@
+
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import {
   requestOtp,
   verifyOtp,
@@ -21,13 +23,14 @@ function Otp() {
   const [resending, setResending] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(30)
 
+  // Load pending phone
   useEffect(() => {
     const storedPhone = localStorage.getItem(
       PENDING_PHONE_KEY
     )
 
     if (!storedPhone) {
-      navigate('/', { replace: true })
+      navigate('/login', { replace: true })
       return
     }
 
@@ -62,9 +65,10 @@ function Otp() {
   }, [secondsLeft])
 
   function handleBack() {
-    navigate('/')
+    navigate('/login')
   }
 
+  // Verify OTP
   async function handleVerify(event) {
     event.preventDefault()
 
@@ -77,6 +81,11 @@ function Otp() {
       return
     }
 
+    if (trimmedCode.length !== 6) {
+      setError('Please enter a valid 6-digit OTP')
+      return
+    }
+
     try {
       setVerifying(true)
 
@@ -85,22 +94,45 @@ function Otp() {
         trimmedCode
       )
 
+      console.log('OTP verification response:', data)
+
+      // Check access token
+      if (!data?.accessToken) {
+        throw new Error(
+          'Login successful, but access token was not received.'
+        )
+      }
+
+      // Save customer session
       saveSession({
         accessToken: data.accessToken,
         customer: data.customer,
       })
 
+      console.log('Customer session saved')
+
+      // Remove temporary OTP data
       localStorage.removeItem(PENDING_PHONE_KEY)
       sessionStorage.removeItem(DEV_OTP_KEY)
 
-      navigate('/', { replace: true })
+      // OTP verified → Home
+      navigate('/home', { replace: true })
+
     } catch (err) {
-      setError(err.message || 'Incorrect code')
+      console.error(
+        'OTP verification error:',
+        err
+      )
+
+      setError(
+        err?.message || 'Incorrect code'
+      )
     } finally {
       setVerifying(false)
     }
   }
 
+  // Resend OTP
   async function handleResend() {
     if (resending || secondsLeft > 0) {
       return
@@ -116,16 +148,23 @@ function Otp() {
       if (data?.devOnlyOtp) {
         sessionStorage.setItem(
           DEV_OTP_KEY,
-          data.devOnlyOtp
+          String(data.devOnlyOtp)
         )
 
-        setDevOtp(data.devOnlyOtp)
+        setDevOtp(String(data.devOnlyOtp))
       }
 
+      setCode('')
       setSecondsLeft(30)
+
     } catch (err) {
+      console.error(
+        'Resend OTP error:',
+        err
+      )
+
       setError(
-        err.message || 'Failed to resend OTP'
+        err?.message || 'Failed to resend OTP'
       )
     } finally {
       setResending(false)
@@ -134,7 +173,9 @@ function Otp() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#f7f8f4] px-4">
+
       <div className="w-full max-w-sm">
+
         {/* Back */}
         <button
           type="button"
@@ -150,6 +191,7 @@ function Otp() {
 
         {/* Card */}
         <div className="rounded-xl bg-white p-6 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
+
           <h2 className="mb-1 text-xl font-bold text-gray-900">
             Enter the code
           </h2>
@@ -179,6 +221,7 @@ function Otp() {
 
           {/* OTP Form */}
           <form onSubmit={handleVerify}>
+
             <input
               value={code}
               onChange={(event) => {
@@ -188,6 +231,7 @@ function Otp() {
                     .slice(0, 6)
 
                 setCode(value)
+                setError('')
               }}
               inputMode="numeric"
               maxLength={6}
@@ -199,13 +243,17 @@ function Otp() {
 
             <button
               type="submit"
-              disabled={verifying}
+              disabled={
+                verifying ||
+                code.length !== 6
+              }
               className="h-12 w-full rounded-lg bg-green-700 font-bold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {verifying
                 ? 'Verifying...'
                 : 'Verify & Continue'}
             </button>
+
           </form>
 
           {/* Resend */}
@@ -228,6 +276,7 @@ function Otp() {
               'Resend OTP'
             )}
           </button>
+
         </div>
       </div>
     </div>
@@ -235,3 +284,4 @@ function Otp() {
 }
 
 export default Otp
+
