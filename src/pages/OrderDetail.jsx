@@ -1,6 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { cancelOrder, getOrder } from '../services/api'
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Circle,
+  CreditCard,
+  MapPin,
+  PackageCheck,
+  XCircle
+} from 'lucide-react'
+import {
+  cancelOrder,
+  getOrder,
+  startOrderPayment
+} from '../services/api'
 
 const STATUS_LABELS = {
   PENDING_PAYMENT: 'Awaiting Payment',
@@ -8,20 +21,20 @@ const STATUS_LABELS = {
   PACKED: 'Packed',
   READY: 'Ready',
   COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled',
+  CANCELLED: 'Cancelled'
 }
 
-const HAPPY_PATH = [
+const TIMELINE = [
   'CONFIRMED',
   'PACKED',
   'READY',
-  'COMPLETED',
+  'COMPLETED'
 ]
 
-const CUSTOMER_CANCELLABLE_STATUSES = [
+const CANCELLABLE_STATUSES = [
   'PENDING_PAYMENT',
   'CONFIRMED',
-  'PACKED',
+  'PACKED'
 ]
 
 function OrderDetail() {
@@ -32,6 +45,7 @@ function OrderDetail() {
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
   const [cancelling, setCancelling] = useState(false)
+  const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -43,7 +57,7 @@ function OrderDetail() {
     loadOrder()
   }, [orderId])
 
-  async function loadOrder() {
+  const loadOrder = async () => {
     try {
       setLoading(true)
       setError('')
@@ -51,67 +65,137 @@ function OrderDetail() {
       const data = await getOrder(orderId)
       setOrder(data)
     } catch (err) {
-      setError(err.message)
+      setError(err?.message || 'Unable to load order details.')
     } finally {
       setLoading(false)
     }
   }
 
-  async function handleCancel() {
-    const confirmed = window.confirm('Cancel this order?')
-
-    if (!confirmed) return
+  const handleCancel = async () => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return
+    }
 
     try {
       setCancelling(true)
+      setError('')
 
-      const updatedOrder = await cancelOrder(order.id)
+      const updatedOrder = await cancelOrder(
+        order.id || order.orderId,
+        'Cancelled by customer'
+      )
 
       setOrder(updatedOrder)
     } catch (err) {
-      alert(err.message)
+      setError(err?.message || 'Unable to cancel order.')
     } finally {
       setCancelling(false)
     }
   }
 
-  function formatDate(date) {
-    return new Date(date).toLocaleString('en-IN', {
+  const handlePayment = async () => {
+    const id = order?.id || order?.orderId
+
+    if (!id) return
+
+    try {
+      setPaying(true)
+      setError('')
+
+      const paymentData = await startOrderPayment(id)
+
+      if (paymentData?.paymentUrl) {
+        window.location.href = paymentData.paymentUrl
+        return
+      }
+
+      if (paymentData?.url) {
+        window.location.href = paymentData.url
+        return
+      }
+
+      if (paymentData?.checkoutUrl) {
+        window.location.href = paymentData.checkoutUrl
+        return
+      }
+
+      await loadOrder()
+    } catch (err) {
+      setError(err?.message || 'Unable to start payment.')
+    } finally {
+      setPaying(false)
+    }
+  }
+
+  const formatDate = date => {
+    if (!date) return 'Date unavailable'
+
+    const parsed = new Date(date)
+
+    if (Number.isNaN(parsed.getTime())) {
+      return String(date)
+    }
+
+    return parsed.toLocaleString('en-IN', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
       hour: 'numeric',
-      minute: '2-digit',
+      minute: '2-digit'
     })
   }
 
-  function getStatusClasses(status) {
-    if (status === 'PENDING_PAYMENT') {
-      return 'bg-red-100 text-red-700'
+  const getStatusClasses = status => {
+    switch (status) {
+      case 'PENDING_PAYMENT':
+        return 'bg-red-100 text-red-700'
+      case 'CONFIRMED':
+      case 'PACKED':
+      case 'COMPLETED':
+        return 'bg-green-100 text-green-700'
+      case 'READY':
+        return 'bg-orange-100 text-orange-700'
+      case 'CANCELLED':
+        return 'bg-red-100 text-red-700'
+      default:
+        return 'bg-gray-100 text-gray-600'
     }
-
-    if (
-      status === 'CONFIRMED' ||
-      status === 'PACKED'
-    ) {
-      return 'bg-green-100 text-green-700'
-    }
-
-    if (status === 'READY') {
-      return 'bg-orange-100 text-orange-700'
-    }
-
-    return 'bg-gray-100 text-gray-600'
   }
 
-  function renderTimeline() {
+  const getAddress = () => {
+    if (order?.fulfillmentMethod !== 'DELIVERY') {
+      return ''
+    }
+
+    return [
+      order?.deliveryLabel,
+      order?.deliveryLine1,
+      order?.deliveryLine2,
+      order?.deliveryCity,
+      order?.deliveryState,
+      order?.deliveryPincode
+    ]
+      .filter(Boolean)
+      .join(', ')
+  }
+
+  const getPaymentText = () => {
+    if (order?.paymentMethod === 'UPI') {
+      return 'UPI'
+    }
+
+    if (order?.fulfillmentMethod === 'DELIVERY') {
+      return 'Cash on Delivery'
+    }
+
+    return 'Cash at Pickup'
+  }
+
+  const renderTimeline = () => {
     if (order.status === 'CANCELLED') {
       return (
-        <div className="flex items-center gap-2 text-red-600">
-          <span className="material-symbols-outlined">
-            cancel
-          </span>
-
+        <div className="flex items-center gap-3 text-red-600">
+          <XCircle size={21} />
           <span className="text-sm">
             This order was cancelled
             {order.cancelReason
@@ -124,41 +208,44 @@ function OrderDetail() {
 
     const steps =
       order.paymentMethod === 'UPI'
-        ? ['PENDING_PAYMENT', ...HAPPY_PATH]
-        : HAPPY_PATH
+        ? ['PENDING_PAYMENT', ...TIMELINE]
+        : TIMELINE
 
     const currentIndex = steps.indexOf(order.status)
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-4">
         {steps.map((step, index) => {
-          const done = index <= currentIndex
+          const done = currentIndex >= index
+          const isCurrent = step === order.status
 
           return (
             <div
               key={step}
-              className="flex items-center gap-2"
+              className="flex items-center gap-3"
             >
-              <span
-                className={`material-symbols-outlined ${
-                  done
-                    ? 'text-green-700'
-                    : 'text-gray-400'
-                }`}
-              >
-                {done
-                  ? 'check_circle'
-                  : 'radio_button_unchecked'}
-              </span>
+              {done ? (
+                <CheckCircle2
+                  size={20}
+                  className="shrink-0 text-green-700"
+                />
+              ) : (
+                <Circle
+                  size={20}
+                  className="shrink-0 text-gray-300"
+                />
+              )}
 
               <span
                 className={`text-sm ${
-                  done
-                    ? 'text-gray-900'
-                    : 'text-gray-400'
+                  isCurrent
+                    ? 'font-bold text-gray-900'
+                    : done
+                      ? 'text-gray-700'
+                      : 'text-gray-400'
                 }`}
               >
-                {STATUS_LABELS[step]}
+                {STATUS_LABELS[step] || step}
               </span>
             </div>
           )
@@ -170,19 +257,25 @@ function OrderDetail() {
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f8f4]">
-        <p className="text-gray-500">
-          Loading order...
-        </p>
+        <div className="text-center">
+          <PackageCheck
+            size={32}
+            className="mx-auto animate-pulse text-green-700"
+          />
+          <p className="mt-3 text-sm text-gray-500">
+            Loading order...
+          </p>
+        </div>
       </div>
     )
   }
 
-  if (error || !order) {
+  if (error && !order) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f8f4] px-4">
         <div className="text-center">
           <p className="mb-4 text-red-500">
-            {error || 'Order not found'}
+            {error}
           </p>
 
           <button
@@ -196,37 +289,32 @@ function OrderDetail() {
     )
   }
 
-  const address =
-    order.fulfillmentMethod === 'DELIVERY'
-      ? [
-          order.deliveryLabel,
-          order.deliveryLine1,
-          order.deliveryLine2,
-          order.deliveryCity,
-          order.deliveryState,
-          order.deliveryPincode,
-        ]
-          .filter(Boolean)
-          .join(', ')
-      : ''
+  if (!order) {
+    return null
+  }
 
-  const paymentText =
+  const address = getAddress()
+  const paymentText = getPaymentText()
+  const orderNumber =
+    order.orderNumber ||
+    order.id ||
+    order.orderId
+
+  const isPendingPayment =
+    order.status === 'PENDING_PAYMENT' &&
     order.paymentMethod === 'UPI'
-      ? 'Payment: UPI'
-      : order.fulfillmentMethod === 'DELIVERY'
-        ? 'Payment: Cash on Delivery'
-        : 'Payment: Cash at Pickup'
+
+  const canCancel =
+    CANCELLABLE_STATUSES.includes(order.status)
 
   return (
     <div className="min-h-screen bg-[#f7f8f4] pb-8">
       <header className="sticky top-0 z-50 flex h-14 items-center bg-[#faf9f5] px-4 shadow-sm">
         <button
           onClick={() => navigate('/orders')}
-          className="-ml-2 flex h-12 w-12 items-center justify-center"
+          className="-ml-2 flex h-12 w-12 items-center justify-center text-gray-700"
         >
-          <span className="material-symbols-outlined">
-            arrow_back
-          </span>
+          <ArrowLeft size={21} />
         </button>
 
         <h1 className="font-display text-xl font-bold text-green-700">
@@ -234,11 +322,17 @@ function OrderDetail() {
         </h1>
       </header>
 
-      <main className="mx-auto max-w-2xl space-y-6 px-4 py-6">
+      <main className="mx-auto max-w-2xl space-y-5 px-4 py-6">
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         <section className="flex items-start justify-between gap-4">
           <div>
             <h2 className="font-display text-xl font-bold text-gray-900">
-              Order #{order.orderNumber}
+              Order #{orderNumber}
             </h2>
 
             <p className="mt-1 text-sm text-gray-500">
@@ -251,36 +345,69 @@ function OrderDetail() {
               order.status
             )}`}
           >
-            {STATUS_LABELS[order.status] ||
-              order.status}
+            {STATUS_LABELS[order.status] || order.status}
           </span>
         </section>
+
+        {isPendingPayment && (
+          <section className="rounded-xl border border-red-200 bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
+            <div className="flex items-center gap-3">
+              <CreditCard
+                size={22}
+                className="text-red-600"
+              />
+
+              <div className="flex-1">
+                <h3 className="text-sm font-bold text-gray-900">
+                  Payment Pending
+                </h3>
+
+                <p className="mt-1 text-xs text-gray-500">
+                  Complete your UPI payment to confirm this order.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={handlePayment}
+              disabled={paying}
+              className="mt-4 w-full rounded-lg bg-green-700 py-3 font-semibold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {paying ? 'Starting Payment...' : 'Pay Now'}
+            </button>
+          </section>
+        )}
 
         <section className="rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
           {renderTimeline()}
         </section>
 
-        <section className="space-y-3 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
+        <section className="space-y-4 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
           <h3 className="text-sm font-bold text-gray-500">
             Items
           </h3>
 
           <div className="space-y-3">
-            {order.items?.map((item) => (
+            {order.items?.map((item, index) => (
               <div
-                key={item.id}
+                key={item?.id || index}
                 className="flex justify-between gap-4 text-sm"
               >
-                <span className="text-gray-900">
-                  {item.productName}{' '}
-                  <span className="text-gray-500">
-                    ({item.weight}
-                    {item.unit} × {item.quantity})
-                  </span>
-                </span>
+                <div className="min-w-0">
+                  <p className="font-medium text-gray-900">
+                    {item?.productName || item?.name || 'Product'}
+                  </p>
 
-                <span className="shrink-0">
-                  ₹{Number(item.lineTotal).toFixed(2)}
+                  <p className="mt-1 text-xs text-gray-500">
+                    {item?.weight
+                      ? `${item.weight}${item.unit || ''} × `
+                      : ''}
+                    {item?.quantity || 1}
+                  </p>
+                </div>
+
+                <span className="shrink-0 font-medium text-gray-900">
+                  ₹{Number(item?.lineTotal || 0).toFixed(2)}
                 </span>
               </div>
             ))}
@@ -291,17 +418,15 @@ function OrderDetail() {
           <div className="flex justify-between text-sm text-gray-500">
             <span>Items</span>
             <span>
-              ₹{Number(order.subtotal).toFixed(2)}
+              ₹{Number(order.subtotal || 0).toFixed(2)}
             </span>
           </div>
 
           <div className="flex justify-between text-sm text-gray-500">
             <span>Delivery Fee</span>
             <span>
-              {Number(order.deliveryFee) > 0
-                ? `₹${Number(
-                    order.deliveryFee
-                  ).toFixed(2)}`
+              {Number(order.deliveryFee || 0) > 0
+                ? `₹${Number(order.deliveryFee).toFixed(2)}`
                 : 'FREE'}
             </span>
           </div>
@@ -312,37 +437,57 @@ function OrderDetail() {
             </span>
 
             <span className="font-display text-2xl font-bold text-green-700">
-              ₹{Number(order.total).toFixed(2)}
+              ₹{Number(order.total || 0).toFixed(2)}
             </span>
           </div>
         </section>
 
-        <section className="space-y-2 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
+        <section className="space-y-3 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
           <h3 className="text-sm font-bold text-gray-500">
             Fulfillment
           </h3>
 
-          <p className="text-sm text-gray-900">
-            {order.fulfillmentMethod === 'DELIVERY'
-              ? 'Home Delivery'
-              : 'Store Pickup'}
-          </p>
+          <div className="flex items-start gap-3">
+            <MapPin
+              size={20}
+              className="mt-0.5 shrink-0 text-green-700"
+            />
 
-          {address && (
-            <p className="text-sm leading-6 text-gray-500">
-              {address}
-            </p>
-          )}
+            <div>
+              <p className="text-sm font-semibold text-gray-900">
+                {order.fulfillmentMethod === 'DELIVERY'
+                  ? 'Home Delivery'
+                  : 'Store Pickup'}
+              </p>
 
-          <p className="text-sm text-gray-500">
-            {paymentText}
-          </p>
+              {address && (
+                <p className="mt-1 text-sm leading-6 text-gray-500">
+                  {address}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <CreditCard
+              size={20}
+              className="shrink-0 text-green-700"
+            />
+
+            <div>
+              <p className="text-xs font-semibold text-gray-500">
+                Payment Method
+              </p>
+
+              <p className="mt-1 text-sm font-medium text-gray-900">
+                {paymentText}
+              </p>
+            </div>
+          </div>
         </section>
 
-        {CUSTOMER_CANCELLABLE_STATUSES.includes(
-          order.status
-        ) && (
-          <section className="rounded-xl bg-white p-4">
+        {canCancel && (
+          <section className="rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
             <button
               onClick={handleCancel}
               disabled={cancelling}

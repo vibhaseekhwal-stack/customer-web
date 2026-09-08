@@ -6,6 +6,7 @@ import {
   getAddresses,
   addAddress,
   placeOrder,
+  startOrderPayment,
 } from '../services/api'
 import {
   ArrowLeft,
@@ -55,11 +56,29 @@ function Checkout() {
 
   async function init() {
     try {
-      const [cartData, feeData, addressData] = await Promise.all([
-        getCart(),
-        getDeliveryFeeInfo(),
-        getAddresses(),
-      ])
+      setLoading(true)
+      setError('')
+
+      const [cartResponse, feeResponse, addressResponse] =
+        await Promise.all([
+          getCart(),
+          getDeliveryFeeInfo(),
+          getAddresses(),
+        ])
+
+      const cartData = cartResponse?.data || cartResponse
+      const feeData = feeResponse?.data || feeResponse
+
+      const addressData =
+        addressResponse?.data?.addresses ||
+        addressResponse?.data ||
+        addressResponse?.addresses ||
+        addressResponse ||
+        []
+
+      const normalizedAddresses = Array.isArray(addressData)
+        ? addressData
+        : []
 
       if (!cartData?.items?.length) {
         navigate('/cart')
@@ -68,20 +87,26 @@ function Checkout() {
 
       setCart(cartData)
       setDeliveryFeeInfo(feeData)
-      setAddresses(addressData || [])
+      setAddresses(normalizedAddresses)
 
       const defaultAddress =
-        addressData?.find((item) => item.isDefault) ||
-        addressData?.[0]
+        normalizedAddresses.find((item) => item.isDefault) ||
+        normalizedAddresses[0]
 
       if (defaultAddress) {
-        setSelectedAddressId(defaultAddress.id)
+        setSelectedAddressId(
+          defaultAddress.id || defaultAddress.addressId
+        )
         setFulfillmentMethod('DELIVERY')
       } else {
         setFulfillmentMethod('PICKUP')
       }
     } catch (err) {
-      setError(err.message)
+      setError(
+        err?.response?.data?.message ||
+        err?.message ||
+        'Unable to load checkout details.'
+      )
     } finally {
       setLoading(false)
     }
@@ -115,16 +140,38 @@ function Checkout() {
     event.preventDefault()
 
     try {
-      const payload = { ...address }
+      setError('')
 
-      if (addresses.length === 0) {
-        payload.isDefault = true
+      const payload = {
+        label: address.label.trim(),
+        line1: address.line1.trim(),
+        line2: address.line2.trim(),
+        city: address.city.trim(),
+        state: address.state.trim(),
+        pincode: address.pincode.trim(),
+        ...(addresses.length === 0 ? { isDefault: true } : {}),
       }
 
-      const newAddress = await addAddress(payload)
+      const response = await addAddress(payload)
 
-      setAddresses((current) => [...current, newAddress])
-      setSelectedAddressId(newAddress.id)
+      const newAddress =
+        response?.data?.address ||
+        response?.data ||
+        response
+
+      const newAddressId =
+        newAddress?.id || newAddress?.addressId
+
+      if (!newAddressId) {
+        throw new Error('Address could not be saved.')
+      }
+
+      setAddresses((current) => [
+        ...current,
+        newAddress,
+      ])
+
+      setSelectedAddressId(newAddressId)
       setFulfillmentMethod('DELIVERY')
       setShowAddressModal(false)
 
@@ -137,7 +184,11 @@ function Checkout() {
         pincode: '',
       })
     } catch (err) {
-      alert(err.message)
+      setError(
+        err?.response?.data?.message ||
+        err?.message ||
+        'Unable to add address.'
+      )
     }
   }
 
@@ -165,24 +216,66 @@ function Checkout() {
     try {
       setPlacingOrder(true)
 
-      const order = await placeOrder({
+      const payload = {
         fulfillmentMethod,
         paymentMethod,
         ...(fulfillmentMethod === 'DELIVERY'
-          ? { addressId: selectedAddressId }
+          ? {
+              addressId: selectedAddressId,
+            }
           : {}),
-      })
+      }
 
-      navigate(`/confirmation?orderId=${order.id}`)
+      const response = await placeOrder(payload)
+
+      const order =
+        response?.data?.order ||
+        response?.data ||
+        response?.order ||
+        response
+
+      const orderId =
+        order?.id ||
+        order?.orderId
+
+      if (!orderId) {
+        throw new Error('Order could not be created.')
+      }
+
+      if (paymentMethod === 'UPI') {
+        const paymentResponse =
+          await startOrderPayment(orderId)
+
+        const paymentData =
+          paymentResponse?.data ||
+          paymentResponse
+
+        const paymentUrl =
+          paymentData?.paymentUrl ||
+          paymentData?.checkoutUrl ||
+          paymentData?.url ||
+          paymentData?.redirectUrl
+
+        if (paymentUrl) {
+          window.location.href = paymentUrl
+          return
+        }
+      }
+
+      navigate(`/confirmation?orderId=${orderId}`)
     } catch (err) {
-      setError(err.message)
+      setError(
+        err?.response?.data?.message ||
+        err?.message ||
+        'Unable to place order.'
+      )
       setPlacingOrder(false)
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f7faf7] flex items-center justify-center px-4">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7faf7] px-4">
         <div className="flex flex-col items-center gap-4">
           <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#16823b]/20 border-t-[#16823b]" />
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
@@ -195,7 +288,7 @@ function Checkout() {
 
   if (error && !cart) {
     return (
-      <div className="min-h-screen bg-[#f7faf7] flex items-center justify-center px-4">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7faf7] px-4">
         <div className="w-full max-w-md rounded-3xl border border-gray-100 bg-white p-8 text-center shadow-xl">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500">
             <ShoppingBag size={28} />
@@ -220,26 +313,36 @@ function Checkout() {
     )
   }
 
-  const subtotal = Number(cart?.grandTotal || 0)
+  const subtotal = Number(
+    cart?.subtotal ??
+    cart?.subTotal ??
+    cart?.grandTotal ??
+    0
+  )
 
   const freeThreshold = Number(
     deliveryFeeInfo?.freeThreshold || 0
   )
 
+  const configuredDeliveryFee = Number(
+    deliveryFeeInfo?.fee || 0
+  )
+
   const deliveryFee =
     fulfillmentMethod === 'DELIVERY' &&
-    deliveryFeeInfo &&
+    freeThreshold > 0 &&
     subtotal < freeThreshold
-      ? Number(deliveryFeeInfo.fee || 0)
-      : 0
+      ? configuredDeliveryFee
+      : fulfillmentMethod === 'DELIVERY' &&
+        freeThreshold === 0
+        ? configuredDeliveryFee
+        : 0
 
   const total = subtotal + deliveryFee
 
   return (
     <div className="min-h-screen bg-[#f7faf7] pb-10">
-
       <main className="mx-auto max-w-6xl px-4 pt-6 sm:px-6 lg:px-8">
-
         <div className="mb-6">
           <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-400">
             <button
@@ -281,9 +384,7 @@ function Checkout() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-
           <div className="space-y-5">
-
             <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
               <div className="mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -308,7 +409,6 @@ function Checkout() {
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-
                 <button
                   type="button"
                   onClick={() => handleFulfillment('DELIVERY')}
@@ -394,15 +494,12 @@ function Checkout() {
                     </div>
                   )}
                 </button>
-
               </div>
             </section>
 
             {fulfillmentMethod === 'DELIVERY' && (
               <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
-
                 <div className="mb-5 flex items-center justify-between gap-3">
-
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
                       <MapPin size={19} />
@@ -420,13 +517,13 @@ function Checkout() {
                   </div>
 
                   <button
+                    type="button"
                     onClick={() => setShowAddressModal(true)}
                     className="flex shrink-0 items-center gap-1.5 rounded-xl bg-[#f4f8f4] px-3 py-2 text-[10px] font-black text-[#16823b] transition hover:bg-[#16823b] hover:text-white"
                   >
                     <Plus size={14} />
                     Add Address
                   </button>
-
                 </div>
 
                 {addresses.length === 0 ? (
@@ -450,14 +547,17 @@ function Checkout() {
                 ) : (
                   <div className="space-y-3">
                     {addresses.map((item) => {
+                      const itemId =
+                        item.id || item.addressId
+
                       const selected =
-                        item.id === selectedAddressId
+                        itemId === selectedAddressId
 
                       return (
                         <button
-                          key={item.id}
+                          key={itemId}
                           type="button"
-                          onClick={() => selectAddress(item.id)}
+                          onClick={() => selectAddress(itemId)}
                           className={`relative flex w-full items-start gap-3 rounded-2xl border-2 p-4 text-left transition ${
                             selected
                               ? 'border-[#16823b] bg-[#f4f8f4]'
@@ -514,12 +614,10 @@ function Checkout() {
                     })}
                   </div>
                 )}
-
               </section>
             )}
 
             <section className="rounded-3xl border border-gray-100 bg-white p-5 shadow-sm sm:p-6">
-
               <div className="mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
@@ -543,7 +641,6 @@ function Checkout() {
               </div>
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-
                 <button
                   type="button"
                   onClick={() => handlePayment('UPI')}
@@ -617,7 +714,6 @@ function Checkout() {
                     </div>
                   )}
                 </button>
-
               </div>
             </section>
 
@@ -627,16 +723,12 @@ function Checkout() {
                 <span>{error}</span>
               </div>
             )}
-
           </div>
 
           <aside className="lg:sticky lg:top-5 lg:self-start">
-
             <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
-
               <div className="border-b border-gray-100 px-5 py-5">
                 <div className="flex items-center justify-between">
-
                   <div>
                     <h2 className="text-base font-black text-[#172019]">
                       Order Summary
@@ -650,15 +742,12 @@ function Checkout() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
                     <ReceiptText size={18} />
                   </div>
-
                 </div>
               </div>
 
               <div className="px-5 py-5">
-
                 <div className="mb-5 rounded-2xl bg-[#f7faf7] p-3">
                   <div className="flex items-center gap-3">
-
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[#16823b] shadow-sm">
                       <ShoppingBag size={18} />
                     </div>
@@ -675,12 +764,10 @@ function Checkout() {
                         Ready to checkout
                       </p>
                     </div>
-
                   </div>
                 </div>
 
                 <div className="space-y-4 text-sm">
-
                   <div className="flex items-center justify-between">
                     <span className="text-gray-500">
                       Item Total
@@ -708,7 +795,6 @@ function Checkout() {
                         : `₹${deliveryFee.toFixed(2)}`}
                     </span>
                   </div>
-
                 </div>
 
                 {deliveryFee > 0 &&
@@ -750,7 +836,6 @@ function Checkout() {
                 <div className="my-5 border-t border-dashed border-gray-200" />
 
                 <div className="flex items-end justify-between">
-
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
                       Grand Total
@@ -760,11 +845,9 @@ function Checkout() {
                       ₹{total.toFixed(2)}
                     </p>
                   </div>
-
                 </div>
 
                 <div className="mt-5 rounded-2xl border border-gray-100">
-
                   <div className="flex items-center gap-3 border-b border-gray-100 p-3">
                     <ShieldCheck
                       size={17}
@@ -798,9 +881,7 @@ function Checkout() {
                       </p>
                     </div>
                   </div>
-
                 </div>
-
               </div>
             </div>
 
@@ -811,14 +892,11 @@ function Checkout() {
               <ArrowLeft size={15} />
               Back to Cart
             </button>
-
           </aside>
-
         </div>
 
         <div className="mt-6 rounded-3xl border border-gray-100 bg-white p-4 shadow-sm sm:p-5">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-
             <div>
               <p className="text-[9px] font-black uppercase tracking-wider text-gray-400">
                 Grand Total
@@ -837,7 +915,9 @@ function Checkout() {
               {placingOrder ? (
                 <>
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Placing Order...
+                  {paymentMethod === 'UPI'
+                    ? 'Redirecting to Payment...'
+                    : 'Placing Order...'}
                 </>
               ) : (
                 <>
@@ -850,19 +930,14 @@ function Checkout() {
                 </>
               )}
             </button>
-
           </div>
         </div>
-
       </main>
 
       {showAddressModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/45 p-4 backdrop-blur-sm">
-
           <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
-
             <div className="flex items-center justify-between border-b border-gray-100 px-5 py-5 sm:px-6">
-
               <div>
                 <h3 className="text-lg font-black text-[#172019]">
                   Add New Address
@@ -880,14 +955,12 @@ function Checkout() {
               >
                 <X size={17} />
               </button>
-
             </div>
 
             <form
               onSubmit={handleAddAddress}
               className="space-y-3 p-5 sm:p-6"
             >
-
               <div>
                 <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-gray-500">
                   Address Label
@@ -926,7 +999,6 @@ function Checkout() {
               />
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-
                 <div>
                   <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-gray-500">
                     City
@@ -956,7 +1028,6 @@ function Checkout() {
                     className="w-full rounded-xl border border-gray-200 bg-[#f7faf7] px-4 py-3 text-sm text-[#172019] outline-none transition placeholder:text-gray-400 focus:border-[#16823b] focus:bg-white"
                   />
                 </div>
-
               </div>
 
               <div>
@@ -971,13 +1042,13 @@ function Checkout() {
                   placeholder="6 digit pincode"
                   required
                   inputMode="numeric"
+                  pattern="[0-9]{6}"
                   maxLength={6}
                   className="w-full rounded-xl border border-gray-200 bg-[#f7faf7] px-4 py-3 text-sm text-[#172019] outline-none transition placeholder:text-gray-400 focus:border-[#16823b] focus:bg-white"
                 />
               </div>
 
               <div className="flex gap-3 pt-3">
-
                 <button
                   type="button"
                   onClick={() => setShowAddressModal(false)}
@@ -992,14 +1063,11 @@ function Checkout() {
                 >
                   Save Address
                 </button>
-
               </div>
-
             </form>
           </div>
         </div>
       )}
-
     </div>
   )
 }

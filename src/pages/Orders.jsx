@@ -14,9 +14,19 @@ import {
   MapPin,
   CreditCard,
   RefreshCw,
-  ShoppingBasket
+  ShoppingBasket,
+  X,
+  Ban,
+  WalletCards
 } from 'lucide-react'
-import { getOrders, addToCart, getCart } from '../services/api'
+import {
+  getOrders,
+  getOrder,
+  getCart,
+  addToCart,
+  cancelOrder,
+  startOrderPayment
+} from '../services/api'
 
 function Orders() {
   const navigate = useNavigate()
@@ -25,57 +35,21 @@ function Orders() {
   const [cart, setCart] = useState(null)
   const [loading, setLoading] = useState(true)
   const [reordering, setReordering] = useState(null)
+  const [cancelling, setCancelling] = useState(null)
+  const [paying, setPaying] = useState(null)
+  const [selectedOrder, setSelectedOrder] = useState(null)
+  const [loadingDetails, setLoadingDetails] = useState(false)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('all')
+  const [cancelReason, setCancelReason] = useState('')
+  const [cancelOrderId, setCancelOrderId] = useState(null)
 
-  const loadOrders = async () => {
-    try {
-      setLoading(true)
-      setError('')
-
-      const [ordersData, cartData] = await Promise.all([
-        getOrders(),
-        getCart()
-      ])
-
-      const orderList =
-        Array.isArray(ordersData)
-          ? ordersData
-          : Array.isArray(ordersData?.data)
-            ? ordersData.data
-            : Array.isArray(ordersData?.data?.content)
-              ? ordersData.data.content
-              : Array.isArray(ordersData?.content)
-                ? ordersData.content
-                : Array.isArray(ordersData?.orders)
-                  ? ordersData.orders
-                  : Array.isArray(ordersData?.data?.orders)
-                    ? ordersData.data.orders
-                    : []
-
-      setOrders(orderList)
-      setCart(cartData)
-    } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-        err?.message ||
-        'Unable to load your orders.'
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadOrders()
-  }, [])
-
-  const getOrderId = (order) =>
+  const getOrderId = order =>
     order?.id ||
     order?.orderId ||
     order?._id
 
-  const getOrderStatus = (order) =>
+  const getOrderStatus = order =>
     String(
       order?.status ||
       order?.orderStatus ||
@@ -83,7 +57,7 @@ function Orders() {
       ''
     ).toUpperCase()
 
-  const getOrderItems = (order) =>
+  const getOrderItems = order =>
     Array.isArray(order?.items)
       ? order.items
       : Array.isArray(order?.orderItems)
@@ -92,7 +66,7 @@ function Orders() {
           ? order.products
           : []
 
-  const getItemName = (item) =>
+  const getItemName = item =>
     item?.productName ||
     item?.name ||
     item?.product?.name ||
@@ -100,7 +74,7 @@ function Orders() {
     item?.variant?.name ||
     'Product'
 
-  const getItemImage = (item) =>
+  const getItemImage = item =>
     item?.image ||
     item?.imageUrl ||
     item?.productImage ||
@@ -109,24 +83,20 @@ function Orders() {
     item?.variant?.image ||
     ''
 
-  const getItemQuantity = (item) =>
-    Number(
-      item?.quantity ||
-      item?.qty ||
-      1
-    )
+  const getItemQuantity = item =>
+    Number(item?.quantity ?? item?.qty ?? 1)
 
-  const getItemPrice = (item) =>
+  const getItemPrice = item =>
     Number(
-      item?.price ||
-      item?.unitPrice ||
-      item?.sellingPrice ||
-      item?.product?.price ||
-      item?.variant?.price ||
+      item?.price ??
+      item?.unitPrice ??
+      item?.sellingPrice ??
+      item?.product?.price ??
+      item?.variant?.price ??
       0
     )
 
-  const getOrderTotal = (order) => {
+  const getOrderTotal = order => {
     const value =
       order?.grandTotal ??
       order?.totalAmount ??
@@ -140,49 +110,193 @@ function Orders() {
     }
 
     return getOrderItems(order).reduce(
-      (sum, item) => sum + getItemPrice(item) * getItemQuantity(item),
+      (sum, item) =>
+        sum + getItemPrice(item) * getItemQuantity(item),
       0
     )
   }
 
-  const getOrderDate = (order) =>
+  const getOrderDate = order =>
     order?.createdAt ||
     order?.orderDate ||
     order?.created_at ||
     order?.date
 
-  const formatDate = (date) => {
-    if (!date) return 'Date unavailable'
+  const getAddress = order =>
+    order?.address ||
+    order?.deliveryAddress ||
+    order?.shippingAddress
 
-    const parsed = new Date(date)
+  const getPaymentMethod = order =>
+    order?.paymentMethod ||
+    order?.payment?.method
 
-    if (Number.isNaN(parsed.getTime())) {
-      return String(date)
-    }
-
-    return parsed.toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    })
+  const normalizeOrders = data => {
+    if (Array.isArray(data)) return data
+    if (Array.isArray(data?.data)) return data.data
+    if (Array.isArray(data?.data?.content)) return data.data.content
+    if (Array.isArray(data?.content)) return data.content
+    if (Array.isArray(data?.orders)) return data.orders
+    if (Array.isArray(data?.data?.orders)) return data.data.orders
+    return []
   }
 
-  const formatTime = (date) => {
-    if (!date) return ''
+  const loadOrders = async () => {
+    try {
+      setLoading(true)
+      setError('')
 
-    const parsed = new Date(date)
+      const [ordersData, cartData] = await Promise.all([
+        getOrders(),
+        getCart()
+      ])
 
-    if (Number.isNaN(parsed.getTime())) {
-      return ''
+      setOrders(normalizeOrders(ordersData))
+      setCart(cartData)
+    } catch (err) {
+      setError(
+        err?.message ||
+        'Unable to load your orders.'
+      )
+    } finally {
+      setLoading(false)
     }
-
-    return parsed.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })
   }
 
-  const getStatusConfig = (status) => {
+  useEffect(() => {
+    loadOrders()
+  }, [])
+
+  const loadOrderDetails = async orderId => {
+    try {
+      setLoadingDetails(true)
+      setError('')
+
+      const data = await getOrder(orderId)
+
+      setSelectedOrder(data)
+    } catch (err) {
+      setError(
+        err?.message ||
+        'Unable to load order details.'
+      )
+    } finally {
+      setLoadingDetails(false)
+    }
+  }
+
+  const handleViewDetails = async order => {
+    const orderId = getOrderId(order)
+
+    if (!orderId) return
+
+    await loadOrderDetails(orderId)
+  }
+
+  const handleReorder = async order => {
+    const orderId = getOrderId(order)
+    const items = getOrderItems(order)
+
+    if (!items.length) {
+      setError('No items available for reorder.')
+      return
+    }
+
+    try {
+      setReordering(orderId)
+      setError('')
+
+      for (const item of items) {
+        const variantId =
+          item?.variantId ||
+          item?.variant?.id ||
+          item?.productVariantId
+
+        if (variantId) {
+          await addToCart(
+            variantId,
+            getItemQuantity(item)
+          )
+        }
+      }
+
+      const updatedCart = await getCart()
+      setCart(updatedCart)
+
+      navigate('/cart')
+    } catch (err) {
+      setError(
+        err?.message ||
+        'Unable to reorder this order.'
+      )
+    } finally {
+      setReordering(null)
+    }
+  }
+
+  const openCancelModal = orderId => {
+    setCancelOrderId(orderId)
+    setCancelReason('')
+  }
+
+  const handleCancelOrder = async () => {
+    if (!cancelOrderId) return
+
+    try {
+      setCancelling(cancelOrderId)
+      setError('')
+
+      await cancelOrder(
+        cancelOrderId,
+        cancelReason.trim() || 'Cancelled by customer'
+      )
+
+      setCancelOrderId(null)
+      setCancelReason('')
+
+      await loadOrders()
+    } catch (err) {
+      setError(
+        err?.message ||
+        'Unable to cancel this order.'
+      )
+    } finally {
+      setCancelling(null)
+    }
+  }
+
+  const handlePayment = async orderId => {
+    if (!orderId) return
+
+    try {
+      setPaying(orderId)
+      setError('')
+
+      const paymentData = await startOrderPayment(orderId)
+
+      const paymentUrl =
+        paymentData?.paymentUrl ||
+        paymentData?.checkoutUrl ||
+        paymentData?.url ||
+        paymentData?.redirectUrl
+
+      if (paymentUrl) {
+        window.location.href = paymentUrl
+        return
+      }
+
+      await loadOrders()
+    } catch (err) {
+      setError(
+        err?.message ||
+        'Unable to start payment.'
+      )
+    } finally {
+      setPaying(null)
+    }
+  }
+
+  const getStatusConfig = status => {
     if (
       ['DELIVERED', 'COMPLETED', 'SUCCESS', 'FULFILLED'].includes(status)
     ) {
@@ -235,37 +349,31 @@ function Orders() {
     }
   }
 
-  const activeOrders = useMemo(() => {
-    return orders.filter(order => {
-      const status = getOrderStatus(order)
+  const completedStatuses = [
+    'DELIVERED',
+    'COMPLETED',
+    'SUCCESS',
+    'FULFILLED',
+    'CANCELLED',
+    'CANCELED',
+    'REJECTED'
+  ]
 
-      return ![
-        'DELIVERED',
-        'COMPLETED',
-        'SUCCESS',
-        'FULFILLED',
-        'CANCELLED',
-        'CANCELED',
-        'REJECTED'
-      ].includes(status)
-    })
-  }, [orders])
+  const activeOrders = useMemo(
+    () =>
+      orders.filter(
+        order => !completedStatuses.includes(getOrderStatus(order))
+      ),
+    [orders]
+  )
 
-  const pastOrders = useMemo(() => {
-    return orders.filter(order => {
-      const status = getOrderStatus(order)
-
-      return [
-        'DELIVERED',
-        'COMPLETED',
-        'SUCCESS',
-        'FULFILLED',
-        'CANCELLED',
-        'CANCELED',
-        'REJECTED'
-      ].includes(status)
-    })
-  }, [orders])
+  const pastOrders = useMemo(
+    () =>
+      orders.filter(
+        order => completedStatuses.includes(getOrderStatus(order))
+      ),
+    [orders]
+  )
 
   const visibleOrders =
     activeTab === 'active'
@@ -274,44 +382,6 @@ function Orders() {
         ? pastOrders
         : orders
 
-  const handleReorder = async (order) => {
-    const orderId = getOrderId(order)
-    const items = getOrderItems(order)
-
-    if (!items.length) return
-
-    try {
-      setReordering(orderId)
-
-      for (const item of items) {
-        const variantId =
-          item?.variantId ||
-          item?.variant?.id ||
-          item?.productVariantId
-
-        if (variantId) {
-          await addToCart(
-            variantId,
-            getItemQuantity(item)
-          )
-        }
-      }
-
-      const updatedCart = await getCart()
-      setCart(updatedCart)
-
-      navigate('/cart')
-    } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-        err?.message ||
-        'Unable to reorder this order.'
-      )
-    } finally {
-      setReordering(null)
-    }
-  }
-
   const cartCount = Array.isArray(cart?.items)
     ? cart.items.reduce(
         (sum, item) => sum + Number(item?.quantity || 0),
@@ -319,17 +389,42 @@ function Orders() {
       )
     : 0
 
+  const formatDate = date => {
+    if (!date) return 'Date unavailable'
+
+    const parsed = new Date(date)
+
+    if (Number.isNaN(parsed.getTime())) {
+      return String(date)
+    }
+
+    return parsed.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    })
+  }
+
+  const formatTime = date => {
+    if (!date) return ''
+
+    const parsed = new Date(date)
+
+    if (Number.isNaN(parsed.getTime())) {
+      return ''
+    }
+
+    return parsed.toLocaleTimeString('en-IN', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f7faf7] px-4 py-6">
         <div className="mx-auto max-w-6xl">
-          <button
-            onClick={() => navigate(-1)}
-            className="mb-6 flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-[#16823b]"
-          >
-            <ArrowLeft size={18} />
-            Back
-          </button>
+          <div className="mb-6 h-6 w-32 animate-pulse rounded bg-gray-200" />
 
           <div className="mb-7">
             <div className="h-8 w-48 animate-pulse rounded-lg bg-gray-200" />
@@ -367,21 +462,19 @@ function Orders() {
           </button>
 
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div>
-              <div className="mb-2 flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#16823b] text-white shadow-sm">
-                  <ShoppingBag size={22} />
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#16823b] text-white shadow-sm">
+                <ShoppingBag size={22} />
+              </div>
 
-                <div>
-                  <h1 className="text-2xl font-bold tracking-tight text-[#172019] sm:text-3xl">
-                    My Orders
-                  </h1>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-[#172019] sm:text-3xl">
+                  My Orders
+                </h1>
 
-                  <p className="mt-0.5 text-sm text-gray-500">
-                    Track and manage your orders
-                  </p>
-                </div>
+                <p className="mt-0.5 text-sm text-gray-500">
+                  Track and manage your orders
+                </p>
               </div>
             </div>
 
@@ -391,6 +484,7 @@ function Orders() {
             >
               <ShoppingBasket size={18} />
               Cart
+
               {cartCount > 0 && (
                 <span className="rounded-full bg-[#16823b] px-2 py-0.5 text-xs text-white">
                   {cartCount}
@@ -415,47 +509,26 @@ function Orders() {
         )}
 
         <div className="mb-6 grid grid-cols-3 rounded-2xl border border-[#dce8de] bg-white p-1.5 shadow-sm">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`rounded-xl px-3 py-3 text-sm font-semibold transition ${
-              activeTab === 'all'
-                ? 'bg-[#16823b] text-white shadow-sm'
-                : 'text-gray-600 hover:bg-[#f4f8f4]'
-            }`}
-          >
-            All Orders
-            <span className="ml-1.5 opacity-80">
-              {orders.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('active')}
-            className={`rounded-xl px-3 py-3 text-sm font-semibold transition ${
-              activeTab === 'active'
-                ? 'bg-[#16823b] text-white shadow-sm'
-                : 'text-gray-600 hover:bg-[#f4f8f4]'
-            }`}
-          >
-            Active
-            <span className="ml-1.5 opacity-80">
-              {activeOrders.length}
-            </span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('past')}
-            className={`rounded-xl px-3 py-3 text-sm font-semibold transition ${
-              activeTab === 'past'
-                ? 'bg-[#16823b] text-white shadow-sm'
-                : 'text-gray-600 hover:bg-[#f4f8f4]'
-            }`}
-          >
-            Past
-            <span className="ml-1.5 opacity-80">
-              {pastOrders.length}
-            </span>
-          </button>
+          {[
+            ['all', 'All Orders', orders.length],
+            ['active', 'Active', activeOrders.length],
+            ['past', 'Past', pastOrders.length]
+          ].map(([tab, label, count]) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`rounded-xl px-3 py-3 text-sm font-semibold transition ${
+                activeTab === tab
+                  ? 'bg-[#16823b] text-white shadow-sm'
+                  : 'text-gray-600 hover:bg-[#f4f8f4]'
+              }`}
+            >
+              {label}
+              <span className="ml-1.5 opacity-80">
+                {count}
+              </span>
+            </button>
+          ))}
         </div>
 
         {visibleOrders.length === 0 ? (
@@ -494,15 +567,26 @@ function Orders() {
               const items = getOrderItems(order)
               const total = getOrderTotal(order)
               const date = getOrderDate(order)
+              const address = getAddress(order)
+              const paymentMethod = getPaymentMethod(order)
 
-              const address =
-                order?.address ||
-                order?.deliveryAddress ||
-                order?.shippingAddress
+              const canCancel =
+                orderId &&
+                !completedStatuses.includes(status)
 
-              const paymentMethod =
-                order?.paymentMethod ||
-                order?.payment?.method
+              const canPay =
+                orderId &&
+                ![
+                  'PAID',
+                  'PAYMENT_SUCCESS',
+                  'DELIVERED',
+                  'COMPLETED',
+                  'SUCCESS',
+                  'FULFILLED',
+                  'CANCELLED',
+                  'CANCELED',
+                  'REJECTED'
+                ].includes(status)
 
               return (
                 <div
@@ -514,7 +598,9 @@ function Orders() {
                       <div>
                         <div className="flex flex-wrap items-center gap-2">
                           <h2 className="text-base font-bold text-[#172019]">
-                            {orderId ? `Order #${orderId}` : 'Order'}
+                            {orderId
+                              ? `Order #${orderId}`
+                              : 'Order'}
                           </h2>
 
                           <span
@@ -526,23 +612,20 @@ function Orders() {
                         </div>
 
                         <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                          <span>
-                            {formatDate(date)}
-                          </span>
+                          <span>{formatDate(date)}</span>
 
                           {formatTime(date) && (
                             <>
                               <span>•</span>
-                              <span>
-                                {formatTime(date)}
-                              </span>
+                              <span>{formatTime(date)}</span>
                             </>
                           )}
 
                           <span>•</span>
 
                           <span>
-                            {items.length} item{items.length !== 1 ? 's' : ''}
+                            {items.length} item
+                            {items.length !== 1 ? 's' : ''}
                           </span>
                         </div>
                       </div>
@@ -568,7 +651,11 @@ function Orders() {
 
                         return (
                           <div
-                            key={item?.id || item?.cartItemId || itemIndex}
+                            key={
+                              item?.id ||
+                              item?.cartItemId ||
+                              itemIndex
+                            }
                             className="flex items-center gap-3 rounded-xl bg-[#f7faf7] p-3"
                           >
                             <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -598,7 +685,9 @@ function Orders() {
 
                             <div className="text-right">
                               <p className="text-sm font-bold text-[#172019]">
-                                ₹{(price * quantity).toFixed(2)}
+                                ₹{(
+                                  price * quantity
+                                ).toFixed(2)}
                               </p>
 
                               {price > 0 && (
@@ -613,7 +702,8 @@ function Orders() {
 
                       {items.length > 4 && (
                         <p className="px-1 text-xs font-medium text-gray-500">
-                          +{items.length - 4} more item{items.length - 4 !== 1 ? 's' : ''}
+                          +{items.length - 4} more item
+                          {items.length - 4 !== 1 ? 's' : ''}
                         </p>
                       )}
                     </div>
@@ -661,7 +751,10 @@ function Orders() {
                                 </p>
 
                                 <p className="mt-1 text-sm font-medium capitalize text-[#172019]">
-                                  {String(paymentMethod).replace(/_/g, ' ')}
+                                  {String(paymentMethod).replace(
+                                    /_/g,
+                                    ' '
+                                  )}
                                 </p>
                               </div>
                             </div>
@@ -670,10 +763,10 @@ function Orders() {
                       </div>
                     )}
 
-                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
+                    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
                       {orderId && (
                         <button
-                          onClick={() => navigate(`/orders/${orderId}`)}
+                          onClick={() => handleViewDetails(order)}
                           className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#dce8de] bg-white px-4 py-2.5 text-sm font-semibold text-[#172019] transition hover:border-[#16823b] hover:text-[#16823b]"
                         >
                           View Details
@@ -681,10 +774,45 @@ function Orders() {
                         </button>
                       )}
 
+                      {canPay && (
+                        <button
+                          onClick={() => handlePayment(orderId)}
+                          disabled={paying === orderId}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#16823b] bg-white px-4 py-2.5 text-sm font-semibold text-[#16823b] transition hover:bg-[#f4f8f4] disabled:opacity-60"
+                        >
+                          <WalletCards
+                            size={17}
+                            className={
+                              paying === orderId
+                                ? 'animate-spin'
+                                : ''
+                            }
+                          />
+                          {paying === orderId
+                            ? 'Processing...'
+                            : 'Pay Now'}
+                        </button>
+                      )}
+
+                      {canCancel && (
+                        <button
+                          onClick={() =>
+                            openCancelModal(orderId)
+                          }
+                          disabled={cancelling === orderId}
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+                        >
+                          <Ban size={17} />
+                          Cancel Order
+                        </button>
+                      )}
+
                       {items.length > 0 && (
                         <button
                           onClick={() => handleReorder(order)}
-                          disabled={reordering === orderId}
+                          disabled={
+                            reordering === orderId
+                          }
                           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#16823b] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#116d30] disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           <RotateCcw
@@ -695,6 +823,7 @@ function Orders() {
                                 : ''
                             }
                           />
+
                           {reordering === orderId
                             ? 'Adding...'
                             : 'Reorder'}
@@ -728,6 +857,165 @@ function Orders() {
           </div>
         )}
       </div>
+
+      {selectedOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            <div className="sticky top-0 flex items-center justify-between border-b border-gray-100 bg-white px-5 py-4">
+              <div>
+                <h2 className="text-lg font-bold text-[#172019]">
+                  Order #{getOrderId(selectedOrder)}
+                </h2>
+
+                <p className="text-xs text-gray-500">
+                  Complete order details
+                </p>
+              </div>
+
+              <button
+                onClick={() => setSelectedOrder(null)}
+                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-5">
+              {loadingDetails ? (
+                <div className="py-10 text-center">
+                  <RefreshCw
+                    size={24}
+                    className="mx-auto animate-spin text-[#16823b]"
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="rounded-xl bg-[#f7faf7] p-4">
+                    <p className="text-xs text-gray-500">
+                      Status
+                    </p>
+
+                    <p className="mt-1 font-semibold text-[#172019]">
+                      {getStatusConfig(
+                        getOrderStatus(selectedOrder)
+                      ).label}
+                    </p>
+                  </div>
+
+                  <div className="mt-4 space-y-3">
+                    {getOrderItems(selectedOrder).map(
+                      (item, index) => (
+                        <div
+                          key={item?.id || index}
+                          className="flex items-center gap-3 rounded-xl border border-gray-100 p-3"
+                        >
+                          <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-50">
+                            {getItemImage(item) ? (
+                              <img
+                                src={getItemImage(item)}
+                                alt={getItemName(item)}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <ShoppingBag
+                                size={22}
+                                className="text-[#16823b]"
+                              />
+                            )}
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold text-[#172019]">
+                              {getItemName(item)}
+                            </p>
+
+                            <p className="text-xs text-gray-500">
+                              Qty: {getItemQuantity(item)}
+                            </p>
+                          </div>
+
+                          <p className="text-sm font-bold text-[#172019]">
+                            ₹{(
+                              getItemPrice(item) *
+                              getItemQuantity(item)
+                            ).toFixed(2)}
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  <div className="mt-5 rounded-xl border border-gray-100 p-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">
+                        Total
+                      </span>
+
+                      <span className="font-bold text-[#16823b]">
+                        ₹{getOrderTotal(
+                          selectedOrder
+                        ).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cancelOrderId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-[#172019]">
+                Cancel Order
+              </h2>
+
+              <button
+                onClick={() => setCancelOrderId(null)}
+                className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <p className="mt-2 text-sm text-gray-500">
+              Are you sure you want to cancel this order?
+            </p>
+
+            <textarea
+              value={cancelReason}
+              onChange={e =>
+                setCancelReason(e.target.value)
+              }
+              placeholder="Enter cancellation reason"
+              rows={4}
+              className="mt-4 w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-[#16823b]"
+            />
+
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setCancelOrderId(null)}
+                className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700"
+              >
+                Keep Order
+              </button>
+
+              <button
+                onClick={handleCancelOrder}
+                disabled={cancelling === cancelOrderId}
+                className="flex-1 rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
+              >
+                {cancelling === cancelOrderId
+                  ? 'Cancelling...'
+                  : 'Confirm Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
