@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+
+import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   ArrowLeft,
@@ -7,7 +8,14 @@ import {
   CreditCard,
   MapPin,
   PackageCheck,
-  XCircle
+  X,
+  XCircle,
+  WalletCards,
+  RefreshCw,
+  ShoppingBag,
+  ReceiptText,
+  Ban,
+  Clock3
 } from 'lucide-react'
 import {
   cancelOrder,
@@ -47,6 +55,8 @@ function OrderDetail() {
   const [cancelling, setCancelling] = useState(false)
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState('')
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [cancelReason, setCancelReason] = useState('')
 
   useEffect(() => {
     if (!orderId) {
@@ -71,21 +81,28 @@ function OrderDetail() {
     }
   }
 
+  const getOrderId = orderData =>
+    orderData?.id ||
+    orderData?.orderId ||
+    orderData?._id
+
   const handleCancel = async () => {
-    if (!window.confirm('Are you sure you want to cancel this order?')) {
-      return
-    }
+    const id = getOrderId(order)
+
+    if (!id) return
 
     try {
       setCancelling(true)
       setError('')
 
       const updatedOrder = await cancelOrder(
-        order.id || order.orderId,
-        'Cancelled by customer'
+        id,
+        cancelReason.trim() || 'Cancelled by customer'
       )
 
-      setOrder(updatedOrder)
+      setOrder(updatedOrder?.data || updatedOrder)
+      setShowCancelModal(false)
+      setCancelReason('')
     } catch (err) {
       setError(err?.message || 'Unable to cancel order.')
     } finally {
@@ -93,37 +110,143 @@ function OrderDetail() {
     }
   }
 
-  const handlePayment = async () => {
-    const id = order?.id || order?.orderId
+  const normalizePaymentResponse = data => {
+    const response = data?.data || data
 
-    if (!id) return
+    return {
+      keyId:
+        response?.keyId ||
+        response?.key ||
+        response?.razorpayKeyId,
+
+      providerOrderId:
+        response?.providerOrderId ||
+        response?.razorpayOrderId ||
+        response?.orderId,
+
+      amount:
+        response?.amount ??
+        response?.payableAmount ??
+        response?.totalAmount ??
+        response?.total,
+
+      currency:
+        response?.currency || 'INR',
+
+      paymentUrl:
+        response?.paymentUrl ||
+        response?.checkoutUrl ||
+        response?.url ||
+        response?.redirectUrl
+    }
+  }
+
+  const handlePayment = async () => {
+    const id = getOrderId(order)
+
+    if (!id || paying) return
 
     try {
       setPaying(true)
       setError('')
 
-      const paymentData = await startOrderPayment(id)
+      const rawPaymentData =
+        await startOrderPayment(id)
 
-      if (paymentData?.paymentUrl) {
-        window.location.href = paymentData.paymentUrl
+      const payment =
+        normalizePaymentResponse(rawPaymentData)
+
+      if (
+        payment.paymentUrl &&
+        !payment.keyId &&
+        !payment.providerOrderId
+      ) {
+        window.location.href =
+          payment.paymentUrl
         return
       }
 
-      if (paymentData?.url) {
-        window.location.href = paymentData.url
+      if (!window.Razorpay) {
+        setError(
+          'Razorpay could not be loaded. Please refresh the page and try again.'
+        )
+        setPaying(false)
         return
       }
 
-      if (paymentData?.checkoutUrl) {
-        window.location.href = paymentData.checkoutUrl
+      if (
+        !payment.keyId ||
+        !payment.providerOrderId
+      ) {
+        setError(
+          'Payment information is incomplete. Please try again.'
+        )
+        setPaying(false)
         return
       }
 
-      await loadOrder()
+      const numericAmount =
+        Number(payment.amount)
+
+      if (
+        !Number.isFinite(numericAmount) ||
+        numericAmount <= 0
+      ) {
+        setError(
+          'Invalid payment amount received from server.'
+        )
+        setPaying(false)
+        return
+      }
+
+      const razorpay =
+        new window.Razorpay({
+          key: payment.keyId,
+          order_id:
+            payment.providerOrderId,
+          amount: Math.round(
+            numericAmount * 100
+          ),
+          currency:
+            payment.currency,
+          name: 'CD Shopping Hub',
+          description: `Order #${order?.orderNumber || id}`,
+
+          handler: async () => {
+            setError('')
+            setPaying(false)
+            await loadOrder()
+          },
+
+          modal: {
+            ondismiss: () => {
+              setPaying(false)
+            }
+          },
+
+          theme: {
+            color: '#16823b'
+          }
+        })
+
+      razorpay.on(
+        'payment.failed',
+        response => {
+          setPaying(false)
+          setError(
+            response?.error?.description ||
+            'Payment failed. Please try again.'
+          )
+        }
+      )
+
+      razorpay.open()
     } catch (err) {
-      setError(err?.message || 'Unable to start payment.')
-    } finally {
       setPaying(false)
+      setError(
+        err?.message ||
+        'Unable to start payment.'
+      )
     }
   }
 
@@ -137,10 +260,10 @@ function OrderDetail() {
     }
 
     return parsed.toLocaleString('en-IN', {
-      day: 'numeric',
+      day: '2-digit',
       month: 'short',
       year: 'numeric',
-      hour: 'numeric',
+      hour: '2-digit',
       minute: '2-digit'
     })
   }
@@ -148,22 +271,50 @@ function OrderDetail() {
   const getStatusClasses = status => {
     switch (status) {
       case 'PENDING_PAYMENT':
-        return 'bg-red-100 text-red-700'
+        return 'bg-red-50 text-red-600 border-red-200'
+
       case 'CONFIRMED':
       case 'PACKED':
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-700'
+        return 'bg-amber-50 text-amber-700 border-amber-200'
+
       case 'READY':
-        return 'bg-orange-100 text-orange-700'
+        return 'bg-blue-50 text-blue-700 border-blue-200'
+
+      case 'COMPLETED':
+        return 'bg-green-50 text-green-700 border-green-200'
+
       case 'CANCELLED':
-        return 'bg-red-100 text-red-700'
+        return 'bg-red-50 text-red-600 border-red-200'
+
       default:
-        return 'bg-gray-100 text-gray-600'
+        return 'bg-gray-50 text-gray-600 border-gray-200'
     }
   }
 
-  const getAddress = () => {
-    if (order?.fulfillmentMethod !== 'DELIVERY') {
+  const getStatusIcon = status => {
+    switch (status) {
+      case 'COMPLETED':
+        return CheckCircle2
+
+      case 'CANCELLED':
+        return XCircle
+
+      case 'PENDING_PAYMENT':
+        return WalletCards
+
+      case 'READY':
+        return PackageCheck
+
+      default:
+        return Clock3
+    }
+  }
+
+  const getAddress = useMemo(() => {
+    if (
+      order?.fulfillmentMethod !==
+      'DELIVERY'
+    ) {
       return ''
     }
 
@@ -177,76 +328,144 @@ function OrderDetail() {
     ]
       .filter(Boolean)
       .join(', ')
-  }
+  }, [order])
 
-  const getPaymentText = () => {
+  const getPaymentText = useMemo(() => {
     if (order?.paymentMethod === 'UPI') {
       return 'UPI'
     }
 
-    if (order?.fulfillmentMethod === 'DELIVERY') {
+    if (
+      order?.fulfillmentMethod ===
+      'DELIVERY'
+    ) {
       return 'Cash on Delivery'
     }
 
     return 'Cash at Pickup'
-  }
+  }, [order])
+
+  const items = Array.isArray(order?.items)
+    ? order.items
+    : []
+
+  const subtotal = Number(
+    order?.subtotal || 0
+  )
+
+  const deliveryFee = Number(
+    order?.deliveryFee || 0
+  )
+
+  const total = Number(
+    order?.total ??
+    order?.grandTotal ??
+    subtotal + deliveryFee
+  )
+
+  const isPendingPayment =
+    order?.status ===
+      'PENDING_PAYMENT' &&
+    order?.paymentMethod === 'UPI'
+
+  const canCancel =
+    CANCELLABLE_STATUSES.includes(
+      order?.status
+    )
 
   const renderTimeline = () => {
     if (order.status === 'CANCELLED') {
       return (
-        <div className="flex items-center gap-3 text-red-600">
-          <XCircle size={21} />
-          <span className="text-sm">
-            This order was cancelled
-            {order.cancelReason
-              ? `: ${order.cancelReason}`
-              : '.'}
-          </span>
+        <div className="rounded-xl border border-red-100 bg-red-50 p-4">
+          <div className="flex items-start gap-3">
+            <XCircle
+              size={21}
+              className="mt-0.5 shrink-0 text-red-600"
+            />
+
+            <div>
+              <p className="text-sm font-bold text-red-700">
+                Order Cancelled
+              </p>
+
+              <p className="mt-1 text-xs leading-5 text-red-600">
+                {order.cancelReason ||
+                  'This order was cancelled by the customer.'}
+              </p>
+            </div>
+          </div>
         </div>
       )
     }
 
     const steps =
       order.paymentMethod === 'UPI'
-        ? ['PENDING_PAYMENT', ...TIMELINE]
+        ? [
+            'PENDING_PAYMENT',
+            ...TIMELINE
+          ]
         : TIMELINE
 
-    const currentIndex = steps.indexOf(order.status)
+    const currentIndex =
+      steps.indexOf(order.status)
 
     return (
-      <div className="space-y-4">
+      <div className="relative space-y-5">
         {steps.map((step, index) => {
-          const done = currentIndex >= index
-          const isCurrent = step === order.status
+          const done =
+            currentIndex >= index
+
+          const isCurrent =
+            step === order.status
+
+          const Icon =
+            done
+              ? CheckCircle2
+              : Circle
 
           return (
             <div
               key={step}
-              className="flex items-center gap-3"
+              className="relative flex items-center gap-3"
             >
-              {done ? (
-                <CheckCircle2
-                  size={20}
-                  className="shrink-0 text-green-700"
-                />
-              ) : (
-                <Circle
-                  size={20}
-                  className="shrink-0 text-gray-300"
+              {index <
+                steps.length - 1 && (
+                <span
+                  className={`absolute left-[9px] top-6 h-5 w-px ${
+                    currentIndex > index
+                      ? 'bg-[#16823b]'
+                      : 'bg-gray-200'
+                  }`}
                 />
               )}
+
+              <Icon
+                size={20}
+                className={`relative z-10 shrink-0 ${
+                  done
+                    ? 'text-[#16823b]'
+                    : 'text-gray-300'
+                }`}
+              />
 
               <span
                 className={`text-sm ${
                   isCurrent
-                    ? 'font-bold text-gray-900'
+                    ? 'font-bold text-[#172019]'
                     : done
-                      ? 'text-gray-700'
+                      ? 'font-medium text-gray-700'
                       : 'text-gray-400'
                 }`}
               >
-                {STATUS_LABELS[step] || step}
+                {STATUS_LABELS[step] ||
+                  step}
               </span>
+
+              {isCurrent && (
+                <span className="ml-auto rounded-full bg-[#f4f8f4] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#16823b]">
+                  Current
+                </span>
+              )}
             </div>
           )
         })}
@@ -256,15 +475,18 @@ function OrderDetail() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f4]">
-        <div className="text-center">
-          <PackageCheck
-            size={32}
-            className="mx-auto animate-pulse text-green-700"
-          />
-          <p className="mt-3 text-sm text-gray-500">
-            Loading order...
-          </p>
+      <div className="min-h-screen bg-[#f7faf7] px-4 py-6">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-6 h-10 w-32 animate-pulse rounded-xl bg-gray-200" />
+
+          <div className="animate-pulse rounded-2xl border border-[#dce8de] bg-white p-6">
+            <div className="h-7 w-52 rounded bg-gray-200" />
+            <div className="mt-3 h-4 w-64 rounded bg-gray-100" />
+
+            <div className="mt-8 h-28 rounded-xl bg-gray-100" />
+
+            <div className="mt-5 h-40 rounded-xl bg-gray-100" />
+          </div>
         </div>
       </div>
     )
@@ -272,16 +494,27 @@ function OrderDetail() {
 
   if (error && !order) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f4] px-4">
-        <div className="text-center">
-          <p className="mb-4 text-red-500">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7faf7] px-4">
+        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-7 text-center shadow-sm">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <XCircle size={28} />
+          </div>
+
+          <h2 className="mt-4 text-lg font-bold text-[#172019]">
+            Unable to load order
+          </h2>
+
+          <p className="mt-2 text-sm text-red-600">
             {error}
           </p>
 
           <button
-            onClick={() => navigate('/orders')}
-            className="rounded-lg bg-green-700 px-5 py-2 font-semibold text-white"
+            onClick={() =>
+              navigate('/orders')
+            }
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#16823b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#116d30]"
           >
+            <ArrowLeft size={17} />
             Back to Orders
           </button>
         </div>
@@ -289,219 +522,505 @@ function OrderDetail() {
     )
   }
 
-  if (!order) {
-    return null
-  }
+  if (!order) return null
 
-  const address = getAddress()
-  const paymentText = getPaymentText()
   const orderNumber =
     order.orderNumber ||
     order.id ||
     order.orderId
 
-  const isPendingPayment =
-    order.status === 'PENDING_PAYMENT' &&
-    order.paymentMethod === 'UPI'
-
-  const canCancel =
-    CANCELLABLE_STATUSES.includes(order.status)
+  const StatusIcon =
+    getStatusIcon(order.status)
 
   return (
-    <div className="min-h-screen bg-[#f7f8f4] pb-8">
-      <header className="sticky top-0 z-50 flex h-14 items-center bg-[#faf9f5] px-4 shadow-sm">
-        <button
-          onClick={() => navigate('/orders')}
-          className="-ml-2 flex h-12 w-12 items-center justify-center text-gray-700"
-        >
-          <ArrowLeft size={21} />
-        </button>
+    <div className="min-h-screen bg-[#f7faf7] pb-10">
+      <header className="sticky top-0 z-40 border-b border-[#dce8de] bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6 lg:px-8">
+          <button
+            onClick={() =>
+              navigate('/orders')
+            }
+            className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl text-gray-600 transition hover:bg-[#f4f8f4] hover:text-[#16823b]"
+          >
+            <ArrowLeft size={20} />
+          </button>
 
-        <h1 className="font-display text-xl font-bold text-green-700">
-          Order Details
-        </h1>
+          <div>
+            <p className="text-xs font-medium text-gray-500">
+              My Orders
+            </p>
+
+            <h1 className="text-lg font-bold text-[#172019]">
+              Order Details
+            </h1>
+          </div>
+        </div>
       </header>
 
-      <main className="mx-auto max-w-2xl space-y-5 px-4 py-6">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
         {error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {error}
+          <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <span>{error}</span>
+
+            <button
+              onClick={loadOrder}
+              className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-white px-3 py-2 font-semibold text-red-700 shadow-sm"
+            >
+              <RefreshCw size={15} />
+              Retry
+            </button>
           </div>
         )}
 
-        <section className="flex items-start justify-between gap-4">
+        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h2 className="font-display text-xl font-bold text-gray-900">
-              Order #{orderNumber}
-            </h2>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#16823b] text-white shadow-sm">
+                <ReceiptText size={21} />
+              </div>
 
-            <p className="mt-1 text-sm text-gray-500">
-              {formatDate(order.createdAt)}
-            </p>
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight text-[#172019]">
+                  Order #{orderNumber}
+                </h2>
+
+                <p className="mt-1 text-xs text-gray-500">
+                  Placed on {formatDate(order.createdAt)}
+                </p>
+              </div>
+            </div>
           </div>
 
           <span
-            className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-bold ${getStatusClasses(
+            className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold ${getStatusClasses(
               order.status
             )}`}
           >
-            {STATUS_LABELS[order.status] || order.status}
+            <StatusIcon size={15} />
+            {STATUS_LABELS[
+              order.status
+            ] || order.status}
           </span>
-        </section>
+        </div>
 
-        {isPendingPayment && (
-          <section className="rounded-xl border border-red-200 bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-            <div className="flex items-center gap-3">
-              <CreditCard
-                size={22}
-                className="text-red-600"
-              />
+        <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
+          <div className="space-y-5">
+            {isPendingPayment && (
+              <section className="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
+                <div className="bg-red-50 px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-red-600 shadow-sm">
+                      <WalletCards size={20} />
+                    </div>
 
-              <div className="flex-1">
-                <h3 className="text-sm font-bold text-gray-900">
-                  Payment Pending
-                </h3>
+                    <div>
+                      <h3 className="text-sm font-bold text-red-700">
+                        Payment Pending
+                      </h3>
 
-                <p className="mt-1 text-xs text-gray-500">
-                  Complete your UPI payment to confirm this order.
-                </p>
-              </div>
-            </div>
+                      <p className="mt-0.5 text-xs text-red-600">
+                        Complete your UPI payment to confirm this order.
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
-            <button
-              onClick={handlePayment}
-              disabled={paying}
-              className="mt-4 w-full rounded-lg bg-green-700 py-3 font-semibold text-white transition hover:bg-green-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {paying ? 'Starting Payment...' : 'Pay Now'}
-            </button>
-          </section>
-        )}
+                <div className="p-5">
+                  <button
+                    onClick={
+                      handlePayment
+                    }
+                    disabled={paying}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16823b] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#116d30] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <CreditCard
+                      size={17}
+                      className={
+                        paying
+                          ? 'animate-pulse'
+                          : ''
+                      }
+                    />
 
-        <section className="rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-          {renderTimeline()}
-        </section>
+                    {paying
+                      ? 'Processing...'
+                      : 'Pay Now'}
+                  </button>
+                </div>
+              </section>
+            )}
 
-        <section className="space-y-4 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-          <h3 className="text-sm font-bold text-gray-500">
-            Items
-          </h3>
+            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm sm:p-6">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
+                  <PackageCheck size={20} />
+                </div>
 
-          <div className="space-y-3">
-            {order.items?.map((item, index) => (
-              <div
-                key={item?.id || index}
-                className="flex justify-between gap-4 text-sm"
-              >
-                <div className="min-w-0">
-                  <p className="font-medium text-gray-900">
-                    {item?.productName || item?.name || 'Product'}
+                <div>
+                  <h3 className="text-base font-bold text-[#172019]">
+                    Order Status
+                  </h3>
+
+                  <p className="text-xs text-gray-500">
+                    Track your order progress
                   </p>
+                </div>
+              </div>
 
-                  <p className="mt-1 text-xs text-gray-500">
-                    {item?.weight
-                      ? `${item.weight}${item.unit || ''} × `
-                      : ''}
-                    {item?.quantity || 1}
+              {renderTimeline()}
+            </section>
+
+            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm sm:p-6">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-[#172019]">
+                    Order Items
+                  </h3>
+
+                  <p className="mt-0.5 text-xs text-gray-500">
+                    {items.length} item
+                    {items.length !== 1
+                      ? 's'
+                      : ''} in this order
                   </p>
                 </div>
 
-                <span className="shrink-0 font-medium text-gray-900">
-                  ₹{Number(item?.lineTotal || 0).toFixed(2)}
-                </span>
+                <ShoppingBag
+                  size={20}
+                  className="text-[#16823b]"
+                />
               </div>
-            ))}
+
+              <div className="space-y-3">
+                {items.map(
+                  (item, index) => {
+                    const quantity =
+                      Number(
+                        item?.quantity || 1
+                      )
+
+                    const price =
+                      Number(
+                        item?.price ||
+                        item?.unitPrice ||
+                        item?.sellingPrice ||
+                        0
+                      )
+
+                    const lineTotal =
+                      Number(
+                        item?.lineTotal ??
+                        price * quantity
+                      )
+
+                    const name =
+                      item?.productName ||
+                      item?.name ||
+                      item?.product?.name ||
+                      'Product'
+
+                    const image =
+                      item?.image ||
+                      item?.imageUrl ||
+                      item?.productImage ||
+                      item?.product?.image ||
+                      ''
+
+                    return (
+                      <div
+                        key={
+                          item?.id ||
+                          index
+                        }
+                        className="flex items-center gap-3 rounded-xl bg-[#f7faf7] p-3"
+                      >
+                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white">
+                          {image ? (
+                            <img
+                              src={image}
+                              alt={name}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <ShoppingBag
+                              size={23}
+                              className="text-[#16823b]"
+                            />
+                          )}
+                        </div>
+
+                        <div className="min-w-0 flex-1">
+                          <h4 className="truncate text-sm font-bold text-[#172019]">
+                            {name}
+                          </h4>
+
+                          <p className="mt-1 text-xs text-gray-500">
+                            {item?.weight
+                              ? `${item.weight}${item.unit || ''} × `
+                              : ''}
+                            Qty: {quantity}
+                          </p>
+
+                          {price > 0 && (
+                            <p className="mt-1 text-xs text-gray-400">
+                              ₹{price.toFixed(2)} each
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-sm font-bold text-[#172019]">
+                            ₹
+                            {lineTotal.toFixed(
+                              2
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  }
+                )}
+              </div>
+            </section>
           </div>
 
-          <div className="h-px w-full bg-[#bdcabb]" />
+          <div className="space-y-5">
+            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
+                  <ReceiptText size={20} />
+                </div>
 
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>Items</span>
-            <span>
-              ₹{Number(order.subtotal || 0).toFixed(2)}
-            </span>
+                <div>
+                  <h3 className="text-base font-bold text-[#172019]">
+                    Payment Summary
+                  </h3>
+
+                  <p className="text-xs text-gray-500">
+                    Order amount breakdown
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">
+                    Items
+                  </span>
+
+                  <span className="font-medium text-[#172019]">
+                    ₹{subtotal.toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500">
+                    Delivery Fee
+                  </span>
+
+                  <span className="font-medium text-[#172019]">
+                    {deliveryFee > 0
+                      ? `₹${deliveryFee.toFixed(2)}`
+                      : 'FREE'}
+                  </span>
+                </div>
+
+                <div className="my-3 h-px bg-[#dce8de]" />
+
+                <div className="flex items-end justify-between">
+                  <span className="text-base font-bold text-[#172019]">
+                    Total
+                  </span>
+
+                  <span className="text-2xl font-bold text-[#16823b]">
+                    ₹{total.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm">
+              <div className="mb-5 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
+                  <MapPin size={20} />
+                </div>
+
+                <div>
+                  <h3 className="text-base font-bold text-[#172019]">
+                    Delivery & Payment
+                  </h3>
+
+                  <p className="text-xs text-gray-500">
+                    Order fulfillment details
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="rounded-xl bg-[#f7faf7] p-3">
+                  <div className="flex items-start gap-3">
+                    <MapPin
+                      size={18}
+                      className="mt-0.5 shrink-0 text-[#16823b]"
+                    />
+
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500">
+                        Fulfillment
+                      </p>
+
+                      <p className="mt-1 text-sm font-bold text-[#172019]">
+                        {order.fulfillmentMethod ===
+                        'DELIVERY'
+                          ? 'Home Delivery'
+                          : 'Store Pickup'}
+                      </p>
+
+                      {getAddress && (
+                        <p className="mt-1 text-xs leading-5 text-gray-500">
+                          {getAddress}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="rounded-xl bg-[#f7faf7] p-3">
+                  <div className="flex items-center gap-3">
+                    <CreditCard
+                      size={18}
+                      className="shrink-0 text-[#16823b]"
+                    />
+
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500">
+                        Payment Method
+                      </p>
+
+                      <p className="mt-1 text-sm font-bold capitalize text-[#172019]">
+                        {getPaymentText}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {canCancel && (
+              <section className="rounded-2xl border border-red-100 bg-white p-5 shadow-sm">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                    <Ban size={19} />
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-[#172019]">
+                      Cancel Order
+                    </h3>
+
+                    <p className="text-xs text-gray-500">
+                      You can cancel this order at this stage.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() =>
+                    setShowCancelModal(
+                      true
+                    )
+                  }
+                  className="w-full rounded-xl border border-red-200 bg-white px-4 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+                >
+                  Cancel Order
+                </button>
+              </section>
+            )}
           </div>
-
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>Delivery Fee</span>
-            <span>
-              {Number(order.deliveryFee || 0) > 0
-                ? `₹${Number(order.deliveryFee).toFixed(2)}`
-                : 'FREE'}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between pt-1">
-            <span className="font-display text-xl font-bold text-gray-900">
-              Total
-            </span>
-
-            <span className="font-display text-2xl font-bold text-green-700">
-              ₹{Number(order.total || 0).toFixed(2)}
-            </span>
-          </div>
-        </section>
-
-        <section className="space-y-3 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-          <h3 className="text-sm font-bold text-gray-500">
-            Fulfillment
-          </h3>
-
-          <div className="flex items-start gap-3">
-            <MapPin
-              size={20}
-              className="mt-0.5 shrink-0 text-green-700"
-            />
-
-            <div>
-              <p className="text-sm font-semibold text-gray-900">
-                {order.fulfillmentMethod === 'DELIVERY'
-                  ? 'Home Delivery'
-                  : 'Store Pickup'}
-              </p>
-
-              {address && (
-                <p className="mt-1 text-sm leading-6 text-gray-500">
-                  {address}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <CreditCard
-              size={20}
-              className="shrink-0 text-green-700"
-            />
-
-            <div>
-              <p className="text-xs font-semibold text-gray-500">
-                Payment Method
-              </p>
-
-              <p className="mt-1 text-sm font-medium text-gray-900">
-                {paymentText}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {canCancel && (
-          <section className="rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-            <button
-              onClick={handleCancel}
-              disabled={cancelling}
-              className="w-full rounded-lg border border-red-500 py-3 font-semibold text-red-500 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {cancelling
-                ? 'Cancelling...'
-                : 'Cancel Order'}
-            </button>
-          </section>
-        )}
+        </div>
       </main>
+
+      {showCancelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+              <div>
+                <h2 className="text-lg font-bold text-[#172019]">
+                  Cancel Order
+                </h2>
+
+                <p className="mt-0.5 text-xs text-gray-500">
+                  Order #{orderNumber}
+                </p>
+              </div>
+
+              <button
+                onClick={() =>
+                  setShowCancelModal(
+                    false
+                  )
+                }
+                className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-5">
+              <div className="rounded-xl border border-red-100 bg-red-50 p-4">
+                <p className="text-sm font-semibold text-red-700">
+                  Are you sure you want to cancel this order?
+                </p>
+
+                <p className="mt-1 text-xs leading-5 text-red-600">
+                  This action may not be reversible.
+                </p>
+              </div>
+
+              <textarea
+                value={cancelReason}
+                onChange={e =>
+                  setCancelReason(
+                    e.target.value
+                  )
+                }
+                placeholder="Enter cancellation reason"
+                rows={4}
+                className="mt-4 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#172019] outline-none transition placeholder:text-gray-400 focus:border-[#16823b] focus:ring-2 focus:ring-[#16823b]/10"
+              />
+
+              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                <button
+                  onClick={() => {
+                    setShowCancelModal(
+                      false
+                    )
+                    setCancelReason('')
+                  }}
+                  className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                >
+                  Keep Order
+                </button>
+
+                <button
+                  onClick={
+                    handleCancel
+                  }
+                  disabled={cancelling}
+                  className="flex-1 rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {cancelling
+                    ? 'Cancelling...'
+                    : 'Confirm Cancel'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
 export default OrderDetail
+

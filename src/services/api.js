@@ -26,8 +26,50 @@ export function clearSession() {
   localStorage.removeItem(AUTH_STORAGE_KEY)
 }
 
-export function logout() {
+export async function logout() {
+  const session = getSession()
+
+  const refreshToken =
+    session?.refreshToken ||
+    session?.tokens?.refreshToken ||
+    session?.data?.refreshToken
+
+  if (!refreshToken) {
+    throw new Error('Refresh token not found')
+  }
+
+  console.log('Logout API calling...')
+
+  const response = await fetch(
+    `${API_BASE_URL}/auth/customer/logout`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        refreshToken,
+      }),
+    }
+  )
+
+  console.log('Logout API response received:', response.status)
+
+  const result = await response.json().catch(() => ({}))
+
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message || 'Logout failed')
+  }
+
+  console.log('Logout successful:', result)
+
+  await new Promise((resolve) => setTimeout(resolve, 5000))
+
   clearSession()
+  localStorage.removeItem(PENDING_PHONE_KEY)
+  localStorage.removeItem(DEV_OTP_KEY)
+  sessionStorage.removeItem(DEV_OTP_KEY)
+
   window.location.href = '/'
 }
 
@@ -48,12 +90,17 @@ export async function apiFetch(path, options = {}) {
     headers,
   })
 
-  if (response.status === 204) return null
+  if (response.status === 204) {
+    return null
+  }
 
   const result = await response.json().catch(() => ({}))
 
   if (response.status === 401) {
     clearSession()
+    localStorage.removeItem(PENDING_PHONE_KEY)
+    localStorage.removeItem(DEV_OTP_KEY)
+    sessionStorage.removeItem(DEV_OTP_KEY)
     window.location.href = '/'
     throw new Error('Session expired')
   }
@@ -65,22 +112,76 @@ export async function apiFetch(path, options = {}) {
   return result.data
 }
 
+export async function healthCheck() {
+  return apiFetch('/health')
+}
+
 export async function requestOtp(phone) {
-  return apiFetch('/auth/customer/request-otp', {
+  const data = await apiFetch('/auth/customer/request-otp', {
     method: 'POST',
     body: JSON.stringify({ phone }),
   })
+
+  localStorage.setItem(PENDING_PHONE_KEY, phone)
+
+  if (data?.devOnlyOtp) {
+    localStorage.setItem(
+      DEV_OTP_KEY,
+      String(data.devOnlyOtp)
+    )
+
+    sessionStorage.setItem(
+      DEV_OTP_KEY,
+      String(data.devOnlyOtp)
+    )
+  }
+
+  return data
 }
 
 export async function verifyOtp(phone, code) {
   const data = await apiFetch('/auth/customer/verify-otp', {
     method: 'POST',
-    body: JSON.stringify({ phone, code }),
+    body: JSON.stringify({
+      phone,
+      code,
+    }),
   })
 
-  if (data?.accessToken) {
-    saveSession(data)
+  const accessToken =
+    data?.accessToken ||
+    data?.token ||
+    data?.tokens?.accessToken ||
+    data?.data?.accessToken
+
+  const refreshToken =
+    data?.refreshToken ||
+    data?.tokens?.refreshToken ||
+    data?.data?.refreshToken
+
+  const customer =
+    data?.customer ||
+    data?.user ||
+    data?.data?.customer ||
+    data?.data?.user ||
+    null
+
+  if (!accessToken) {
+    throw new Error(
+      'Login successful, but access token was not received.'
+    )
   }
+
+  saveSession({
+    ...data,
+    accessToken,
+    refreshToken,
+    customer,
+  })
+
+  localStorage.removeItem(PENDING_PHONE_KEY)
+  localStorage.removeItem(DEV_OTP_KEY)
+  sessionStorage.removeItem(DEV_OTP_KEY)
 
   return data
 }
@@ -134,28 +235,78 @@ export async function getBrands() {
   return Array.isArray(data) ? data : data?.items || []
 }
 
-export async function getProducts() {
-  const data = await apiFetch('/products?page=1&limit=20')
-  return data?.items || []
+export async function getBrand(brandId) {
+  return apiFetch(`/brands/${brandId}`)
+}
+
+export async function getProducts({
+  page = 1,
+  limit = 20,
+  search = '',
+  categoryId = '',
+  brandId = '',
+} = {}) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  })
+
+  if (search) {
+    params.append('search', search)
+  }
+
+  if (categoryId) {
+    params.append('categoryId', categoryId)
+  }
+
+  if (brandId) {
+    params.append('brandId', brandId)
+  }
+
+  const data = await apiFetch(`/products?${params.toString()}`)
+
+  return Array.isArray(data) ? data : data?.items || []
 }
 
 export async function getProductsByCategory(categoryId) {
-  const data = await apiFetch(
-    `/products?page=1&limit=20&categoryId=${encodeURIComponent(categoryId)}`
-  )
+  return getProducts({
+    page: 1,
+    limit: 20,
+    categoryId,
+  })
+}
 
-  return data?.items || []
+export async function getProductsByBrand(brandId) {
+  return getProducts({
+    page: 1,
+    limit: 20,
+    brandId,
+  })
+}
+
+export async function searchProducts(search) {
+  return getProducts({
+    page: 1,
+    limit: 20,
+    search,
+  })
 }
 
 export async function getProduct(productId) {
   return apiFetch(`/products/${productId}`)
 }
 
+export async function getProductBySku(sku) {
+  return apiFetch(
+    `/products/barcode/${encodeURIComponent(sku)}`
+  )
+}
+
 export async function getCart() {
   return apiFetch('/cart')
 }
 
-export async function addToCart(variantId, quantity) {
+export async function addToCart(variantId, quantity = 1) {
   return apiFetch('/cart/items', {
     method: 'POST',
     body: JSON.stringify({
@@ -165,19 +316,21 @@ export async function addToCart(variantId, quantity) {
   })
 }
 
-export async function updateCartItem(itemId, quantity) {
+export async function updateCartItem(cartItemId, quantity) {
   if (quantity <= 0) {
-    return removeCartItem(itemId)
+    return removeCartItem(cartItemId)
   }
 
-  return apiFetch(`/cart/items/${itemId}`, {
+  return apiFetch(`/cart/items/${cartItemId}`, {
     method: 'PATCH',
-    body: JSON.stringify({ quantity }),
+    body: JSON.stringify({
+      quantity,
+    }),
   })
 }
 
-export async function removeCartItem(itemId) {
-  return apiFetch(`/cart/items/${itemId}`, {
+export async function removeCartItem(cartItemId) {
+  return apiFetch(`/cart/items/${cartItemId}`, {
     method: 'DELETE',
   })
 }
@@ -213,7 +366,9 @@ export async function cancelOrder(
 ) {
   return apiFetch(`/orders/${orderId}/cancel`, {
     method: 'POST',
-    body: JSON.stringify({ reason }),
+    body: JSON.stringify({
+      reason,
+    }),
   })
 }
 

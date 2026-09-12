@@ -1,9 +1,24 @@
+
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
   getOrder,
   startOrderPayment,
 } from '../services/api'
+import {
+  CheckCircle2,
+  Clock3,
+  PackageCheck,
+  MapPin,
+  CreditCard,
+  Truck,
+  ShoppingBag,
+  ChevronRight,
+  ArrowLeft,
+  ShieldCheck,
+  ReceiptText,
+  AlertCircle,
+} from 'lucide-react'
 
 const STATUS_LABELS = {
   PENDING_PAYMENT: 'Awaiting Payment',
@@ -47,9 +62,7 @@ function Confirmation() {
       const data = await getOrder(orderId)
       setOrder(data)
     } catch (err) {
-      setError(
-        err.message || 'Failed to load order'
-      )
+      setError(err.message || 'Failed to load order')
     } finally {
       setLoading(false)
     }
@@ -90,9 +103,7 @@ function Confirmation() {
     const razorpay = new window.Razorpay({
       key: payment.keyId,
       order_id: payment.providerOrderId,
-      amount: Math.round(
-        Number(payment.amount) * 100
-      ),
+      amount: Math.round(Number(payment.amount) * 100),
       currency: payment.currency,
       name: 'CD Shopping Hub',
       description: `Order #${order.orderNumber}`,
@@ -113,9 +124,7 @@ function Confirmation() {
   }
 
   async function pollForConfirmation(id) {
-    setPaymentMessage(
-      'Confirming your payment...'
-    )
+    setPaymentMessage('Confirming your payment...')
     setPaymentButtonVisible(false)
 
     for (let attempt = 0; attempt < 10; attempt++) {
@@ -126,10 +135,7 @@ function Confirmation() {
       try {
         const updatedOrder = await getOrder(id)
 
-        if (
-          updatedOrder.status !==
-          'PENDING_PAYMENT'
-        ) {
+        if (updatedOrder.status !== 'PENDING_PAYMENT') {
           setOrder(updatedOrder)
           setPaymentMessage('')
           setPaying(false)
@@ -137,7 +143,6 @@ function Confirmation() {
           return
         }
       } catch {
-        // Continue polling
       }
     }
 
@@ -162,30 +167,41 @@ function Confirmation() {
 
   if (loading) {
     return (
-      <main className="mx-auto min-h-screen max-w-2xl bg-[#f7f8f4] px-4 py-10">
-        <div className="py-20 text-center text-gray-500">
-          Loading...
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#315d32]/20 border-t-[#315d32]" />
+          <p className="text-xs font-bold uppercase tracking-widest text-[#8a9287]">
+            Loading order...
+          </p>
         </div>
-      </main>
+      </div>
     )
   }
 
   if (error || !order) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f7f8f4] px-4">
-        <div className="text-center">
-          <p className="mb-4 text-red-600">
-            {error || 'Order not found'}
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
+        <div className="w-full max-w-md rounded-[24px] border border-[#e1e7dd] bg-white p-8 text-center shadow-[0_20px_60px_rgba(47,70,39,0.08)]">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-500">
+            <AlertCircle size={28} />
+          </div>
+
+          <h2 className="mt-5 text-xl font-black text-[#202a20]">
+            Order not found
+          </h2>
+
+          <p className="mt-2 text-sm text-[#8a9287]">
+            {error || 'We could not find this order.'}
           </p>
 
           <button
             onClick={() => navigate('/orders')}
-            className="rounded-lg bg-green-700 px-5 py-2 font-semibold text-white"
+            className="mt-6 w-full rounded-[12px] bg-[#315d32] py-3.5 text-sm font-black text-white transition hover:bg-[#274d29]"
           >
             View Orders
           </button>
         </div>
-      </main>
+      </div>
     )
   }
 
@@ -194,8 +210,7 @@ function Confirmation() {
     order.status === 'PENDING_PAYMENT'
 
   const statusLabel =
-    STATUS_LABELS[order.status] ||
-    order.status
+    STATUS_LABELS[order.status] || order.status
 
   const fulfillmentMethod =
     order.fulfillmentMethod === 'DELIVERY'
@@ -204,179 +219,409 @@ function Confirmation() {
 
   const paymentMethod =
     order.paymentMethod === 'UPI'
-      ? 'Payment: UPI'
+      ? 'UPI'
       : order.fulfillmentMethod === 'DELIVERY'
-        ? 'Payment: Cash on Delivery'
-        : 'Payment: Cash at Pickup'
+        ? 'Cash on Delivery'
+        : 'Cash at Pickup'
+
+  const subtotal = Number(order.subtotal || 0)
+  const deliveryFee = Number(order.deliveryFee || 0)
+  const total = Number(order.total || 0)
 
   return (
-    <main className="min-h-screen bg-[#f7f8f4] pb-10">
-      <div className="mx-auto max-w-2xl px-4 py-6">
+    <div className="min-h-screen bg-[#f7f8f2]">
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-5 flex items-center gap-2 text-xs">
+          <button
+            onClick={() => navigate('/orders')}
+            className="font-semibold text-[#6f786d] transition hover:text-[#315d32]"
+          >
+            Your Orders
+          </button>
 
-        {/* Status */}
-        <div className="flex flex-col items-center py-6 text-center">
-          <span
-            className={`material-symbols-outlined text-[64px] ${
+          <ChevronRight
+            size={14}
+            className="text-[#a7afa3]"
+          />
+
+          <span className="font-bold text-[#315d32]">
+            Order Confirmation
+          </span>
+        </div>
+
+        <section
+          className={`overflow-hidden rounded-[22px] border bg-white shadow-[0_12px_35px_rgba(47,70,39,0.06)] ${
+            needsPayment
+              ? 'border-[#f1d6d6]'
+              : 'border-[#dfe7db]'
+          }`}
+        >
+          <div
+            className={`px-5 py-7 sm:px-8 ${
               needsPayment
-                ? 'text-red-600'
-                : 'text-green-700'
+                ? 'bg-[#fff7f7]'
+                : 'bg-[#f4f9f0]'
             }`}
           >
-            {needsPayment
-              ? 'schedule'
-              : 'check_circle'}
-          </span>
-
-          <h1 className="mt-4 text-2xl font-bold text-gray-900">
-            {needsPayment
-              ? 'Almost There'
-              : 'Order Placed!'}
-          </h1>
-
-          <p className="mt-1 text-sm text-gray-500">
-            Order #{order.orderNumber} ·{' '}
-            {statusLabel}
-          </p>
-        </div>
-
-        {/* Payment */}
-        {needsPayment && (
-          <div className="mb-6 space-y-3 rounded-lg bg-red-100 p-4 text-sm text-red-700">
-            <p>
-              {paymentMessage ||
-                'This order still needs to be paid online to be confirmed.'}
-            </p>
-
-            {paymentButtonVisible && (
-              <button
-                onClick={startPayment}
-                disabled={paying}
-                className="h-11 w-full rounded-lg bg-green-700 font-bold text-white disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {paying
-                  ? 'Starting payment...'
-                  : 'Pay Now'}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Items */}
-        <section className="mb-6 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-          <h2 className="mb-3 text-xl font-bold text-gray-900">
-            Items
-          </h2>
-
-          <div className="space-y-3">
-            {order.items?.map((item) => (
+            <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left">
               <div
-                key={item.id}
-                className="flex justify-between gap-4 text-sm"
+                className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full ${
+                  needsPayment
+                    ? 'bg-[#fff0f0] text-[#d14343]'
+                    : 'bg-[#e4f2dc] text-[#315d32]'
+                }`}
               >
-                <span className="text-gray-900">
-                  {item.productName}{' '}
-                  <span className="text-gray-500">
-                    ({item.weight}
-                    {item.unit} × {item.quantity})
-                  </span>
-                </span>
-
-                <span className="shrink-0">
-                  ₹
-                  {Number(
-                    item.lineTotal
-                  ).toFixed(2)}
-                </span>
+                {needsPayment ? (
+                  <Clock3 size={34} strokeWidth={1.8} />
+                ) : (
+                  <CheckCircle2
+                    size={38}
+                    strokeWidth={1.8}
+                  />
+                )}
               </div>
-            ))}
+
+              <div className="mt-4 sm:ml-5 sm:mt-0">
+                <h1 className="text-2xl font-black tracking-tight text-[#202a20] sm:text-3xl">
+                  {needsPayment
+                    ? 'Almost there!'
+                    : 'Thank you for your order!'}
+                </h1>
+
+                <p className="mt-1 text-sm text-[#687166]">
+                  {needsPayment
+                    ? 'Your order has been created and is waiting for payment.'
+                    : 'Your order has been successfully placed.'}
+                </p>
+
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+                  <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#315d32] shadow-sm">
+                    Order #{order.orderNumber}
+                  </span>
+
+                  <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#687166] shadow-sm">
+                    {statusLabel}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-        </section>
 
-        {/* Fulfillment */}
-        <section className="mb-6 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-          <h2 className="mb-3 text-xl font-bold text-gray-900">
-            Fulfillment
-          </h2>
+          {needsPayment && (
+            <div className="border-t border-[#f1dede] bg-white px-5 py-5 sm:px-8">
+              <div className="flex flex-col gap-4 rounded-[16px] border border-[#f0dddd] bg-[#fff8f8] p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex gap-3">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ffecec] text-[#d14343]">
+                    <CreditCard size={17} />
+                  </div>
 
-          <p className="text-sm text-gray-900">
-            {fulfillmentMethod}
-          </p>
+                  <div>
+                    <p className="text-sm font-black text-[#202a20]">
+                      Payment required
+                    </p>
 
-          {order.fulfillmentMethod ===
-            'DELIVERY' && (
-            <p className="mt-1 text-sm text-gray-500">
-              {formatAddress(order)}
-            </p>
+                    <p className="mt-1 max-w-xl text-xs leading-5 text-[#7d706f]">
+                      {paymentMessage ||
+                        'Complete your online payment to confirm this order.'}
+                    </p>
+                  </div>
+                </div>
+
+                {paymentButtonVisible && (
+                  <button
+                    onClick={startPayment}
+                    disabled={paying}
+                    className="w-full rounded-[11px] bg-[#315d32] px-7 py-3 text-sm font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                  >
+                    {paying
+                      ? 'Starting payment...'
+                      : 'Pay Now'}
+                  </button>
+                )}
+              </div>
+            </div>
           )}
-
-          <p className="mt-1 text-sm text-gray-500">
-            {paymentMethod}
-          </p>
         </section>
 
-        {/* Summary */}
-        <section className="mb-8 rounded-xl bg-white p-4 shadow-[0px_4px_12px_rgba(0,0,0,0.04)]">
-          <div className="flex justify-between text-sm text-gray-500">
-            <span>Items</span>
-            <span>
-              ₹
-              {Number(
-                order.subtotal
-              ).toFixed(2)}
-            </span>
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
+          <div className="space-y-6">
+            <section className="overflow-hidden rounded-[20px] border border-[#e1e7dd] bg-white shadow-[0_10px_30px_rgba(47,70,39,0.045)]">
+              <div className="border-b border-[#edf0ea] px-5 py-4 sm:px-6">
+                <h2 className="text-lg font-black text-[#202a20]">
+                  Order Details
+                </h2>
+
+                <p className="mt-1 text-xs text-[#8a9287]">
+                  Items included in your order
+                </p>
+              </div>
+
+              <div className="divide-y divide-[#edf0ea]">
+                {order.items?.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex gap-4 px-5 py-5 sm:px-6"
+                  >
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[12px] bg-[#f4f7f1] text-[#315d32]">
+                      <ShoppingBag size={25} />
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-col justify-between gap-2 sm:flex-row">
+                        <div>
+                          <h3 className="text-sm font-black text-[#202a20]">
+                            {item.productName}
+                          </h3>
+
+                          <p className="mt-1 text-xs text-[#8a9287]">
+                            {item.weight}
+                            {item.unit} × {item.quantity}
+                          </p>
+                        </div>
+
+                        <p className="text-sm font-black text-[#202a20]">
+                          ₹
+                          {Number(
+                            item.lineTotal
+                          ).toFixed(2)}
+                        </p>
+                      </div>
+
+                      <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-[#315d32]">
+                        <CheckCircle2 size={13} />
+                        Order item confirmed
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[20px] border border-[#e1e7dd] bg-white shadow-[0_10px_30px_rgba(47,70,39,0.045)]">
+              <div className="border-b border-[#edf0ea] px-5 py-4 sm:px-6">
+                <h2 className="text-lg font-black text-[#202a20]">
+                  Delivery & Payment
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 divide-y divide-[#edf0ea] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+                <div className="flex gap-3 px-5 py-5 sm:px-6">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#eef5e7] text-[#315d32]">
+                    {order.fulfillmentMethod ===
+                    'DELIVERY' ? (
+                      <Truck size={19} />
+                    ) : (
+                      <PackageCheck size={19} />
+                    )}
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#969e93]">
+                      Fulfillment
+                    </p>
+
+                    <p className="mt-1 text-sm font-black text-[#202a20]">
+                      {fulfillmentMethod}
+                    </p>
+
+                    {order.fulfillmentMethod ===
+                      'DELIVERY' && (
+                      <p className="mt-1 text-xs leading-5 text-[#7e877c]">
+                        {formatAddress(order)}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex gap-3 px-5 py-5 sm:px-6">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#eef5e7] text-[#315d32]">
+                    <CreditCard size={19} />
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-[#969e93]">
+                      Payment Method
+                    </p>
+
+                    <p className="mt-1 text-sm font-black text-[#202a20]">
+                      {paymentMethod}
+                    </p>
+
+                    <p className="mt-1 text-xs text-[#7e877c]">
+                      {needsPayment
+                        ? 'Payment pending'
+                        : 'Payment confirmed'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={() =>
+                  navigate(
+                    `/order-detail?orderId=${order.id}`
+                  )
+                }
+                className="flex flex-1 items-center justify-center gap-2 rounded-[12px] border border-[#315d32] bg-white py-3.5 text-sm font-black text-[#315d32] transition hover:bg-[#eef5e7]"
+              >
+                View Order Details
+                <ChevronRight size={17} />
+              </button>
+
+              <button
+                onClick={() => navigate('/orders')}
+                className="flex flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#315d32] py-3.5 text-sm font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29]"
+              >
+                View All Orders
+              </button>
+            </div>
           </div>
 
-          <div className="mt-2 flex justify-between text-sm text-gray-500">
-            <span>Delivery Fee</span>
+          <aside className="lg:sticky lg:top-5 lg:self-start">
+            <div className="overflow-hidden rounded-[20px] border border-[#e1e7dd] bg-white shadow-[0_15px_40px_rgba(47,70,39,0.07)]">
+              <div className="border-b border-[#edf0ea] px-5 py-4">
+                <div className="flex items-center gap-2">
+                  <ReceiptText
+                    size={18}
+                    className="text-[#315d32]"
+                  />
 
-            <span>
-              {Number(order.deliveryFee) > 0
-                ? `₹${Number(
-                    order.deliveryFee
-                  ).toFixed(2)}`
-                : 'FREE'}
-            </span>
-          </div>
+                  <h2 className="text-base font-black text-[#202a20]">
+                    Order Summary
+                  </h2>
+                </div>
+              </div>
 
-          <div className="my-3 h-px bg-gray-200" />
+              <div className="p-5">
+                <div className="rounded-[14px] bg-[#f7f8f2] p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-[#8a9287]">
+                      Order Number
+                    </span>
 
-          <div className="flex items-center justify-between">
-            <span className="text-xl font-bold text-gray-900">
-              Total
-            </span>
+                    <span className="text-xs font-black text-[#202a20]">
+                      #{order.orderNumber}
+                    </span>
+                  </div>
 
-            <span className="text-2xl font-bold text-green-700">
-              ₹
-              {Number(
-                order.total
-              ).toFixed(2)}
-            </span>
-          </div>
-        </section>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-[#8a9287]">
+                      Status
+                    </span>
 
-        {/* Actions */}
-        <div className="flex gap-3">
-          <button
-            onClick={() =>
-              navigate(
-                `/order-detail?orderId=${order.id}`
-              )
-            }
-            className="flex-1 rounded-lg border border-green-700 py-3 font-semibold text-green-700"
-          >
-            View Order
-          </button>
+                    <span className="rounded-full bg-[#e8f2e3] px-2.5 py-1 text-[9px] font-black uppercase text-[#315d32]">
+                      {statusLabel}
+                    </span>
+                  </div>
+                </div>
 
-          <button
-            onClick={() => navigate('/')}
-            className="flex-1 rounded-lg bg-green-700 py-3 font-semibold text-white"
-          >
-            Continue Shopping
-          </button>
+                <div className="my-5 space-y-4">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[#7e877c]">
+                      Item Total
+                    </span>
+
+                    <span className="font-bold text-[#202a20]">
+                      ₹{subtotal.toFixed(2)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[#7e877c]">
+                      Delivery Fee
+                    </span>
+
+                    <span
+                      className={`font-bold ${
+                        deliveryFee === 0
+                          ? 'text-[#315d32]'
+                          : 'text-[#202a20]'
+                      }`}
+                    >
+                      {deliveryFee === 0
+                        ? 'FREE'
+                        : `₹${deliveryFee.toFixed(2)}`}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="border-t border-dashed border-[#dce3d8] pt-5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-black text-[#202a20]">
+                      Total
+                    </span>
+
+                    <span className="text-2xl font-black text-[#315d32]">
+                      ₹{total.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-5 space-y-3">
+                  <div className="flex items-center gap-3 rounded-[13px] border border-[#e5ebe1] p-3">
+                    <ShieldCheck
+                      size={18}
+                      className="shrink-0 text-[#315d32]"
+                    />
+
+                    <div>
+                      <p className="text-[10px] font-black text-[#202a20]">
+                        Secure Order
+                      </p>
+
+                      <p className="mt-0.5 text-[9px] text-[#929a8f]">
+                        Your order information is protected
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 rounded-[13px] border border-[#e5ebe1] p-3">
+                    <PackageCheck
+                      size={18}
+                      className="shrink-0 text-[#315d32]"
+                    />
+
+                    <div>
+                      <p className="text-[10px] font-black text-[#202a20]">
+                        Order Tracking
+                      </p>
+
+                      <p className="mt-0.5 text-[9px] text-[#929a8f]">
+                        Track your order anytime
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/order-detail?orderId=${order.id}`
+                    )
+                  }
+                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#315d32] py-3 text-xs font-black text-[#315d32] transition hover:bg-[#eef5e7]"
+                >
+                  Track Order
+                  <ChevronRight size={15} />
+                </button>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/')}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#dfe6dc] bg-white py-3.5 text-xs font-black text-[#606960] shadow-sm transition hover:border-[#315d32]/30 hover:bg-[#eef5e7] hover:text-[#315d32]"
+            >
+              <ArrowLeft size={15} />
+              Continue Shopping
+            </button>
+          </aside>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }
 
 export default Confirmation
+

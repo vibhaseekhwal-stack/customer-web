@@ -49,6 +49,7 @@ function Account() {
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
   const [error, setError] = useState('')
 
   const emptyAddress = {
@@ -82,6 +83,25 @@ function Account() {
       setError(err.message)
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleLogout() {
+    if (loggingOut) return
+
+    const confirmed = window.confirm(
+      'Are you sure you want to log out?'
+    )
+
+    if (!confirmed) return
+
+    try {
+      setLoggingOut(true)
+      await logout()
+    } catch (err) {
+      console.error('Logout failed:', err)
+      setLoggingOut(false)
+      alert(err.message)
     }
   }
 
@@ -263,10 +283,10 @@ function Account() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4f7f4]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2]">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-green-700 border-t-transparent" />
-          <p className="text-xs font-bold uppercase tracking-wide text-gray-500">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#315d32] border-t-transparent" />
+          <p className="text-xs font-bold uppercase tracking-wide text-[#81907b]">
             Loading profile...
           </p>
         </div>
@@ -276,9 +296,9 @@ function Account() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f4f7f4] px-4">
-        <div className="w-full max-w-sm rounded-3xl border border-gray-100 bg-white p-8 text-center shadow-lg">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
+        <div className="w-full max-w-sm rounded-[28px] border border-white bg-white p-8 text-center shadow-[0_20px_60px_rgba(47,70,39,0.10)]">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef5e7] text-[#315d32]">
             <ShieldCheck size={24} />
           </div>
 
@@ -288,7 +308,7 @@ function Account() {
 
           <button
             onClick={() => window.location.reload()}
-            className="rounded-xl bg-green-700 px-5 py-2.5 text-xs font-black text-white"
+            className="rounded-xl bg-[#315d32] px-5 py-2.5 text-xs font-black text-white transition hover:bg-[#274d29]"
           >
             Try Again
           </button>
@@ -298,8 +318,8 @@ function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f7f4] pb-20">
-      <div className="bg-gradient-to-r from-emerald-950 via-green-900 to-emerald-800 px-4 py-6 text-white shadow-md sm:px-8">
+    <div className="min-h-screen bg-[#f7f8f2] pb-20">
+      <div className="bg-[#315d32] px-4 py-6 text-white shadow-lg shadow-[#315d32]/15 sm:px-8">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <div className="flex items-center gap-3">
             <button
@@ -315,7 +335,7 @@ function Account() {
                 My Account
               </h1>
 
-              <p className="text-[11px] font-medium text-green-100">
+              <p className="text-[11px] font-medium text-[#dceacb]">
                 Manage profile and delivery locations
               </p>
             </div>
@@ -328,7 +348,7 @@ function Account() {
             <ShoppingCart size={19} />
 
             {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[9px] font-black text-green-800">
+              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#b8df7d] px-1 text-[9px] font-black text-[#274d29]">
                 {cartCount}
               </span>
             )}
@@ -337,35 +357,35 @@ function Account() {
       </div>
 
       <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
-        <section className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <section className="mb-6 rounded-[26px] border border-white/80 bg-white p-5 shadow-[0_18px_50px_rgba(47,70,39,0.08)]">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-emerald-100 bg-emerald-50 text-green-700">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32]">
                 <User size={30} />
               </div>
 
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <h2 className="truncate text-base font-black text-gray-900 sm:text-lg">
+                  <h2 className="truncate text-base font-black text-[#202a20] sm:text-lg">
                     {customer?.name || 'Add your name'}
                   </h2>
 
                   <button
                     onClick={openNameForm}
-                    className="rounded-lg p-1 text-gray-400 transition hover:bg-emerald-50 hover:text-green-700"
+                    className="rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
                   >
                     <Edit3 size={16} />
                   </button>
                 </div>
 
-                <p className="mt-1 text-xs font-medium text-gray-500">
+                <p className="mt-1 text-xs font-medium text-[#8a9287]">
                   {customer?.phone
                     ? `+91 ${customer.phone}`
                     : 'No phone linked'}
                 </p>
 
                 {customer?.isPhoneVerified && (
-                  <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-green-700">
+                  <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-[#4e8b38]">
                     <ShieldCheck size={13} />
                     Phone verified
                   </div>
@@ -373,12 +393,12 @@ function Account() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-emerald-50 px-5 py-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-green-700">
+            <div className="rounded-2xl bg-[#eef5e7] px-5 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#527e45]">
                 Total Orders
               </p>
 
-              <p className="mt-1 text-xl font-black text-gray-900">
+              <p className="mt-1 text-xl font-black text-[#202a20]">
                 {orders.length}
               </p>
             </div>
@@ -386,16 +406,19 @@ function Account() {
         </section>
 
         {showNameForm && (
-          <form className="mb-6 rounded-2xl border border-emerald-100 bg-white p-5 shadow-sm">
+          <form
+            onSubmit={handleNameSubmit}
+            className="mb-6 rounded-[26px] border border-[#dceacb] bg-white p-5 shadow-[0_18px_50px_rgba(47,70,39,0.07)]"
+          >
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">
+              <h3 className="text-sm font-black uppercase tracking-wider text-[#202a20]">
                 Edit Profile
               </h3>
 
               <button
                 type="button"
                 onClick={() => setShowNameForm(false)}
-                className="rounded-lg p-1 text-gray-400 hover:bg-gray-100"
+                className="rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
               >
                 <X size={18} />
               </button>
@@ -409,15 +432,14 @@ function Account() {
                   setName(event.target.value)
                 }
                 placeholder="Enter your full name"
-                className="flex-1 rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-xs font-bold text-gray-800 outline-none focus:border-green-600"
+                className="flex-1 rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-bold text-[#202820] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
                 autoFocus
               />
 
               <button
                 type="submit"
                 disabled={saving}
-                onClick={handleNameSubmit}
-                className="rounded-xl bg-green-700 px-7 py-3 text-xs font-black text-white shadow-md shadow-green-900/20 transition hover:bg-green-800 disabled:opacity-50"
+                className="rounded-xl bg-[#315d32] px-7 py-3 text-xs font-black text-white shadow-md shadow-[#315d32]/20 transition hover:bg-[#274d29] disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
@@ -426,7 +448,7 @@ function Account() {
         )}
 
         <section className="mb-7">
-          <h2 className="mb-4 px-1 text-sm font-black uppercase tracking-wider text-gray-500">
+          <h2 className="mb-4 px-1 text-sm font-black uppercase tracking-wider text-[#606960]">
             Your Account
           </h2>
 
@@ -438,25 +460,25 @@ function Account() {
                 <button
                   key={card.title}
                   onClick={card.action}
-                  className="group flex min-h-[125px] items-start gap-4 rounded-2xl border border-gray-100 bg-white p-5 text-left shadow-sm transition hover:border-emerald-200 hover:shadow-md"
+                  className="group flex min-h-[125px] items-start gap-4 rounded-[24px] border border-white bg-white p-5 text-left shadow-[0_12px_35px_rgba(47,70,39,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#dceacb] hover:shadow-[0_18px_45px_rgba(47,70,39,0.10)]"
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-green-700">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32]">
                     <Icon size={22} />
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-black text-gray-900">
+                    <h3 className="text-sm font-black text-[#202a20]">
                       {card.title}
                     </h3>
 
-                    <p className="mt-1 text-[11px] font-medium leading-5 text-gray-500">
+                    <p className="mt-1 text-[11px] font-medium leading-5 text-[#8a9287]">
                       {card.description}
                     </p>
                   </div>
 
                   <ChevronRight
                     size={17}
-                    className="mt-1 shrink-0 text-gray-300 transition group-hover:text-green-700"
+                    className="mt-1 shrink-0 text-[#c2c9bd] transition group-hover:translate-x-1 group-hover:text-[#315d32]"
                   />
                 </button>
               )
@@ -466,22 +488,22 @@ function Account() {
 
         <section
           id="addresses"
-          className="rounded-2xl border border-gray-100 bg-white shadow-sm"
+          className="rounded-[26px] border border-white bg-white shadow-[0_18px_50px_rgba(47,70,39,0.07)]"
         >
-          <div className="flex flex-col gap-3 border-b border-gray-100 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-[#edf0ea] p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-base font-black text-gray-900">
+              <h2 className="text-base font-black text-[#202a20]">
                 Your Addresses
               </h2>
 
-              <p className="mt-1 text-[11px] font-medium text-gray-500">
+              <p className="mt-1 text-[11px] font-medium text-[#8a9287]">
                 Manage your delivery addresses
               </p>
             </div>
 
             <button
               onClick={openAddressModal}
-              className="flex items-center justify-center gap-2 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-2.5 text-xs font-black text-green-700 transition hover:bg-emerald-100"
+              className="flex items-center justify-center gap-2 rounded-xl border border-[#dceacb] bg-[#eef5e7] px-4 py-2.5 text-xs font-black text-[#315d32] transition hover:bg-[#e1edd7]"
             >
               <Plus size={15} />
               Add New Address
@@ -490,17 +512,17 @@ function Account() {
 
           <div className="p-5">
             {addresses.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center">
+              <div className="rounded-2xl border border-dashed border-[#dfe5da] bg-[#fafcf8] p-10 text-center">
                 <MapPinned
                   size={36}
-                  className="mx-auto mb-3 text-gray-300"
+                  className="mx-auto mb-3 text-[#b4bdb0]"
                 />
 
-                <p className="text-xs font-bold text-gray-500">
+                <p className="text-xs font-bold text-[#606960]">
                   No saved addresses yet.
                 </p>
 
-                <p className="mt-1 text-[11px] text-gray-400">
+                <p className="mt-1 text-[11px] text-[#969e93]">
                   Add an address for fast grocery delivery.
                 </p>
               </div>
@@ -509,11 +531,11 @@ function Account() {
                 {addresses.map((item) => (
                   <div
                     key={item.id}
-                    className="rounded-2xl border border-gray-100 bg-white p-5 transition hover:border-emerald-200 hover:shadow-sm"
+                    className="rounded-2xl border border-[#edf0ea] bg-[#fafcf8] p-5 transition hover:border-[#dceacb] hover:bg-white hover:shadow-sm"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-green-700">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32]">
                           {item.label?.toLowerCase() === 'work' ? (
                             <Briefcase size={17} />
                           ) : (
@@ -522,12 +544,12 @@ function Account() {
                         </div>
 
                         <div>
-                          <h3 className="text-xs font-black text-gray-900">
+                          <h3 className="text-xs font-black text-[#202a20]">
                             {item.label || 'Address'}
                           </h3>
 
                           {item.isDefault && (
-                            <span className="text-[9px] font-bold uppercase text-green-700">
+                            <span className="text-[9px] font-bold uppercase text-[#4e8b38]">
                               Default address
                             </span>
                           )}
@@ -535,13 +557,13 @@ function Account() {
                       </div>
 
                       {item.isDefault && (
-                        <span className="rounded-full bg-green-100 px-2 py-1 text-[9px] font-bold text-green-800">
+                        <span className="rounded-full bg-[#e5f2dc] px-2 py-1 text-[9px] font-bold text-[#315d32]">
                           DEFAULT
                         </span>
                       )}
                     </div>
 
-                    <p className="mt-4 min-h-[65px] text-xs font-medium leading-6 text-gray-500">
+                    <p className="mt-4 min-h-[65px] text-xs font-medium leading-6 text-[#737c70]">
                       {[
                         item.line1,
                         item.line2,
@@ -553,24 +575,24 @@ function Account() {
                         .join(', ')}
                     </p>
 
-                    <div className="mt-4 flex items-center gap-4 border-t border-gray-100 pt-4">
+                    <div className="mt-4 flex items-center gap-4 border-t border-[#edf0ea] pt-4">
                       <button
                         onClick={() =>
                           openEditAddress(item)
                         }
-                        className="flex items-center gap-1 text-[11px] font-black text-green-700 hover:underline"
+                        className="flex items-center gap-1 text-[11px] font-black text-[#315d32] transition hover:text-[#274d29] hover:underline"
                       >
                         <Edit3 size={13} />
                         Edit
                       </button>
 
-                      <span className="h-4 w-px bg-gray-200" />
+                      <span className="h-4 w-px bg-[#dfe5da]" />
 
                       <button
                         onClick={() =>
                           handleDeleteAddress(item.id)
                         }
-                        className="flex items-center gap-1 text-[11px] font-black text-red-500 hover:underline"
+                        className="flex items-center gap-1 text-[11px] font-black text-[#b95b52] transition hover:text-[#9f4038] hover:underline"
                       >
                         <Trash2 size={13} />
                         Remove
@@ -584,27 +606,20 @@ function Account() {
         </section>
 
         <button
-          onClick={() => {
-            if (
-              window.confirm(
-                'Are you sure you want to log out?'
-              )
-            ) {
-              logout()
-            }
-          }}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/50 py-3.5 text-xs font-black text-red-600 transition hover:bg-red-100"
+          onClick={handleLogout}
+          disabled={loggingOut}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#e8c9c5] bg-[#fff6f4] py-3.5 text-xs font-black text-[#b95b52] transition hover:bg-[#ffebe8] disabled:cursor-not-allowed disabled:opacity-60"
         >
           <LogOut size={16} />
-          Sign Out
+          {loggingOut ? 'Signing Out...' : 'Sign Out'}
         </button>
       </main>
 
       {showAddressModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/50 px-4 py-6 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-3xl border border-gray-100 bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-gray-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#1d2b1e]/55 px-4 py-6 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-[30px] border border-white/80 bg-white shadow-[0_30px_100px_rgba(29,43,30,0.25)]">
+            <div className="flex items-center justify-between border-b border-[#edf0ea] px-6 py-4">
+              <h3 className="text-sm font-black uppercase tracking-wider text-[#202a20]">
                 {editingAddressId
                   ? 'Edit Address'
                   : 'Add New Address'}
@@ -612,7 +627,7 @@ function Account() {
 
               <button
                 onClick={closeAddressModal}
-                className="rounded-lg p-1 text-gray-400 hover:bg-gray-100"
+                className="rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
               >
                 <X size={18} />
               </button>
@@ -627,7 +642,7 @@ function Account() {
                 value={address.label}
                 onChange={handleAddressChange}
                 placeholder="Label (e.g. Home, Work, Parents)"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-xs font-medium outline-none focus:border-green-600"
+                className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
               />
 
               <input
@@ -636,7 +651,7 @@ function Account() {
                 onChange={handleAddressChange}
                 placeholder="House / Flat No., Building / Street Name *"
                 required
-                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-xs font-medium outline-none focus:border-green-600"
+                className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
               />
 
               <input
@@ -644,7 +659,7 @@ function Account() {
                 value={address.line2}
                 onChange={handleAddressChange}
                 placeholder="Landmark (optional)"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-xs font-medium outline-none focus:border-green-600"
+                className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
               />
 
               <div className="grid grid-cols-2 gap-3">
@@ -654,7 +669,7 @@ function Account() {
                   onChange={handleAddressChange}
                   placeholder="City *"
                   required
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-xs font-medium outline-none focus:border-green-600"
+                  className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
                 />
 
                 <input
@@ -663,7 +678,7 @@ function Account() {
                   onChange={handleAddressChange}
                   placeholder="State *"
                   required
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-xs font-medium outline-none focus:border-green-600"
+                  className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
                 />
               </div>
 
@@ -675,14 +690,14 @@ function Account() {
                 required
                 inputMode="numeric"
                 maxLength={6}
-                className="w-full rounded-xl border border-gray-200 bg-gray-50/50 px-4 py-3 text-xs font-medium outline-none focus:border-green-600"
+                className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
               />
 
-              <div className="flex gap-3 border-t border-gray-100 pt-4">
+              <div className="flex gap-3 border-t border-[#edf0ea] pt-4">
                 <button
                   type="button"
                   onClick={closeAddressModal}
-                  className="flex-1 rounded-xl border border-gray-200 py-3 text-xs font-bold text-gray-600 hover:bg-gray-50"
+                  className="flex-1 rounded-xl border border-[#dfe5da] bg-white py-3 text-xs font-bold text-[#606960] transition hover:bg-[#f7f8f2]"
                 >
                   Cancel
                 </button>
@@ -690,7 +705,7 @@ function Account() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 rounded-xl bg-green-700 py-3 text-xs font-black text-white shadow-md shadow-green-900/20 transition hover:bg-green-800 disabled:opacity-50"
+                  className="flex-1 rounded-xl bg-[#315d32] py-3 text-xs font-black text-white shadow-md shadow-[#315d32]/20 transition hover:bg-[#274d29] disabled:opacity-50"
                 >
                   {saving
                     ? 'Saving...'

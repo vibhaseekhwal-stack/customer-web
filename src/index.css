@@ -61,10 +61,23 @@ body,
   margin: 0;
 }
 
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
 body {
   background: #faf9f5;
   color: #1b1c1a;
   font-family: "Karla", sans-serif;
+  scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+  display: none;
 }
 
 button,

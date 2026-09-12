@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -53,10 +52,9 @@ function Login() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f7f8f2]">
-
-      {/* Organic Background */}
+    <main className="relative h-screen w-screen overflow-hidden bg-[#f7f8f2]">
       <div className="absolute -left-40 -top-40 h-[520px] w-[520px] rounded-full bg-[#dceacb]" />
+
       <div className="absolute -bottom-56 -right-40 h-[600px] w-[600px] rounded-full bg-[#e7efd9]" />
 
       <div className="absolute left-[7%] top-[16%] text-[70px] opacity-20">
@@ -71,15 +69,10 @@ function Login() {
         +
       </div>
 
-      <div className="relative z-10 flex min-h-screen items-center justify-center px-5 py-8">
-
+      <div className="relative z-10 flex h-full w-full items-center justify-center px-5">
         <div className="w-full max-w-[1020px]">
-
-          {/* Brand */}
-          <div className="mb-8 flex items-center justify-center gap-3">
-
+          <div className="mb-5 flex items-center justify-center gap-3">
             <div className="relative flex h-12 w-12 items-center justify-center rounded-[18px] bg-[#315d32] shadow-lg shadow-[#315d32]/20">
-
               <svg
                 width="27"
                 height="27"
@@ -100,7 +93,6 @@ function Login() {
                   strokeLinecap="round"
                 />
               </svg>
-
             </div>
 
             <div>
@@ -112,20 +104,14 @@ function Login() {
                 Fresh · Local · Simple
               </p>
             </div>
-
           </div>
 
-          {/* Main */}
-          <div className="grid overflow-hidden rounded-[36px] border border-white/80 bg-white/80 shadow-[0_30px_100px_rgba(47,70,39,0.12)] backdrop-blur-xl md:grid-cols-[1fr_430px]">
-
-            {/* Visual Side */}
-            <div className="relative hidden min-h-[620px] overflow-hidden bg-[#315d32] md:block">
-
-              {/* Shapes */}
+          <div className="grid h-[620px] w-full overflow-hidden rounded-[36px] border border-white/80 bg-white/80 shadow-[0_30px_100px_rgba(47,70,39,0.12)] backdrop-blur-xl md:grid-cols-[1fr_430px]">
+            <div className="relative hidden h-full overflow-hidden bg-[#315d32] md:block">
               <div className="absolute -right-28 -top-28 h-[360px] w-[360px] rounded-full bg-[#86a95f]/30" />
+
               <div className="absolute -bottom-32 -left-32 h-[430px] w-[430px] rounded-full border-[70px] border-[#9bbb72]/10" />
 
-              {/* Floating Items */}
               <div className="absolute right-[13%] top-[15%] flex h-16 w-16 rotate-12 items-center justify-center rounded-2xl bg-white/10 text-3xl backdrop-blur-md">
                 🍅
               </div>
@@ -139,7 +125,6 @@ function Login() {
               </div>
 
               <div className="relative z-10 flex h-full flex-col justify-center px-12 lg:px-16">
-
                 <span className="mb-6 inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-medium text-white/80 backdrop-blur-md">
                   <span className="h-2 w-2 rounded-full bg-[#b8df7d]" />
                   Your local grocery store
@@ -158,9 +143,7 @@ function Login() {
                   carefully picked and delivered from stores around you.
                 </p>
 
-                {/* Mini Stats */}
                 <div className="mt-10 flex gap-3">
-
                   <div className="rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-md">
                     <p className="text-lg font-bold text-white">
                       Fresh
@@ -187,21 +170,14 @@ function Login() {
                       To order
                     </p>
                   </div>
-
                 </div>
-
               </div>
             </div>
 
-            {/* Login */}
-            <div className="flex min-h-[620px] items-center bg-white px-7 py-12 sm:px-10">
-
+            <div className="flex h-full items-center bg-white px-7 py-10 sm:px-10">
               <div className="w-full">
-
                 <div className="mb-9">
-
                   <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-[20px] bg-[#eef5e7]">
-
                     <svg
                       width="27"
                       height="27"
@@ -232,7 +208,6 @@ function Login() {
                         fill="#315d32"
                       />
                     </svg>
-
                   </div>
 
                   <h2 className="font-display text-[30px] font-bold leading-tight text-[#202a20]">
@@ -243,11 +218,9 @@ function Login() {
                     Enter your phone number. We'll verify you
                     with a quick one-time code.
                   </p>
-
                 </div>
 
                 <form onSubmit={handleSubmit}>
-
                   <label
                     htmlFor="phone"
                     className="mb-2.5 block text-xs font-bold uppercase tracking-[1px] text-[#606960]"
@@ -255,7 +228,6 @@ function Login() {
                     Mobile number
                   </label>
 
-                  {/* Unique Input */}
                   <div
                     className={`flex h-[62px] items-center rounded-[20px] border bg-[#fafcf8] px-2 transition-all ${
                       error
@@ -263,7 +235,6 @@ function Login() {
                         : 'border-[#e0e6dc] focus-within:border-[#5e9742] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#6c9d50]/10'
                     }`}
                   >
-
                     <div className="flex h-[48px] items-center rounded-[15px] bg-[#edf3e9] px-4">
                       <span className="text-sm font-bold text-[#4d594c]">
                         +91
@@ -307,7 +278,6 @@ function Login() {
                         </svg>
                       </div>
                     )}
-
                   </div>
 
                   {error && (
@@ -316,19 +286,16 @@ function Login() {
                     </p>
                   )}
 
-                  {/* Button */}
                   <button
                     type="submit"
                     disabled={loading}
                     className="group mt-5 flex h-[62px] w-full items-center justify-between rounded-[20px] bg-[#315d32] px-5 text-sm font-bold text-white shadow-lg shadow-[#315d32]/15 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#274d29] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-60"
                   >
-
                     <span>
                       {loading ? 'Sending OTP...' : 'Continue securely'}
                     </span>
 
                     <span className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-white/10 transition-transform duration-200 group-hover:translate-x-1">
-
                       {loading ? (
                         <svg
                           className="h-5 w-5 animate-spin"
@@ -343,6 +310,7 @@ function Login() {
                             strokeWidth="2"
                             opacity="0.3"
                           />
+
                           <path
                             d="M21 12a9 9 0 0 0-9-9"
                             stroke="currentColor"
@@ -366,18 +334,12 @@ function Login() {
                           />
                         </svg>
                       )}
-
                     </span>
-
                   </button>
-
                 </form>
 
-                {/* Trust */}
                 <div className="mt-8 flex items-center gap-3 border-t border-[#edf0ea] pt-6">
-
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0f5ec]">
-
                     <svg
                       width="17"
                       height="17"
@@ -391,6 +353,7 @@ function Login() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
+
                       <path
                         d="M9 12L11 14L15 10"
                         stroke="#527e45"
@@ -399,7 +362,6 @@ function Login() {
                         strokeLinejoin="round"
                       />
                     </svg>
-
                   </div>
 
                   <div>
@@ -411,10 +373,8 @@ function Login() {
                       Your number is protected and only used for verification.
                     </p>
                   </div>
-
                 </div>
 
-                {/* Terms */}
                 <p className="mt-7 text-center text-[10px] leading-5 text-[#9aa197]">
                   By continuing, you agree to our{' '}
                   <span className="font-semibold text-[#527e45]">
@@ -426,16 +386,13 @@ function Login() {
                   </span>
                   .
                 </p>
-
               </div>
             </div>
-
           </div>
 
-          <p className="mt-5 text-center text-[10px] font-medium tracking-wide text-[#9aa197]">
+          <p className="mt-4 text-center text-[10px] font-medium tracking-wide text-[#9aa197]">
             FRESH SHOPPING · MADE SIMPLE
           </p>
-
         </div>
       </div>
     </main>
@@ -443,4 +400,3 @@ function Login() {
 }
 
 export default Login
-
