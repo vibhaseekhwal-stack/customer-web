@@ -224,6 +224,11 @@ function Category() {
     navigate(`/category/${id}`)
   }
 
+  const handleProductClick = (product) => {
+    if (!product?.id) return
+    navigate(`/product/${product.id}`)
+  }
+
   const selectedSortLabel =
     sort === 'relevance'
       ? 'Relevance'
@@ -502,6 +507,9 @@ function Category() {
                           index % fallbackImages.length
                         ]
                       }
+                      onClick={() =>
+                        handleProductClick(product)
+                      }
                     />
                   ))}
                 </div>
@@ -570,7 +578,7 @@ function Category() {
   )
 }
 
-function ProductCard({ product, image }) {
+function ProductCard({ product, image, onClick }) {
   const [adding, setAdding] = useState(false)
 
   const variant = getVariant(product)
@@ -613,8 +621,21 @@ function ProductCard({ product, image }) {
   }
 
   return (
-    <article className="group relative overflow-hidden rounded-xl border border-[#e2e7e2] bg-white p-2.5 shadow-[0_3px_12px_rgba(30,60,35,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-[#cbdcca] hover:shadow-[0_8px_24px_rgba(30,60,35,0.09)]">
-
+    <article
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (
+          event.key === 'Enter' ||
+          event.key === ' '
+        ) {
+          event.preventDefault()
+          onClick?.()
+        }
+      }}
+      className="group relative cursor-pointer overflow-hidden rounded-xl border border-[#e2e7e2] bg-white p-2.5 shadow-[0_3px_12px_rgba(30,60,35,0.04)] transition duration-200 hover:-translate-y-0.5 hover:border-[#cbdcca] hover:shadow-[0_8px_24px_rgba(30,60,35,0.09)]"
+    >
       {discount > 0 && (
         <span className="absolute left-3 top-3 z-10 rounded-md bg-[#f39a00] px-2 py-1 text-[9px] font-bold text-white shadow-sm">
           {discount}% OFF
@@ -649,25 +670,30 @@ function ProductCard({ product, image }) {
 
         <div className="mt-2 flex items-center gap-2">
           <span className="text-base font-bold text-[#252b25]">
-            ${price.toFixed(2)}
+            ₹{price.toFixed(2)}
           </span>
 
           {mrp > price && (
             <span className="text-xs text-[#9aa19a] line-through">
-              ${mrp.toFixed(2)}
+              ₹{mrp.toFixed(2)}
             </span>
           )}
         </div>
 
         {!available ? (
           <button
+            type="button"
             disabled
+            onClick={(event) =>
+              event.stopPropagation()
+            }
             className="mt-3 h-9 w-full rounded-lg bg-[#eceeeb] text-xs font-medium text-[#999f99]"
           >
             Out of Stock
           </button>
         ) : (
           <button
+            type="button"
             onClick={handleAdd}
             disabled={adding}
             className="mt-3 h-9 w-full rounded-lg bg-[#2b7b43] text-xs font-bold text-white transition hover:bg-[#236a38] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
