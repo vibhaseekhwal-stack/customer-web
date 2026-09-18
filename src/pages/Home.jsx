@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom'
 import {
   getCategories,
   getProducts,
-  getProduct,
   addToCart,
 } from '../services/api'
 
@@ -27,11 +26,11 @@ const HERO_BANNERS = [
   },
   {
     image:
-      'https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=1800&q=90',
-    badge: 'Organic & Pure',
-    title: 'Farm Fresh Organic\nFruits & Vegetables',
+      'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1800&q=90',
+    badge: 'Everyday Essentials',
+    title: 'Daily Staples\nStocked & Ready',
     subtitle:
-      'Handpicked directly from local farmers to ensure maximum nutrition and taste.',
+      'Premium quality grains, pulses, oils, flour and kitchen essentials — always in stock.',
   },
 ]
 
@@ -58,7 +57,6 @@ function Home() {
 
   const [categories, setCategories] = useState([])
   const [products, setProducts] = useState([])
-  const [selectedProduct, setSelectedProduct] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -82,7 +80,10 @@ function Home() {
         const [categoriesData, productsData] =
           await Promise.all([
             getCategories(),
-            getProducts(),
+            getProducts({
+              page: 1,
+              limit: 20,
+            }),
           ])
 
         const categoryList = Array.isArray(categoriesData)
@@ -109,6 +110,7 @@ function Home() {
         setProducts(activeProducts)
       } catch (err) {
         console.error('Home API error:', err)
+
         setError(
           err?.message || 'Unable to load home data'
         )
@@ -126,53 +128,51 @@ function Home() {
     navigate(`/category/${category.id}`)
   }
 
-  const handleProductClick = async (product) => {
-    try {
-      const data = await getProduct(product.id)
-      setSelectedProduct(data)
-    } catch (err) {
-      console.error('Product detail API error:', err)
-    }
+  const handleProductClick = (product) => {
+    if (!product?.id) return
+
+    navigate(`/product/${product.id}`)
   }
 
   const bestDeals = useMemo(() => {
+    const getDiscount = (product) => {
+      const variants =
+        product?.variants?.filter(
+          (variant) => variant?.isActive !== false
+        ) || []
+
+      if (!variants.length) return 0
+
+      const variant = variants.reduce(
+        (min, item) =>
+          Number(item.sellingPrice) <
+          Number(min.sellingPrice)
+            ? item
+            : min,
+        variants[0]
+      )
+
+      const mrp = Number(variant?.mrp || 0)
+      const selling = Number(
+        variant?.sellingPrice || 0
+      )
+
+      return mrp > selling
+        ? ((mrp - selling) / mrp) * 100
+        : 0
+    }
+
     return [...products]
-      .sort((a, b) => {
-        const getDiscount = (product) => {
-          const variants =
-            product?.variants?.filter(
-              (variant) => variant?.isActive !== false
-            ) || []
-
-          if (!variants.length) return 0
-
-          const variant = variants.reduce(
-            (min, item) =>
-              Number(item.sellingPrice) <
-              Number(min.sellingPrice)
-                ? item
-                : min,
-            variants[0]
-          )
-
-          const mrp = Number(variant?.mrp || 0)
-          const selling = Number(
-            variant?.sellingPrice || 0
-          )
-
-          return mrp > selling
-            ? ((mrp - selling) / mrp) * 100
-            : 0
-        }
-
-        return getDiscount(b) - getDiscount(a)
-      })
-      .slice(0, 12)
+      .sort(
+        (a, b) =>
+          getDiscount(b) - getDiscount(a)
+      )
+      .slice(0, 8)
   }, [products])
 
   const displayCategories =
     categories.length > 0
-      ? categories
+      ? categories.slice(0, 6)
       : DUMMY_CATEGORIES
 
   if (loading) {
@@ -237,7 +237,6 @@ function Home() {
                     <div className="max-w-xl">
                       <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/95 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-[#315d32] shadow-lg">
                         <span className="h-2 w-2 animate-pulse rounded-full bg-[#315d32]" />
-
                         {banner.badge}
                       </div>
 
@@ -252,7 +251,7 @@ function Home() {
                       <button
                         type="button"
                         onClick={() =>
-                          navigate('/products')
+                          navigate('/categories')
                         }
                         className="mt-6 rounded-[16px] bg-[#315d32] px-7 py-3.5 text-xs font-black text-white shadow-xl shadow-black/20 transition-all hover:bg-[#274d29] active:scale-95"
                       >
@@ -284,7 +283,11 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-[1400px] px-3 pt-10 sm:px-5 lg:px-8">
-        <SectionHeading title="Shop by Category" />
+        <SectionHeading
+          title="Shop by Category"
+          action="View All"
+          onAction={() => navigate('/categories')}
+        />
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
           {displayCategories.map((category, idx) => (
@@ -305,10 +308,7 @@ function Home() {
       </section>
 
       <section className="mx-auto max-w-[1400px] px-3 pt-10 sm:px-5 lg:px-8">
-        <SectionHeading
-          title="Best Deals"
-          action="View All"
-        />
+        <SectionHeading title="Best Deals" />
 
         {bestDeals.length > 0 ? (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4">
@@ -331,89 +331,6 @@ function Home() {
           <EmptyState text="No products available" />
         )}
       </section>
-
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#202a20]/45 p-5 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[30px] border border-[#e1e7dd] bg-white p-6 shadow-[0_30px_90px_rgba(47,70,39,0.18)]">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex gap-4">
-                <img
-                  src={
-                    selectedProduct.imageUrl ||
-                    DUMMY_PRODUCT_IMAGES[0]
-                  }
-                  alt={selectedProduct.name}
-                  className="h-20 w-20 rounded-[20px] bg-[#f7f8f2] object-cover p-1 shadow-sm"
-                />
-
-                <div>
-                  <h3 className="text-lg font-black text-[#202a20]">
-                    {selectedProduct.name}
-                  </h3>
-
-                  {selectedProduct.description && (
-                    <p className="mt-2 text-xs leading-5 text-[#8a9287]">
-                      {selectedProduct.description}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedProduct(null)
-                }
-                className="flex h-9 w-9 items-center justify-center rounded-[13px] bg-[#f7f8f2] text-[#606960] transition hover:bg-red-50 hover:text-red-500"
-              >
-                ✕
-              </button>
-            </div>
-
-            {selectedProduct.variants?.length > 0 && (
-              <div className="mt-6 space-y-2">
-                {selectedProduct.variants.map(
-                  (variant) => (
-                    <div
-                      key={variant.id}
-                      className="flex items-center justify-between rounded-[20px] border border-[#e1e7dd] bg-[#f7f8f2] p-4 transition hover:border-[#315d32]/30 hover:bg-[#eef5e7]"
-                    >
-                      <div>
-                        <p className="text-xs font-black text-[#202a20]">
-                          {variant.weight}{' '}
-                          {variant.unit}
-                        </p>
-
-                        <p className="mt-1 text-[10px] text-[#969e93]">
-                          {variant.sku}
-                        </p>
-                      </div>
-
-                      <div className="text-right">
-                        <p className="text-base font-black text-[#315d32]">
-                          ₹
-                          {Number(
-                            variant.sellingPrice || 0
-                          ).toFixed(0)}
-                        </p>
-
-                        {variant.mrp && (
-                          <p className="text-[10px] text-[#969e93] line-through">
-                            ₹
-                            {Number(
-                              variant.mrp
-                            ).toFixed(0)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </main>
   )
 }
@@ -422,6 +339,7 @@ function SectionHeading({
   title,
   subtitle,
   action,
+  onAction,
 }) {
   return (
     <div className="mb-5 flex items-end justify-between gap-3">
@@ -440,7 +358,8 @@ function SectionHeading({
       {action && (
         <button
           type="button"
-          className="shrink-0 rounded-full bg-[#eef5e7] px-3 py-1.5 text-xs font-black text-[#315d32] transition hover:bg-[#315d32] hover:text-white"
+          onClick={onAction}
+          className="shrink-0 rounded-full bg-[#eef5e7] px-4 py-2 text-xs font-black text-[#315d32] transition-all hover:bg-[#315d32] hover:text-white active:scale-95"
         >
           {action}
         </button>
@@ -577,8 +496,7 @@ function ProductCard({
 
           <div className="mt-1">
             <span className="text-[11px] font-medium text-[#969e93]">
-              {cheapest?.weight}{' '}
-              {cheapest?.unit}
+              {cheapest?.weight} {cheapest?.unit}
             </span>
           </div>
         </div>

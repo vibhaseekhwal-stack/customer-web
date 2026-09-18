@@ -9,6 +9,7 @@ import Otp from './pages/Otp'
 import Home from './pages/Home'
 import Product from './pages/Product'
 import Category from './pages/Category'
+import Categories from './pages/Categories'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import Confirmation from './pages/Confirmation'
@@ -55,6 +56,11 @@ function App() {
         <Route
           path="/home"
           element={<Home />}
+        />
+
+        <Route
+          path="/categories"
+          element={<Categories />}
         />
 
         <Route
