@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -9,7 +10,6 @@ import {
   startOrderPayment,
 } from '../services/api'
 import {
-  ArrowLeft,
   Truck,
   Store,
   MapPin,
@@ -277,8 +277,8 @@ function Checkout() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#315d32]/20 border-t-[#315d32]" />
-          <p className="text-xs font-bold uppercase tracking-wider text-[#8a9287]">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#315d32]/20 border-t-[#315d32] sm:h-11 sm:w-11" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#8a9287] sm:text-xs">
             Loading checkout...
           </p>
         </div>
@@ -289,7 +289,7 @@ function Checkout() {
   if (error && !cart) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
-        <div className="w-full max-w-md rounded-[32px] border border-[#e1e7dd] bg-white p-8 text-center shadow-[0_25px_70px_rgba(47,70,39,0.09)]">
+        <div className="w-full max-w-md rounded-[28px] border border-[#e1e7dd] bg-white p-6 text-center shadow-[0_25px_70px_rgba(47,70,39,0.09)] sm:rounded-[32px] sm:p-8">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-[20px] bg-red-50 text-red-500">
             <ShoppingBag size={28} />
           </div>
@@ -306,7 +306,7 @@ function Checkout() {
             onClick={() => navigate('/cart')}
             className="mt-6 w-full rounded-[18px] bg-[#315d32] py-3.5 text-sm font-black text-white shadow-lg shadow-[#315d32]/20 transition hover:bg-[#274d29]"
           >
-            Back to Cart
+            Go to Cart
           </button>
         </div>
       </div>
@@ -341,69 +341,59 @@ function Checkout() {
   const total = subtotal + deliveryFee
 
   return (
-    <div className="min-h-screen bg-[#f7f8f2] pb-10">
-      <main className="mx-auto max-w-6xl px-4 pt-6 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <div className="flex items-center gap-2 text-[11px] font-semibold text-[#969e93]">
-            <button
-              onClick={() => navigate('/cart')}
-              className="transition hover:text-[#315d32]"
-            >
-              Cart
-            </button>
+    <div className="min-h-screen overflow-x-hidden bg-[#f7f8f2] pb-8 sm:pb-10 lg:pb-12">
+      <main className="mx-auto w-full max-w-7xl px-3 pt-5 sm:px-5 sm:pt-7 lg:px-8 lg:pt-8">
+        <div className="mb-5 sm:mb-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="min-w-0">
+              <div className="mb-2.5 inline-flex items-center gap-2 rounded-full border border-[#dfe8d9] bg-[#eef5e7] px-3 py-1.5 text-[9px] font-black uppercase tracking-[1.3px] text-[#315d32] sm:mb-3 sm:px-3.5 sm:text-[10px] sm:tracking-[1.5px]">
+                <ShoppingBag size={12} />
+                Secure Checkout
+              </div>
 
-            <ChevronRight size={12} />
-
-            <span className="font-bold text-[#315d32]">
-              Checkout
-            </span>
-          </div>
-
-          <div className="mt-3 flex items-end justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-black tracking-tight text-[#202a20] sm:text-3xl">
+              <h1 className="text-[27px] font-black tracking-[-0.8px] text-[#202a20] sm:text-3xl lg:text-4xl">
                 Complete Your Order
               </h1>
 
-              <p className="mt-1 text-sm text-[#8a9287]">
+              <p className="mt-1.5 text-xs text-[#8a9287] sm:mt-2 sm:text-sm">
                 Choose delivery, address and payment method.
               </p>
             </div>
 
-            <div className="hidden items-center gap-2 rounded-[18px] border border-[#e1e7dd] bg-white px-4 py-3 shadow-sm sm:flex">
+            <div className="flex w-full items-center gap-2.5 rounded-[18px] border border-[#e1e7dd] bg-white px-3.5 py-3 shadow-sm sm:w-fit sm:rounded-[20px] sm:px-4">
               <ShieldCheck
                 size={18}
-                className="text-[#315d32]"
+                className="shrink-0 text-[#315d32]"
               />
 
               <span className="text-[10px] font-black text-[#606960]">
-                Secure Checkout
+                Safe & Secure Checkout
               </span>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="space-y-5">
-            <section className="rounded-[30px] border border-[#e1e7dd] bg-white p-5 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
+        <div className="grid grid-cols-1 items-start gap-5 md:gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px]">
+          <div className="min-w-0 space-y-4 sm:space-y-5">
+            <section className="rounded-[24px] border border-[#e1e7dd] bg-white p-4 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:rounded-[30px] sm:p-6">
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
                     <Truck size={19} />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <h2 className="text-sm font-black text-[#202a20] sm:text-base">
                       Delivery Options
                     </h2>
 
-                    <p className="mt-0.5 text-[10px] text-[#969e93]">
+                    <p className="mt-0.5 text-[10px] text-[#969e93] sm:text-[11px]">
                       How would you like to receive your order?
                     </p>
                   </div>
                 </div>
 
-                <span className="hidden rounded-full bg-[#eef5e7] px-3 py-1 text-[9px] font-black uppercase text-[#315d32] sm:block">
+                <span className="hidden shrink-0 rounded-full bg-[#eef5e7] px-3 py-1 text-[9px] font-black uppercase text-[#315d32] sm:block">
                   Step 1
                 </span>
               </div>
@@ -412,7 +402,7 @@ function Checkout() {
                 <button
                   type="button"
                   onClick={() => handleFulfillment('DELIVERY')}
-                  className={`relative rounded-[20px] border-2 p-4 text-left transition ${
+                  className={`relative rounded-[18px] border-2 p-3.5 text-left transition sm:rounded-[20px] sm:p-4 ${
                     fulfillmentMethod === 'DELIVERY'
                       ? 'border-[#315d32] bg-[#eef5e7]'
                       : 'border-[#e1e7dd] bg-white hover:border-[#315d32]/30'
@@ -420,25 +410,25 @@ function Checkout() {
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] sm:h-11 sm:w-11 sm:rounded-[14px] ${
                         fulfillmentMethod === 'DELIVERY'
                           ? 'bg-[#315d32] text-white'
                           : 'bg-[#eef5e7] text-[#315d32]'
                       }`}
                     >
-                      <Truck size={20} />
+                      <Truck size={19} />
                     </div>
 
-                    <div>
+                    <div className="min-w-0 pr-4">
                       <p className="text-sm font-black text-[#202a20]">
                         Home Delivery
                       </p>
 
-                      <p className="mt-1 text-[11px] leading-4 text-[#8a9287]">
+                      <p className="mt-1 text-[10px] leading-4 text-[#8a9287] sm:text-[11px]">
                         Get your groceries delivered to your doorstep.
                       </p>
 
-                      <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-[#315d32]">
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[9px] font-bold text-[#315d32] sm:mt-3 sm:text-[10px]">
                         <Clock3 size={13} />
                         Fast & convenient
                       </div>
@@ -455,7 +445,7 @@ function Checkout() {
                 <button
                   type="button"
                   onClick={() => handleFulfillment('PICKUP')}
-                  className={`relative rounded-[20px] border-2 p-4 text-left transition ${
+                  className={`relative rounded-[18px] border-2 p-3.5 text-left transition sm:rounded-[20px] sm:p-4 ${
                     fulfillmentMethod === 'PICKUP'
                       ? 'border-[#315d32] bg-[#eef5e7]'
                       : 'border-[#e1e7dd] bg-white hover:border-[#315d32]/30'
@@ -463,25 +453,25 @@ function Checkout() {
                 >
                   <div className="flex items-start gap-3">
                     <div
-                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] sm:h-11 sm:w-11 sm:rounded-[14px] ${
                         fulfillmentMethod === 'PICKUP'
                           ? 'bg-[#315d32] text-white'
                           : 'bg-[#eef5e7] text-[#315d32]'
                       }`}
                     >
-                      <Store size={20} />
+                      <Store size={19} />
                     </div>
 
-                    <div>
+                    <div className="min-w-0 pr-4">
                       <p className="text-sm font-black text-[#202a20]">
                         Store Pickup
                       </p>
 
-                      <p className="mt-1 text-[11px] leading-4 text-[#8a9287]">
+                      <p className="mt-1 text-[10px] leading-4 text-[#8a9287] sm:text-[11px]">
                         Pick up your order directly from the store.
                       </p>
 
-                      <div className="mt-3 flex items-center gap-1.5 text-[10px] font-bold text-[#315d32]">
+                      <div className="mt-2.5 flex items-center gap-1.5 text-[9px] font-bold text-[#315d32] sm:mt-3 sm:text-[10px]">
                         <PackageCheck size={13} />
                         Easy pickup
                       </div>
@@ -498,19 +488,19 @@ function Checkout() {
             </section>
 
             {fulfillmentMethod === 'DELIVERY' && (
-              <section className="rounded-[30px] border border-[#e1e7dd] bg-white p-5 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:p-6">
+              <section className="rounded-[24px] border border-[#e1e7dd] bg-white p-4 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:rounded-[30px] sm:p-6">
                 <div className="mb-5 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
                       <MapPin size={19} />
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <h2 className="text-sm font-black text-[#202a20] sm:text-base">
                         Delivery Address
                       </h2>
 
-                      <p className="mt-0.5 text-[10px] text-[#969e93]">
+                      <p className="mt-0.5 text-[10px] text-[#969e93] sm:text-[11px]">
                         Select where you want your order delivered
                       </p>
                     </div>
@@ -519,10 +509,12 @@ function Checkout() {
                   <button
                     type="button"
                     onClick={() => setShowAddressModal(true)}
-                    className="flex shrink-0 items-center gap-1.5 rounded-[13px] bg-[#eef5e7] px-3 py-2 text-[10px] font-black text-[#315d32] transition hover:bg-[#315d32] hover:text-white"
+                    className="flex shrink-0 items-center gap-1.5 rounded-[13px] bg-[#eef5e7] px-2.5 py-2 text-[9px] font-black text-[#315d32] transition hover:bg-[#315d32] hover:text-white sm:px-3 sm:text-[10px]"
                   >
                     <Plus size={14} />
-                    Add Address
+                    <span className="hidden xs:inline">Add</span>
+                    <span className="sm:hidden">Address</span>
+                    <span className="hidden sm:inline">Address</span>
                   </button>
                 </div>
 
@@ -530,7 +522,7 @@ function Checkout() {
                   <button
                     type="button"
                     onClick={() => setShowAddressModal(true)}
-                    className="w-full rounded-[20px] border border-dashed border-[#315d32]/30 bg-[#f7f8f2] p-7 text-center transition hover:border-[#315d32] hover:bg-[#eef5e7]"
+                    className="w-full rounded-[18px] border border-dashed border-[#315d32]/30 bg-[#f7f8f2] p-6 text-center transition hover:border-[#315d32] hover:bg-[#eef5e7] sm:rounded-[20px] sm:p-7"
                   >
                     <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-[16px] bg-white text-[#315d32] shadow-sm">
                       <MapPin size={22} />
@@ -558,20 +550,20 @@ function Checkout() {
                           key={itemId}
                           type="button"
                           onClick={() => selectAddress(itemId)}
-                          className={`relative flex w-full items-start gap-3 rounded-[20px] border-2 p-4 text-left transition ${
+                          className={`relative flex w-full items-start gap-3 rounded-[18px] border-2 p-3.5 text-left transition sm:rounded-[20px] sm:p-4 ${
                             selected
                               ? 'border-[#315d32] bg-[#eef5e7]'
                               : 'border-[#e1e7dd] bg-white hover:border-[#315d32]/30'
                           }`}
                         >
                           <div
-                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] sm:h-11 sm:w-11 sm:rounded-[14px] ${
                               selected
                                 ? 'bg-[#315d32] text-white'
                                 : 'bg-[#eef5e7] text-[#315d32]'
                             }`}
                           >
-                            <MapPin size={19} />
+                            <MapPin size={18} />
                           </div>
 
                           <div className="min-w-0 flex-1 pr-6">
@@ -587,7 +579,7 @@ function Checkout() {
                               )}
                             </div>
 
-                            <p className="mt-1.5 text-[11px] leading-5 text-[#8a9287]">
+                            <p className="mt-1.5 text-[10px] leading-5 text-[#8a9287] sm:text-[11px]">
                               {[
                                 item.line1,
                                 item.line2,
@@ -617,25 +609,25 @@ function Checkout() {
               </section>
             )}
 
-            <section className="rounded-[30px] border border-[#e1e7dd] bg-white p-5 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
+            <section className="rounded-[24px] border border-[#e1e7dd] bg-white p-4 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:rounded-[30px] sm:p-6">
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
                     <CreditCard size={19} />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <h2 className="text-sm font-black text-[#202a20] sm:text-base">
                       Payment Method
                     </h2>
 
-                    <p className="mt-0.5 text-[10px] text-[#969e93]">
+                    <p className="mt-0.5 text-[10px] text-[#969e93] sm:text-[11px]">
                       Select your preferred payment option
                     </p>
                   </div>
                 </div>
 
-                <span className="hidden rounded-full bg-[#eef5e7] px-3 py-1 text-[9px] font-black uppercase text-[#315d32] sm:block">
+                <span className="hidden shrink-0 rounded-full bg-[#eef5e7] px-3 py-1 text-[9px] font-black uppercase text-[#315d32] sm:block">
                   Step 2
                 </span>
               </div>
@@ -644,34 +636,34 @@ function Checkout() {
                 <button
                   type="button"
                   onClick={() => handlePayment('UPI')}
-                  className={`relative flex items-center gap-3 rounded-[20px] border-2 p-4 text-left transition ${
+                  className={`relative flex items-center gap-3 rounded-[18px] border-2 p-3.5 text-left transition sm:rounded-[20px] sm:p-4 ${
                     paymentMethod === 'UPI'
                       ? 'border-[#315d32] bg-[#eef5e7]'
                       : 'border-[#e1e7dd] bg-white hover:border-[#315d32]/30'
                   }`}
                 >
                   <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] sm:h-11 sm:w-11 sm:rounded-[14px] ${
                       paymentMethod === 'UPI'
                         ? 'bg-[#315d32] text-white'
                         : 'bg-[#eef5e7] text-[#315d32]'
                     }`}
                   >
-                    <CreditCard size={20} />
+                    <CreditCard size={19} />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-black text-[#202a20]">
                       UPI Payment
                     </p>
 
-                    <p className="mt-1 text-[10px] text-[#8a9287]">
+                    <p className="mt-1 text-[9px] text-[#8a9287] sm:text-[10px]">
                       GPay, PhonePe, Paytm & more
                     </p>
                   </div>
 
                   {paymentMethod === 'UPI' && (
-                    <div className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#315d32] text-white">
+                    <div className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#315d32] text-white">
                       <Check size={11} />
                     </div>
                   )}
@@ -680,36 +672,36 @@ function Checkout() {
                 <button
                   type="button"
                   onClick={() => handlePayment('CASH')}
-                  className={`relative flex items-center gap-3 rounded-[20px] border-2 p-4 text-left transition ${
+                  className={`relative flex items-center gap-3 rounded-[18px] border-2 p-3.5 text-left transition sm:rounded-[20px] sm:p-4 ${
                     paymentMethod === 'CASH'
                       ? 'border-[#315d32] bg-[#eef5e7]'
                       : 'border-[#e1e7dd] bg-white hover:border-[#315d32]/30'
                   }`}
                 >
                   <div
-                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] ${
+                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] sm:h-11 sm:w-11 sm:rounded-[14px] ${
                       paymentMethod === 'CASH'
                         ? 'bg-[#315d32] text-white'
                         : 'bg-[#eef5e7] text-[#315d32]'
                     }`}
                   >
-                    <Banknote size={20} />
+                    <Banknote size={19} />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-black text-[#202a20]">
                       {fulfillmentMethod === 'DELIVERY'
                         ? 'Cash on Delivery'
                         : 'Pay at Pickup'}
                     </p>
 
-                    <p className="mt-1 text-[10px] text-[#8a9287]">
+                    <p className="mt-1 text-[9px] text-[#8a9287] sm:text-[10px]">
                       Simple & convenient
                     </p>
                   </div>
 
                   {paymentMethod === 'CASH' && (
-                    <div className="ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-[#315d32] text-white">
+                    <div className="ml-auto flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#315d32] text-white">
                       <Check size={11} />
                     </div>
                   )}
@@ -718,41 +710,41 @@ function Checkout() {
             </section>
 
             {error && (
-              <div className="flex items-center gap-3 rounded-[18px] border border-red-100 bg-red-50 px-4 py-3 text-xs font-bold text-red-600">
-                <X size={16} />
+              <div className="flex items-start gap-3 rounded-[18px] border border-red-100 bg-red-50 px-4 py-3 text-xs font-bold text-red-600">
+                <X size={16} className="mt-0.5 shrink-0" />
                 <span>{error}</span>
               </div>
             )}
           </div>
 
-          <aside className="lg:sticky lg:top-5 lg:self-start">
-            <div className="overflow-hidden rounded-[30px] border border-[#e1e7dd] bg-white shadow-[0_20px_60px_rgba(47,70,39,0.09)]">
-              <div className="bg-[#315d32] px-5 py-5 sm:px-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="mb-1 text-[10px] font-bold uppercase tracking-[1.5px] text-[#b8df7d]">
+          <aside className="w-full lg:sticky lg:top-5 lg:self-start">
+            <div className="overflow-hidden rounded-[24px] border border-[#e1e7dd] bg-white shadow-[0_20px_60px_rgba(47,70,39,0.09)] sm:rounded-[30px]">
+              <div className="bg-[#315d32] px-4 py-4 sm:px-6 sm:py-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="mb-1 text-[9px] font-bold uppercase tracking-[1.3px] text-[#b8df7d] sm:text-[10px] sm:tracking-[1.5px]">
                       Checkout
                     </p>
 
-                    <h2 className="text-lg font-black text-white">
+                    <h2 className="text-base font-black text-white sm:text-lg">
                       Order Summary
                     </h2>
 
-                    <p className="mt-1 text-xs text-white/60">
+                    <p className="mt-1 text-[10px] text-white/60 sm:text-xs">
                       Review your order before placing it
                     </p>
                   </div>
 
-                  <div className="flex h-11 w-11 items-center justify-center rounded-[15px] border border-white/10 bg-white/10 text-white">
-                    <ReceiptText size={19} />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[13px] border border-white/10 bg-white/10 text-white sm:h-11 sm:w-11 sm:rounded-[15px]">
+                    <ReceiptText size={18} />
                   </div>
                 </div>
               </div>
 
-              <div className="px-5 py-6">
-                <div className="mb-5 rounded-[20px] bg-[#f7f8f2] p-3.5">
+              <div className="px-4 py-5 sm:px-6 sm:py-6">
+                <div className="mb-5 rounded-[18px] bg-[#f7f8f2] p-3.5 sm:rounded-[20px]">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-white text-[#315d32] shadow-sm">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white text-[#315d32] shadow-sm">
                       <ShoppingBag size={18} />
                     </div>
 
@@ -771,8 +763,8 @@ function Checkout() {
                   </div>
                 </div>
 
-                <div className="space-y-4 text-sm">
-                  <div className="flex items-center justify-between">
+                <div className="space-y-3.5 text-sm sm:space-y-4">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="text-[#8a9287]">
                       Item Total
                     </span>
@@ -782,7 +774,7 @@ function Checkout() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="text-[#8a9287]">
                       Delivery Fee
                     </span>
@@ -803,7 +795,7 @@ function Checkout() {
 
                 {deliveryFee > 0 &&
                   freeThreshold > subtotal && (
-                    <div className="mt-4 rounded-[18px] border border-[#dfe9d8] bg-[#eef5e7] p-3.5">
+                    <div className="mt-4 rounded-[17px] border border-[#dfe9d8] bg-[#eef5e7] p-3 sm:rounded-[18px] sm:p-3.5">
                       <div className="flex gap-2">
                         <Truck
                           size={15}
@@ -823,7 +815,7 @@ function Checkout() {
                   fulfillmentMethod === 'DELIVERY' &&
                   freeThreshold > 0 &&
                   subtotal >= freeThreshold && (
-                    <div className="mt-4 rounded-[18px] border border-[#dfe9d8] bg-[#eef5e7] p-3.5">
+                    <div className="mt-4 rounded-[17px] border border-[#dfe9d8] bg-[#eef5e7] p-3 sm:rounded-[18px] sm:p-3.5">
                       <div className="flex items-center gap-2">
                         <Check
                           size={15}
@@ -837,25 +829,25 @@ function Checkout() {
                     </div>
                   )}
 
-                <div className="my-6 border-t border-dashed border-[#d8dfd4]" />
+                <div className="my-5 border-t border-dashed border-[#d8dfd4] sm:my-6" />
 
-                <div className="flex items-end justify-between">
+                <div className="flex items-end justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[1.2px] text-[#969e93]">
+                    <p className="text-[9px] font-bold uppercase tracking-[1.1px] text-[#969e93] sm:text-[10px] sm:tracking-[1.2px]">
                       Grand Total
                     </p>
 
-                    <p className="mt-1 text-2xl font-black text-[#315d32]">
+                    <p className="mt-1 text-xl font-black text-[#315d32] sm:text-2xl">
                       ₹{total.toFixed(2)}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-5 overflow-hidden rounded-[18px] border border-[#e1e7dd]">
+                <div className="mt-4 overflow-hidden rounded-[17px] border border-[#e1e7dd] sm:mt-5 sm:rounded-[18px]">
                   <div className="flex items-center gap-3 border-b border-[#edf0ea] p-3">
                     <ShieldCheck
                       size={17}
-                      className="text-[#315d32]"
+                      className="shrink-0 text-[#315d32]"
                     />
 
                     <div>
@@ -872,7 +864,7 @@ function Checkout() {
                   <div className="flex items-center gap-3 p-3">
                     <PackageCheck
                       size={17}
-                      className="text-[#315d32]"
+                      className="shrink-0 text-[#315d32]"
                     />
 
                     <div>
@@ -886,21 +878,50 @@ function Checkout() {
                     </div>
                   </div>
                 </div>
+
+                <button
+                  onClick={handlePlaceOrder}
+                  disabled={placingOrder}
+                  className="group mt-5 flex h-12 w-full items-center justify-between rounded-[17px] bg-[#315d32] px-4 text-xs font-black text-white shadow-lg shadow-[#315d32]/20 transition hover:-translate-y-0.5 hover:bg-[#274d29] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:h-[52px] sm:rounded-[18px] sm:px-5 sm:text-sm"
+                >
+                  {placingOrder ? (
+                    <>
+                      <span className="flex items-center gap-2">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                        {paymentMethod === 'UPI'
+                          ? 'Redirecting...'
+                          : 'Placing Order...'}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Place Order</span>
+
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/10">
+                        <ChevronRight
+                          size={18}
+                          strokeWidth={3}
+                          className="transition-transform group-hover:translate-x-1"
+                        />
+                      </span>
+                    </>
+                  )}
+                </button>
+
+                <div className="mt-4 flex items-center justify-center gap-2 text-[8px] font-black uppercase tracking-[1.2px] text-[#969e93] sm:mt-5 sm:text-[9px] sm:tracking-[1.4px]">
+                  <ShieldCheck
+                    size={13}
+                    className="text-[#315d32]"
+                  />
+                  Secure & Protected Checkout
+                </div>
               </div>
             </div>
-
-            <button
-              onClick={() => navigate('/cart')}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-[18px] border border-[#dfe6dc] bg-white py-3.5 text-xs font-black text-[#606960] shadow-sm transition hover:border-[#315d32]/30 hover:bg-[#eef5e7] hover:text-[#315d32]"
-            >
-              <ArrowLeft size={15} />
-              Back to Cart
-            </button>
           </aside>
         </div>
 
-        <div className="mt-6 rounded-[30px] border border-[#e1e7dd] bg-white p-4 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:p-5">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
+        <div className="mt-5 rounded-[24px] border border-[#e1e7dd] bg-white p-4 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:mt-6 sm:rounded-[30px] sm:p-5 lg:hidden">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[1.2px] text-[#969e93]">
                 Grand Total
@@ -914,23 +935,26 @@ function Checkout() {
             <button
               onClick={handlePlaceOrder}
               disabled={placingOrder}
-              className="group flex h-12 w-full items-center justify-center gap-2 rounded-[18px] bg-[#315d32] px-6 text-sm font-black text-white shadow-lg shadow-[#315d32]/20 transition hover:-translate-y-0.5 hover:bg-[#274d29] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[300px]"
+              className="group flex h-12 w-full items-center justify-between rounded-[17px] bg-[#315d32] px-4 text-xs font-black text-white shadow-lg shadow-[#315d32]/20 transition hover:bg-[#274d29] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:min-w-[300px] sm:px-5 sm:text-sm"
             >
               {placingOrder ? (
-                <>
+                <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   {paymentMethod === 'UPI'
                     ? 'Redirecting to Payment...'
                     : 'Placing Order...'}
-                </>
+                </span>
               ) : (
                 <>
-                  Place Order
-                  <ChevronRight
-                    size={18}
-                    strokeWidth={3}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
+                  <span>Place Order</span>
+
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/10">
+                    <ChevronRight
+                      size={18}
+                      strokeWidth={3}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </span>
                 </>
               )}
             </button>
@@ -939,15 +963,15 @@ function Checkout() {
       </main>
 
       {showAddressModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#202a20]/45 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md overflow-hidden rounded-[30px] border border-[#e1e7dd] bg-white shadow-[0_30px_90px_rgba(47,70,39,0.18)]">
-            <div className="flex items-center justify-between border-b border-[#edf0ea] px-5 py-5 sm:px-6">
-              <div>
-                <h3 className="text-lg font-black text-[#202a20]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#202a20]/45 p-3 backdrop-blur-sm sm:p-4">
+          <div className="my-auto w-full max-w-md overflow-hidden rounded-[24px] border border-[#e1e7dd] bg-white shadow-[0_30px_90px_rgba(47,70,39,0.18)] sm:rounded-[30px]">
+            <div className="flex items-center justify-between border-b border-[#edf0ea] px-4 py-4 sm:px-6 sm:py-5">
+              <div className="min-w-0">
+                <h3 className="text-base font-black text-[#202a20] sm:text-lg">
                   Add New Address
                 </h3>
 
-                <p className="mt-1 text-[10px] text-[#969e93]">
+                <p className="mt-1 text-[9px] text-[#969e93] sm:text-[10px]">
                   Enter your delivery details
                 </p>
               </div>
@@ -955,7 +979,7 @@ function Checkout() {
               <button
                 type="button"
                 onClick={() => setShowAddressModal(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-[13px] bg-[#f7f8f2] text-[#606960] transition hover:bg-red-50 hover:text-red-500"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#f7f8f2] text-[#606960] transition hover:bg-red-50 hover:text-red-500"
               >
                 <X size={17} />
               </button>
@@ -963,10 +987,10 @@ function Checkout() {
 
             <form
               onSubmit={handleAddAddress}
-              className="space-y-3 p-5 sm:p-6"
+              className="space-y-3 p-4 sm:p-6"
             >
               <div>
-                <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-[#606960]">
+                <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wide text-[#606960] sm:text-[10px]">
                   Address Label
                 </label>
 
@@ -975,12 +999,12 @@ function Checkout() {
                   value={address.label}
                   onChange={handleAddressChange}
                   placeholder="Home, Work"
-                  className="w-full rounded-[14px] border border-[#dfe6dc] bg-[#f7f8f2] px-4 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
+                  className="w-full rounded-[13px] border border-[#dfe6dc] bg-[#f7f8f2] px-3.5 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
                 />
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-[#606960]">
+                <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wide text-[#606960] sm:text-[10px]">
                   Address
                 </label>
 
@@ -990,7 +1014,7 @@ function Checkout() {
                   onChange={handleAddressChange}
                   placeholder="House / Flat, Street"
                   required
-                  className="w-full rounded-[14px] border border-[#dfe6dc] bg-[#f7f8f2] px-4 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
+                  className="w-full rounded-[13px] border border-[#dfe6dc] bg-[#f7f8f2] px-3.5 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
                 />
               </div>
 
@@ -999,12 +1023,12 @@ function Checkout() {
                 value={address.line2}
                 onChange={handleAddressChange}
                 placeholder="Landmark (optional)"
-                className="w-full rounded-[14px] border border-[#dfe6dc] bg-[#f7f8f2] px-4 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
+                className="w-full rounded-[13px] border border-[#dfe6dc] bg-[#f7f8f2] px-3.5 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
               />
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-[#606960]">
+                  <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wide text-[#606960] sm:text-[10px]">
                     City
                   </label>
 
@@ -1014,12 +1038,12 @@ function Checkout() {
                     onChange={handleAddressChange}
                     placeholder="City"
                     required
-                    className="w-full rounded-[14px] border border-[#dfe6dc] bg-[#f7f8f2] px-4 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
+                    className="w-full rounded-[13px] border border-[#dfe6dc] bg-[#f7f8f2] px-3.5 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
                   />
                 </div>
 
                 <div>
-                  <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-[#606960]">
+                  <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wide text-[#606960] sm:text-[10px]">
                     State
                   </label>
 
@@ -1029,13 +1053,13 @@ function Checkout() {
                     onChange={handleAddressChange}
                     placeholder="State"
                     required
-                    className="w-full rounded-[14px] border border-[#dfe6dc] bg-[#f7f8f2] px-4 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
+                    className="w-full rounded-[13px] border border-[#dfe6dc] bg-[#f7f8f2] px-3.5 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wide text-[#606960]">
+                <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wide text-[#606960] sm:text-[10px]">
                   Pincode
                 </label>
 
@@ -1048,11 +1072,11 @@ function Checkout() {
                   inputMode="numeric"
                   pattern="[0-9]{6}"
                   maxLength={6}
-                  className="w-full rounded-[14px] border border-[#dfe6dc] bg-[#f7f8f2] px-4 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
+                  className="w-full rounded-[13px] border border-[#dfe6dc] bg-[#f7f8f2] px-3.5 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
                 />
               </div>
 
-              <div className="flex gap-3 pt-3">
+              <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddressModal(false)}

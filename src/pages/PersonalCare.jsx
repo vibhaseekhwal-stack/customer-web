@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -193,48 +194,52 @@ function PersonalCare() {
   })
 
   return (
-    <div className="relative min-h-screen bg-[#f7f8f2] pb-28">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#f7f8f2] pb-24 sm:pb-28">
 
       {successToast && (
-        <div className="fixed right-4 top-20 z-50 flex items-center gap-2 rounded-[18px] border border-[#dfe9d8] bg-white px-4 py-3 text-[#315d32] shadow-[0_15px_45px_rgba(47,70,39,0.15)]">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#eef5e7]">
-            <Check size={15} />
-          </div>
+        <div className="fixed left-4 right-4 top-20 z-50 flex items-center justify-center sm:left-auto sm:right-4">
+          <div className="flex w-fit max-w-full items-center gap-2 rounded-[18px] border border-[#dfe9d8] bg-white px-4 py-3 text-[#315d32] shadow-[0_15px_45px_rgba(47,70,39,0.15)]">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#eef5e7]">
+              <Check size={15} />
+            </div>
 
-          <span className="text-xs font-black">
-            {successToast}
-          </span>
+            <span className="truncate text-xs font-black">
+              {successToast}
+            </span>
+          </div>
         </div>
       )}
 
-      <div className="bg-[#315d32] px-4 py-8 text-white shadow-[0_15px_40px_rgba(47,70,39,0.12)] sm:px-8">
+      <div className="bg-[#315d32] px-4 py-6 text-white shadow-[0_15px_40px_rgba(47,70,39,0.12)] sm:px-6 sm:py-8 lg:px-8">
         <div className="mx-auto max-w-[1400px]">
-          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
 
-            <div>
-              <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-wide backdrop-blur-md">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+
+            <div className="min-w-0 flex-1">
+
+              <div className="mb-3 inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[9px] font-black uppercase tracking-wide backdrop-blur-md sm:text-[10px]">
                 <Sparkles
-                  size={13}
-                  className="text-[#b8df7d]"
+                  size={12}
+                  className="shrink-0 text-[#b8df7d]"
                 />
 
-                <span>
+                <span className="truncate">
                   Fresh • Quality • Personal Essentials
                 </span>
               </div>
 
-              <h1 className="text-2xl font-black tracking-tight sm:text-4xl">
+              <h1 className="text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">
                 Personal Care Essentials
               </h1>
 
-              <p className="mt-1.5 max-w-xl text-xs font-medium leading-5 text-white/65 sm:text-sm">
+              <p className="mt-1.5 max-w-2xl text-xs font-medium leading-5 text-white/65 sm:text-sm">
                 Everyday grooming, skin, hair and personal care essentials,
                 carefully selected for your daily routine.
               </p>
             </div>
 
-            <div className="w-full md:w-[350px]">
-              <div className="flex h-12 w-full items-center gap-2 rounded-[18px] border border-white/15 bg-white/10 px-4 backdrop-blur-md transition focus-within:bg-white focus-within:text-[#202a20]">
+            <div className="w-full lg:w-[360px] lg:shrink-0">
+              <div className="flex h-12 w-full items-center gap-2 rounded-[18px] border border-white/15 bg-white/10 px-4 backdrop-blur-md transition focus-within:bg-white focus-within:text-[#202a20] sm:h-[52px]">
 
                 <Search
                   size={18}
@@ -246,7 +251,7 @@ function PersonalCare() {
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   placeholder="Search personal care..."
-                  className="w-full bg-transparent text-xs font-medium text-white outline-none placeholder:text-white/55 focus:text-[#202a20]"
+                  className="min-w-0 w-full bg-transparent text-xs font-medium text-white outline-none placeholder:text-white/55 focus:text-[#202a20] sm:text-sm"
                 />
               </div>
             </div>
@@ -255,14 +260,14 @@ function PersonalCare() {
         </div>
       </div>
 
-      <div className="mx-auto mt-6 max-w-[1400px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto mt-4 max-w-[1400px] px-4 sm:mt-6 sm:px-6 lg:px-8">
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-3 scrollbar-none">
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2 scrollbar-none">
           {subCategories.map(cat => (
             <button
               key={cat}
               onClick={() => setSelectedSubCategory(cat)}
-              className={`shrink-0 rounded-[14px] px-4 py-2.5 text-xs font-black transition ${
+              className={`shrink-0 rounded-[13px] px-3.5 py-2.5 text-[10px] font-black transition sm:rounded-[14px] sm:px-4 sm:text-xs ${
                 selectedSubCategory === cat
                   ? 'bg-[#315d32] text-white shadow-lg shadow-[#315d32]/15'
                   : 'border border-[#e1e7dd] bg-white text-[#606960] hover:border-[#315d32]/30 hover:bg-[#eef5e7] hover:text-[#315d32]'
@@ -273,7 +278,7 @@ function PersonalCare() {
           ))}
         </div>
 
-        <div className="mb-5 mt-6 flex items-center justify-between gap-3">
+        <div className="mb-5 mt-5 flex flex-col gap-3 sm:mt-6 sm:flex-row sm:items-center sm:justify-between">
 
           <div className="flex min-w-0 items-center gap-2">
 
@@ -285,15 +290,15 @@ function PersonalCare() {
             </div>
 
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
 
-                <h2 className="truncate text-base font-black text-[#202a20] sm:text-lg">
+                <h2 className="truncate text-sm font-black text-[#202a20] sm:text-base lg:text-lg">
                   {selectedSubCategory === 'All'
                     ? 'All Personal Care Items'
                     : `${selectedSubCategory} Collection`}
                 </h2>
 
-                <span className="shrink-0 rounded-full bg-[#eef5e7] px-2.5 py-1 text-[9px] font-black text-[#315d32]">
+                <span className="shrink-0 rounded-full bg-[#eef5e7] px-2 py-1 text-[8px] font-black text-[#315d32] sm:px-2.5 sm:py-1 sm:text-[9px]">
                   {filteredProducts.length} items
                 </span>
 
@@ -303,11 +308,11 @@ function PersonalCare() {
 
           <button
             onClick={() => navigate('/cart')}
-            className="flex shrink-0 items-center gap-1.5 rounded-[14px] border border-[#dfe6dc] bg-white px-3 py-2 text-xs font-black text-[#315d32] shadow-sm transition hover:bg-[#eef5e7]"
+            className="flex w-full items-center justify-center gap-1.5 rounded-[14px] border border-[#dfe6dc] bg-white px-3 py-2.5 text-xs font-black text-[#315d32] shadow-sm transition hover:bg-[#eef5e7] sm:w-auto sm:shrink-0 sm:px-4"
           >
             <ShoppingBag size={14} />
 
-            <span className="hidden sm:inline">
+            <span>
               Go to Cart
             </span>
           </button>
@@ -316,10 +321,10 @@ function PersonalCare() {
 
         {filteredProducts.length === 0 ? (
 
-          <div className="rounded-[30px] border border-[#e1e7dd] bg-white px-6 py-16 text-center shadow-[0_18px_55px_rgba(47,70,39,0.05)]">
+          <div className="rounded-[24px] border border-[#e1e7dd] bg-white px-5 py-12 text-center shadow-[0_18px_55px_rgba(47,70,39,0.05)] sm:rounded-[30px] sm:px-6 sm:py-16">
 
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#eef5e7] text-[#315d32]">
-              <Search size={25} />
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-[#eef5e7] text-[#315d32] sm:h-16 sm:w-16 sm:rounded-[20px]">
+              <Search size={24} />
             </div>
 
             <h3 className="mt-4 text-base font-black text-[#202a20]">
@@ -334,7 +339,7 @@ function PersonalCare() {
 
         ) : (
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
 
             {filteredProducts.map(item => {
 
@@ -351,28 +356,28 @@ function PersonalCare() {
               return (
                 <div
                   key={item.id}
-                  className="group flex flex-col justify-between rounded-[24px] border border-[#e1e7dd] bg-white p-3.5 shadow-[0_10px_35px_rgba(47,70,39,0.045)] transition duration-300 hover:-translate-y-1 hover:border-[#315d32]/25 hover:shadow-[0_18px_45px_rgba(47,70,39,0.09)]"
+                  className="group flex min-w-0 flex-col justify-between rounded-[18px] border border-[#e1e7dd] bg-white p-2.5 shadow-[0_8px_25px_rgba(47,70,39,0.045)] transition duration-300 hover:-translate-y-1 hover:border-[#315d32]/25 hover:shadow-[0_18px_45px_rgba(47,70,39,0.09)] sm:rounded-[22px] sm:p-3.5 lg:rounded-[24px]"
                 >
 
                   <div>
 
-                    <div className="relative flex h-40 w-full items-center justify-center overflow-hidden rounded-[18px] bg-[#f7f8f2]">
+                    <div className="relative flex h-36 w-full items-center justify-center overflow-hidden rounded-[15px] bg-[#f7f8f2] sm:h-40 sm:rounded-[18px] lg:h-44">
 
-                      <span className="absolute left-2.5 top-2.5 z-10 rounded-full border border-[#dfe9d8] bg-white/95 px-2.5 py-1 text-[9px] font-black text-[#315d32] shadow-sm backdrop-blur-sm">
+                      <span className="absolute left-2 top-2 z-10 max-w-[70%] truncate rounded-full border border-[#dfe9d8] bg-white/95 px-2 py-1 text-[8px] font-black text-[#315d32] shadow-sm backdrop-blur-sm sm:left-2.5 sm:top-2.5 sm:px-2.5 sm:text-[9px]">
                         {item.badge}
                       </span>
 
                       <img
                         src={item.imageUrl}
                         alt={item.name}
-                        className="h-full w-full rounded-[18px] object-cover transition duration-500 group-hover:scale-105"
+                        className="h-full w-full rounded-[15px] object-cover transition duration-500 group-hover:scale-105 sm:rounded-[18px]"
                       />
 
-                      <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 rounded-full bg-[#202a20]/75 px-2 py-1 text-[9px] font-black text-white backdrop-blur-sm">
+                      <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-[#202a20]/75 px-1.5 py-1 text-[8px] font-black text-white backdrop-blur-sm sm:bottom-2.5 sm:right-2.5 sm:px-2 sm:text-[9px]">
 
                         <Star
-                          size={10}
-                          className="fill-[#b8df7d] text-[#b8df7d]"
+                          size={9}
+                          className="fill-[#b8df7d] text-[#b8df7d] sm:h-[10px] sm:w-[10px]"
                         />
 
                         {item.rating}
@@ -380,9 +385,9 @@ function PersonalCare() {
 
                     </div>
 
-                    <div className="mt-3">
+                    <div className="mt-2.5 sm:mt-3">
 
-                      <h3 className="line-clamp-2 text-xs font-black leading-5 text-[#202a20] transition group-hover:text-[#315d32]">
+                      <h3 className="line-clamp-2 min-h-[36px] text-[10px] font-black leading-4 text-[#202a20] transition group-hover:text-[#315d32] sm:min-h-[40px] sm:text-xs sm:leading-5">
                         {item.name}
                       </h3>
 
@@ -390,7 +395,7 @@ function PersonalCare() {
 
                     {item.variants.length > 1 && (
 
-                      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                      <div className="mt-2 flex max-h-[50px] flex-wrap items-center gap-1 overflow-hidden sm:mt-2.5 sm:gap-1.5">
 
                         {item.variants.map((v, idx) => (
 
@@ -402,7 +407,7 @@ function PersonalCare() {
                                 idx
                               )
                             }
-                            className={`rounded-[9px] border px-2 py-1 text-[9px] font-black transition ${
+                            className={`rounded-[8px] border px-1.5 py-1 text-[8px] font-black transition sm:rounded-[9px] sm:px-2 sm:text-[9px] ${
                               currentVariantIndex === idx
                                 ? 'border-[#315d32] bg-[#eef5e7] text-[#315d32]'
                                 : 'border-[#e1e7dd] bg-[#f7f8f2] text-[#606960] hover:border-[#315d32]/30 hover:text-[#315d32]'
@@ -419,23 +424,23 @@ function PersonalCare() {
 
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between border-t border-[#edf0ea] pt-3">
+                  <div className="mt-3 flex items-end justify-between gap-2 border-t border-[#edf0ea] pt-2.5 sm:mt-4 sm:pt-3">
 
-                    <div>
+                    <div className="min-w-0">
 
-                      <div className="flex items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-1">
 
-                        <span className="text-sm font-black text-[#202a20]">
+                        <span className="text-xs font-black text-[#202a20] sm:text-sm">
                           ₹{activeVariant.price}
                         </span>
 
-                        <span className="text-[9px] font-medium text-[#969e93] line-through">
+                        <span className="text-[8px] font-medium text-[#969e93] line-through sm:text-[9px]">
                           ₹{activeVariant.originalPrice}
                         </span>
 
                       </div>
 
-                      <span className="text-[9px] font-black text-[#315d32]">
+                      <span className="text-[8px] font-black text-[#315d32] sm:text-[9px]">
                         {activeVariant.discount}
                       </span>
 
@@ -447,28 +452,29 @@ function PersonalCare() {
                         onClick={() =>
                           handleAdd(activeVariant)
                         }
-                        className="rounded-[13px] bg-[#315d32] px-4 py-2 text-[10px] font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29] active:scale-95"
+                        className="shrink-0 rounded-[11px] bg-[#315d32] px-3 py-2 text-[9px] font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29] active:scale-95 sm:rounded-[13px] sm:px-4 sm:text-[10px]"
                       >
                         ADD
                       </button>
 
                     ) : (
 
-                      <div className="flex items-center gap-1.5 rounded-[13px] bg-[#315d32] px-2 py-1.5 text-white shadow-md shadow-[#315d32]/15">
+                      <div className="flex shrink-0 items-center gap-1 rounded-[11px] bg-[#315d32] px-1.5 py-1.5 text-white shadow-md shadow-[#315d32]/15 sm:gap-1.5 sm:rounded-[13px] sm:px-2">
 
                         <button
                           onClick={() =>
                             handleRemove(activeVariant)
                           }
-                          className="flex h-5 w-5 items-center justify-center rounded-[7px] bg-white/10 transition hover:bg-white/20"
+                          className="flex h-5 w-5 items-center justify-center rounded-[6px] bg-white/10 transition hover:bg-white/20 sm:h-6 sm:w-6 sm:rounded-[7px]"
                         >
                           <Minus
-                            size={11}
+                            size={10}
                             strokeWidth={3}
+                            className="sm:h-[11px] sm:w-[11px]"
                           />
                         </button>
 
-                        <span className="w-5 text-center text-xs font-black">
+                        <span className="w-4 text-center text-[10px] font-black sm:w-5 sm:text-xs">
                           {qty}
                         </span>
 
@@ -476,11 +482,12 @@ function PersonalCare() {
                           onClick={() =>
                             handleAdd(activeVariant)
                           }
-                          className="flex h-5 w-5 items-center justify-center rounded-[7px] bg-white/10 transition hover:bg-white/20"
+                          className="flex h-5 w-5 items-center justify-center rounded-[6px] bg-white/10 transition hover:bg-white/20 sm:h-6 sm:w-6 sm:rounded-[7px]"
                         >
                           <Plus
-                            size={11}
+                            size={10}
                             strokeWidth={3}
+                            className="sm:h-[11px] sm:w-[11px]"
                           />
                         </button>
 
@@ -504,3 +511,4 @@ function PersonalCare() {
 }
 
 export default PersonalCare
+

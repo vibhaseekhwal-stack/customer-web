@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import {
@@ -9,7 +8,6 @@ import {
   CheckCircle2,
   Clock3,
   PackageCheck,
-  MapPin,
   CreditCard,
   Truck,
   ShoppingBag,
@@ -167,10 +165,10 @@ function Confirmation() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#315d32]/20 border-t-[#315d32]" />
-          <p className="text-xs font-bold uppercase tracking-widest text-[#8a9287]">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#315d32]/20 border-t-[#315d32] sm:h-11 sm:w-11" />
+          <p className="text-center text-[10px] font-bold uppercase tracking-widest text-[#8a9287] sm:text-xs">
             Loading order...
           </p>
         </div>
@@ -180,23 +178,23 @@ function Confirmation() {
 
   if (error || !order) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
-        <div className="w-full max-w-md rounded-[24px] border border-[#e1e7dd] bg-white p-8 text-center shadow-[0_20px_60px_rgba(47,70,39,0.08)]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4 py-6 sm:px-6">
+        <div className="w-full max-w-md rounded-[20px] border border-[#e1e7dd] bg-white p-5 text-center shadow-[0_20px_60px_rgba(47,70,39,0.08)] sm:rounded-[24px] sm:p-8">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-500">
             <AlertCircle size={28} />
           </div>
 
-          <h2 className="mt-5 text-xl font-black text-[#202a20]">
+          <h2 className="mt-5 text-lg font-black text-[#202a20] sm:text-xl">
             Order not found
           </h2>
 
-          <p className="mt-2 text-sm text-[#8a9287]">
+          <p className="mt-2 text-xs leading-5 text-[#8a9287] sm:text-sm">
             {error || 'We could not find this order.'}
           </p>
 
           <button
             onClick={() => navigate('/orders')}
-            className="mt-6 w-full rounded-[12px] bg-[#315d32] py-3.5 text-sm font-black text-white transition hover:bg-[#274d29]"
+            className="mt-6 min-h-11 w-full rounded-[12px] bg-[#315d32] px-4 py-3.5 text-sm font-black text-white transition hover:bg-[#274d29]"
           >
             View Orders
           </button>
@@ -230,34 +228,16 @@ function Confirmation() {
 
   return (
     <div className="min-h-screen bg-[#f7f8f2]">
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-5 flex items-center gap-2 text-xs">
-          <button
-            onClick={() => navigate('/orders')}
-            className="font-semibold text-[#6f786d] transition hover:text-[#315d32]"
-          >
-            Your Orders
-          </button>
-
-          <ChevronRight
-            size={14}
-            className="text-[#a7afa3]"
-          />
-
-          <span className="font-bold text-[#315d32]">
-            Order Confirmation
-          </span>
-        </div>
-
+      <main className="mx-auto w-full max-w-7xl px-3 py-4 sm:px-5 sm:py-6 md:px-6 lg:px-8 lg:py-7">
         <section
-          className={`overflow-hidden rounded-[22px] border bg-white shadow-[0_12px_35px_rgba(47,70,39,0.06)] ${
+          className={`overflow-hidden rounded-[18px] border bg-white shadow-[0_12px_35px_rgba(47,70,39,0.06)] sm:rounded-[22px] ${
             needsPayment
               ? 'border-[#f1d6d6]'
               : 'border-[#dfe7db]'
           }`}
         >
           <div
-            className={`px-5 py-7 sm:px-8 ${
+            className={`px-4 py-5 sm:px-6 sm:py-7 md:px-8 ${
               needsPayment
                 ? 'bg-[#fff7f7]'
                 : 'bg-[#f4f9f0]'
@@ -265,41 +245,44 @@ function Confirmation() {
           >
             <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:text-left">
               <div
-                className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-full ${
+                className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full sm:h-16 sm:w-16 ${
                   needsPayment
                     ? 'bg-[#fff0f0] text-[#d14343]'
                     : 'bg-[#e4f2dc] text-[#315d32]'
                 }`}
               >
                 {needsPayment ? (
-                  <Clock3 size={34} strokeWidth={1.8} />
+                  <Clock3
+                    size={30}
+                    strokeWidth={1.8}
+                  />
                 ) : (
                   <CheckCircle2
-                    size={38}
+                    size={36}
                     strokeWidth={1.8}
                   />
                 )}
               </div>
 
-              <div className="mt-4 sm:ml-5 sm:mt-0">
-                <h1 className="text-2xl font-black tracking-tight text-[#202a20] sm:text-3xl">
+              <div className="mt-4 min-w-0 sm:ml-5 sm:mt-0">
+                <h1 className="text-xl font-black leading-tight tracking-tight text-[#202a20] sm:text-2xl md:text-3xl">
                   {needsPayment
                     ? 'Almost there!'
                     : 'Thank you for your order!'}
                 </h1>
 
-                <p className="mt-1 text-sm text-[#687166]">
+                <p className="mt-2 max-w-2xl text-xs leading-5 text-[#687166] sm:text-sm">
                   {needsPayment
                     ? 'Your order has been created and is waiting for payment.'
                     : 'Your order has been successfully placed.'}
                 </p>
 
-                <div className="mt-3 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                  <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#315d32] shadow-sm">
+                <div className="mt-3 flex w-full flex-wrap items-center justify-center gap-2 sm:justify-start">
+                  <span className="max-w-full break-all rounded-full bg-white px-3 py-1.5 text-[10px] font-bold text-[#315d32] shadow-sm sm:text-xs">
                     Order #{order.orderNumber}
                   </span>
 
-                  <span className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#687166] shadow-sm">
+                  <span className="rounded-full bg-white px-3 py-1.5 text-[10px] font-bold text-[#687166] shadow-sm sm:text-xs">
                     {statusLabel}
                   </span>
                 </div>
@@ -308,19 +291,19 @@ function Confirmation() {
           </div>
 
           {needsPayment && (
-            <div className="border-t border-[#f1dede] bg-white px-5 py-5 sm:px-8">
-              <div className="flex flex-col gap-4 rounded-[16px] border border-[#f0dddd] bg-[#fff8f8] p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex gap-3">
+            <div className="border-t border-[#f1dede] bg-white px-4 py-4 sm:px-6 sm:py-5 md:px-8">
+              <div className="flex flex-col gap-4 rounded-[16px] border border-[#f0dddd] bg-[#fff8f8] p-3.5 sm:p-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex min-w-0 gap-3">
                   <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ffecec] text-[#d14343]">
                     <CreditCard size={17} />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-black text-[#202a20]">
                       Payment required
                     </p>
 
-                    <p className="mt-1 max-w-xl text-xs leading-5 text-[#7d706f]">
+                    <p className="mt-1 max-w-xl break-words text-xs leading-5 text-[#7d706f]">
                       {paymentMessage ||
                         'Complete your online payment to confirm this order.'}
                     </p>
@@ -331,7 +314,7 @@ function Confirmation() {
                   <button
                     onClick={startPayment}
                     disabled={paying}
-                    className="w-full rounded-[11px] bg-[#315d32] px-7 py-3 text-sm font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                    className="min-h-11 w-full shrink-0 rounded-[11px] bg-[#315d32] px-5 py-3 text-sm font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29] disabled:cursor-not-allowed disabled:opacity-50 md:w-auto md:px-7"
                   >
                     {paying
                       ? 'Starting payment...'
@@ -343,15 +326,15 @@ function Confirmation() {
           )}
         </section>
 
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_350px]">
-          <div className="space-y-6">
-            <section className="overflow-hidden rounded-[20px] border border-[#e1e7dd] bg-white shadow-[0_10px_30px_rgba(47,70,39,0.045)]">
-              <div className="border-b border-[#edf0ea] px-5 py-4 sm:px-6">
-                <h2 className="text-lg font-black text-[#202a20]">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:mt-5 sm:gap-5 md:mt-6 md:gap-6 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0 space-y-4 sm:space-y-5 md:space-y-6">
+            <section className="overflow-hidden rounded-[18px] border border-[#e1e7dd] bg-white shadow-[0_10px_30px_rgba(47,70,39,0.045)] sm:rounded-[20px]">
+              <div className="border-b border-[#edf0ea] px-4 py-4 sm:px-5 md:px-6">
+                <h2 className="text-base font-black text-[#202a20] sm:text-lg">
                   Order Details
                 </h2>
 
-                <p className="mt-1 text-xs text-[#8a9287]">
+                <p className="mt-1 text-[11px] text-[#8a9287] sm:text-xs">
                   Items included in your order
                 </p>
               </div>
@@ -360,26 +343,26 @@ function Confirmation() {
                 {order.items?.map((item) => (
                   <div
                     key={item.id}
-                    className="flex gap-4 px-5 py-5 sm:px-6"
+                    className="flex gap-3 px-4 py-4 sm:gap-4 sm:px-5 sm:py-5 md:px-6"
                   >
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[12px] bg-[#f4f7f1] text-[#315d32]">
-                      <ShoppingBag size={25} />
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px] bg-[#f4f7f1] text-[#315d32] sm:h-16 sm:w-16">
+                      <ShoppingBag size={23} />
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <div className="flex flex-col justify-between gap-2 sm:flex-row">
-                        <div>
-                          <h3 className="text-sm font-black text-[#202a20]">
+                      <div className="flex flex-col justify-between gap-2 sm:flex-row sm:gap-4">
+                        <div className="min-w-0">
+                          <h3 className="break-words text-sm font-black leading-5 text-[#202a20] sm:text-[15px]">
                             {item.productName}
                           </h3>
 
-                          <p className="mt-1 text-xs text-[#8a9287]">
+                          <p className="mt-1 text-[11px] text-[#8a9287] sm:text-xs">
                             {item.weight}
                             {item.unit} × {item.quantity}
                           </p>
                         </div>
 
-                        <p className="text-sm font-black text-[#202a20]">
+                        <p className="shrink-0 text-sm font-black text-[#202a20]">
                           ₹
                           {Number(
                             item.lineTotal
@@ -397,15 +380,15 @@ function Confirmation() {
               </div>
             </section>
 
-            <section className="rounded-[20px] border border-[#e1e7dd] bg-white shadow-[0_10px_30px_rgba(47,70,39,0.045)]">
-              <div className="border-b border-[#edf0ea] px-5 py-4 sm:px-6">
-                <h2 className="text-lg font-black text-[#202a20]">
+            <section className="rounded-[18px] border border-[#e1e7dd] bg-white shadow-[0_10px_30px_rgba(47,70,39,0.045)] sm:rounded-[20px]">
+              <div className="border-b border-[#edf0ea] px-4 py-4 sm:px-5 md:px-6">
+                <h2 className="text-base font-black text-[#202a20] sm:text-lg">
                   Delivery & Payment
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 divide-y divide-[#edf0ea] sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-                <div className="flex gap-3 px-5 py-5 sm:px-6">
+              <div className="grid grid-cols-1 divide-y divide-[#edf0ea] md:grid-cols-2 md:divide-x md:divide-y-0">
+                <div className="flex gap-3 px-4 py-4 sm:px-5 sm:py-5 md:px-6">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#eef5e7] text-[#315d32]">
                     {order.fulfillmentMethod ===
                     'DELIVERY' ? (
@@ -415,7 +398,7 @@ function Confirmation() {
                     )}
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-wider text-[#969e93]">
                       Fulfillment
                     </p>
@@ -426,19 +409,19 @@ function Confirmation() {
 
                     {order.fulfillmentMethod ===
                       'DELIVERY' && (
-                      <p className="mt-1 text-xs leading-5 text-[#7e877c]">
+                      <p className="mt-1 break-words text-xs leading-5 text-[#7e877c]">
                         {formatAddress(order)}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex gap-3 px-5 py-5 sm:px-6">
+                <div className="flex gap-3 px-4 py-4 sm:px-5 sm:py-5 md:px-6">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-[#eef5e7] text-[#315d32]">
                     <CreditCard size={19} />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-[10px] font-black uppercase tracking-wider text-[#969e93]">
                       Payment Method
                     </p>
@@ -464,7 +447,7 @@ function Confirmation() {
                     `/order-detail?orderId=${order.id}`
                   )
                 }
-                className="flex flex-1 items-center justify-center gap-2 rounded-[12px] border border-[#315d32] bg-white py-3.5 text-sm font-black text-[#315d32] transition hover:bg-[#eef5e7]"
+                className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[12px] border border-[#315d32] bg-white px-4 py-3.5 text-sm font-black text-[#315d32] transition hover:bg-[#eef5e7]"
               >
                 View Order Details
                 <ChevronRight size={17} />
@@ -472,16 +455,16 @@ function Confirmation() {
 
               <button
                 onClick={() => navigate('/orders')}
-                className="flex flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#315d32] py-3.5 text-sm font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29]"
+                className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[12px] bg-[#315d32] px-4 py-3.5 text-sm font-black text-white shadow-md shadow-[#315d32]/15 transition hover:bg-[#274d29]"
               >
                 View All Orders
               </button>
             </div>
           </div>
 
-          <aside className="lg:sticky lg:top-5 lg:self-start">
-            <div className="overflow-hidden rounded-[20px] border border-[#e1e7dd] bg-white shadow-[0_15px_40px_rgba(47,70,39,0.07)]">
-              <div className="border-b border-[#edf0ea] px-5 py-4">
+          <aside className="w-full lg:sticky lg:top-5 lg:self-start">
+            <div className="overflow-hidden rounded-[18px] border border-[#e1e7dd] bg-white shadow-[0_15px_40px_rgba(47,70,39,0.07)] sm:rounded-[20px]">
+              <div className="border-b border-[#edf0ea] px-4 py-4 sm:px-5">
                 <div className="flex items-center gap-2">
                   <ReceiptText
                     size={18}
@@ -494,47 +477,47 @@ function Confirmation() {
                 </div>
               </div>
 
-              <div className="p-5">
-                <div className="rounded-[14px] bg-[#f7f8f2] p-4">
-                  <div className="flex items-center justify-between">
+              <div className="p-4 sm:p-5">
+                <div className="rounded-[14px] bg-[#f7f8f2] p-3.5 sm:p-4">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="text-xs text-[#8a9287]">
                       Order Number
                     </span>
 
-                    <span className="text-xs font-black text-[#202a20]">
+                    <span className="break-all text-right text-xs font-black text-[#202a20]">
                       #{order.orderNumber}
                     </span>
                   </div>
 
-                  <div className="mt-3 flex items-center justify-between">
+                  <div className="mt-3 flex items-center justify-between gap-3">
                     <span className="text-xs text-[#8a9287]">
                       Status
                     </span>
 
-                    <span className="rounded-full bg-[#e8f2e3] px-2.5 py-1 text-[9px] font-black uppercase text-[#315d32]">
+                    <span className="rounded-full bg-[#e8f2e3] px-2.5 py-1 text-right text-[9px] font-black uppercase text-[#315d32]">
                       {statusLabel}
                     </span>
                   </div>
                 </div>
 
                 <div className="my-5 space-y-4">
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center justify-between gap-4 text-sm">
                     <span className="text-[#7e877c]">
                       Item Total
                     </span>
 
-                    <span className="font-bold text-[#202a20]">
+                    <span className="shrink-0 font-bold text-[#202a20]">
                       ₹{subtotal.toFixed(2)}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center justify-between gap-4 text-sm">
                     <span className="text-[#7e877c]">
                       Delivery Fee
                     </span>
 
                     <span
-                      className={`font-bold ${
+                      className={`shrink-0 font-bold ${
                         deliveryFee === 0
                           ? 'text-[#315d32]'
                           : 'text-[#202a20]'
@@ -548,12 +531,12 @@ function Confirmation() {
                 </div>
 
                 <div className="border-t border-dashed border-[#dce3d8] pt-5">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-4">
                     <span className="text-base font-black text-[#202a20]">
                       Total
                     </span>
 
-                    <span className="text-2xl font-black text-[#315d32]">
+                    <span className="text-xl font-black text-[#315d32] sm:text-2xl">
                       ₹{total.toFixed(2)}
                     </span>
                   </div>
@@ -566,12 +549,12 @@ function Confirmation() {
                       className="shrink-0 text-[#315d32]"
                     />
 
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[10px] font-black text-[#202a20]">
                         Secure Order
                       </p>
 
-                      <p className="mt-0.5 text-[9px] text-[#929a8f]">
+                      <p className="mt-0.5 text-[9px] leading-4 text-[#929a8f]">
                         Your order information is protected
                       </p>
                     </div>
@@ -583,12 +566,12 @@ function Confirmation() {
                       className="shrink-0 text-[#315d32]"
                     />
 
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-[10px] font-black text-[#202a20]">
                         Order Tracking
                       </p>
 
-                      <p className="mt-0.5 text-[9px] text-[#929a8f]">
+                      <p className="mt-0.5 text-[9px] leading-4 text-[#929a8f]">
                         Track your order anytime
                       </p>
                     </div>
@@ -601,7 +584,7 @@ function Confirmation() {
                       `/order-detail?orderId=${order.id}`
                     )
                   }
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#315d32] py-3 text-xs font-black text-[#315d32] transition hover:bg-[#eef5e7]"
+                  className="mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-[12px] border border-[#315d32] px-4 py-3 text-xs font-black text-[#315d32] transition hover:bg-[#eef5e7]"
                 >
                   Track Order
                   <ChevronRight size={15} />
@@ -611,7 +594,7 @@ function Confirmation() {
 
             <button
               onClick={() => navigate('/')}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-[12px] border border-[#dfe6dc] bg-white py-3.5 text-xs font-black text-[#606960] shadow-sm transition hover:border-[#315d32]/30 hover:bg-[#eef5e7] hover:text-[#315d32]"
+              className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-[12px] border border-[#dfe6dc] bg-white px-4 py-3.5 text-xs font-black text-[#606960] shadow-sm transition hover:border-[#315d32]/30 hover:bg-[#eef5e7] hover:text-[#315d32] sm:mt-4"
             >
               <ArrowLeft size={15} />
               Continue Shopping
@@ -624,4 +607,3 @@ function Confirmation() {
 }
 
 export default Confirmation
-

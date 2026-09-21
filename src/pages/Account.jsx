@@ -69,12 +69,11 @@ function Account() {
 
   async function loadAccountData() {
     try {
-      const [addressData, orderData, cartData] =
-        await Promise.all([
-          getAddresses(),
-          getOrders(),
-          getCart(),
-        ])
+      const [addressData, orderData, cartData] = await Promise.all([
+        getAddresses(),
+        getOrders(),
+        getCart(),
+      ])
 
       setAddresses(addressData || [])
       setOrders(orderData || [])
@@ -283,10 +282,11 @@ function Account() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#315d32] border-t-transparent" />
-          <p className="text-xs font-bold uppercase tracking-wide text-[#81907b]">
+
+          <p className="text-center text-[10px] font-bold uppercase tracking-wide text-[#81907b] sm:text-xs">
             Loading profile...
           </p>
         </div>
@@ -297,12 +297,12 @@ function Account() {
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
-        <div className="w-full max-w-sm rounded-[28px] border border-white bg-white p-8 text-center shadow-[0_20px_60px_rgba(47,70,39,0.10)]">
+        <div className="w-full max-w-sm rounded-[28px] border border-white bg-white p-6 text-center shadow-[0_20px_60px_rgba(47,70,39,0.10)] sm:p-8">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eef5e7] text-[#315d32]">
             <ShieldCheck size={24} />
           </div>
 
-          <p className="mb-4 text-xs font-bold text-red-500">
+          <p className="mb-4 break-words text-xs font-bold text-red-500">
             {error}
           </p>
 
@@ -318,87 +318,76 @@ function Account() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f8f2] pb-20">
-      <div className="bg-[#315d32] px-4 py-6 text-white shadow-lg shadow-[#315d32]/15 sm:px-8">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-3">
+    <div className="min-h-screen overflow-x-hidden bg-[#f7f8f2] pb-12 sm:pb-16 lg:pb-20">
+      <div className="bg-[#315d32] px-3 py-4 text-white shadow-lg shadow-[#315d32]/15 sm:px-6 sm:py-5 md:px-8 lg:py-6">
+        <div className="mx-auto flex w-full max-w-6xl items-center gap-3">
+          <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md transition hover:bg-white/20"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md transition hover:bg-white/20 sm:h-10 sm:w-10"
               title="Go Back"
+              aria-label="Go Back"
             >
-              <ArrowLeft size={19} />
+              <ArrowLeft size={18} />
             </button>
 
-            <div>
-              <h1 className="text-lg font-black tracking-tight sm:text-2xl">
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-black tracking-tight sm:text-xl md:text-2xl">
                 My Account
               </h1>
 
-              <p className="text-[11px] font-medium text-[#dceacb]">
+              <p className="truncate text-[9px] font-medium text-[#dceacb] sm:text-[11px]">
                 Manage profile and delivery locations
               </p>
             </div>
           </div>
-
-          <button
-            onClick={() => navigate('/cart')}
-            className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-white/10 transition hover:bg-white/20"
-          >
-            <ShoppingCart size={19} />
-
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#b8df7d] px-1 text-[9px] font-black text-[#274d29]">
-                {cartCount}
-              </span>
-            )}
-          </button>
         </div>
       </div>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
-        <section className="mb-6 rounded-[26px] border border-white/80 bg-white p-5 shadow-[0_18px_50px_rgba(47,70,39,0.08)]">
+      <main className="mx-auto w-full max-w-6xl px-3 py-5 sm:px-5 sm:py-6 md:px-7 lg:px-8">
+        <section className="mb-5 rounded-[22px] border border-white/80 bg-white p-4 shadow-[0_18px_50px_rgba(47,70,39,0.08)] sm:mb-6 sm:rounded-[26px] sm:p-5 md:p-6">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32]">
-                <User size={30} />
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32] sm:h-16 sm:w-16">
+                <User size={27} className="sm:h-[30px] sm:w-[30px]" />
               </div>
 
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h2 className="truncate text-base font-black text-[#202a20] sm:text-lg">
+                <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                  <h2 className="min-w-0 truncate text-sm font-black text-[#202a20] sm:text-lg">
                     {customer?.name || 'Add your name'}
                   </h2>
 
                   <button
                     onClick={openNameForm}
-                    className="rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
+                    className="shrink-0 rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
+                    aria-label="Edit name"
                   >
-                    <Edit3 size={16} />
+                    <Edit3 size={15} />
                   </button>
                 </div>
 
-                <p className="mt-1 text-xs font-medium text-[#8a9287]">
+                <p className="mt-1 truncate text-[11px] font-medium text-[#8a9287] sm:text-xs">
                   {customer?.phone
                     ? `+91 ${customer.phone}`
                     : 'No phone linked'}
                 </p>
 
                 {customer?.isPhoneVerified && (
-                  <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-[#4e8b38]">
-                    <ShieldCheck size={13} />
+                  <div className="mt-1.5 flex items-center gap-1 text-[9px] font-bold text-[#4e8b38] sm:mt-2 sm:text-[10px]">
+                    <ShieldCheck size={12} />
                     Phone verified
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="rounded-2xl bg-[#eef5e7] px-5 py-3">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#527e45]">
+            <div className="w-full rounded-2xl bg-[#eef5e7] px-4 py-3 sm:w-auto sm:min-w-[130px] sm:px-5">
+              <p className="text-[9px] font-bold uppercase tracking-wider text-[#527e45] sm:text-[10px]">
                 Total Orders
               </p>
 
-              <p className="mt-1 text-xl font-black text-[#202a20]">
+              <p className="mt-1 text-lg font-black text-[#202a20] sm:text-xl">
                 {orders.length}
               </p>
             </div>
@@ -408,17 +397,17 @@ function Account() {
         {showNameForm && (
           <form
             onSubmit={handleNameSubmit}
-            className="mb-6 rounded-[26px] border border-[#dceacb] bg-white p-5 shadow-[0_18px_50px_rgba(47,70,39,0.07)]"
+            className="mb-5 rounded-[22px] border border-[#dceacb] bg-white p-4 shadow-[0_18px_50px_rgba(47,70,39,0.07)] sm:mb-6 sm:rounded-[26px] sm:p-5"
           >
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-black uppercase tracking-wider text-[#202a20]">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <h3 className="text-xs font-black uppercase tracking-wider text-[#202a20] sm:text-sm">
                 Edit Profile
               </h3>
 
               <button
                 type="button"
                 onClick={() => setShowNameForm(false)}
-                className="rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
+                className="shrink-0 rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
               >
                 <X size={18} />
               </button>
@@ -432,14 +421,14 @@ function Account() {
                   setName(event.target.value)
                 }
                 placeholder="Enter your full name"
-                className="flex-1 rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-bold text-[#202820] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
+                className="min-w-0 flex-1 rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-bold text-[#202820] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
                 autoFocus
               />
 
               <button
                 type="submit"
                 disabled={saving}
-                className="rounded-xl bg-[#315d32] px-7 py-3 text-xs font-black text-white shadow-md shadow-[#315d32]/20 transition hover:bg-[#274d29] disabled:opacity-50"
+                className="w-full rounded-xl bg-[#315d32] px-7 py-3 text-xs font-black text-white shadow-md shadow-[#315d32]/20 transition hover:bg-[#274d29] disabled:opacity-50 sm:w-auto"
               >
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
@@ -447,12 +436,12 @@ function Account() {
           </form>
         )}
 
-        <section className="mb-7">
-          <h2 className="mb-4 px-1 text-sm font-black uppercase tracking-wider text-[#606960]">
+        <section className="mb-6 sm:mb-7">
+          <h2 className="mb-3 px-1 text-xs font-black uppercase tracking-wider text-[#606960] sm:mb-4 sm:text-sm">
             Your Account
           </h2>
 
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
             {accountCards.map((card) => {
               const Icon = card.icon
 
@@ -460,24 +449,24 @@ function Account() {
                 <button
                   key={card.title}
                   onClick={card.action}
-                  className="group flex min-h-[125px] items-start gap-4 rounded-[24px] border border-white bg-white p-5 text-left shadow-[0_12px_35px_rgba(47,70,39,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#dceacb] hover:shadow-[0_18px_45px_rgba(47,70,39,0.10)]"
+                  className="group flex min-h-[112px] w-full min-w-0 items-start gap-3 rounded-[20px] border border-white bg-white p-4 text-left shadow-[0_12px_35px_rgba(47,70,39,0.06)] transition duration-200 hover:-translate-y-0.5 hover:border-[#dceacb] hover:shadow-[0_18px_45px_rgba(47,70,39,0.10)] sm:min-h-[125px] sm:gap-4 sm:rounded-[24px] sm:p-5"
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32]">
-                    <Icon size={22} />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32] sm:h-11 sm:w-11">
+                    <Icon size={20} className="sm:h-[22px] sm:w-[22px]" />
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-sm font-black text-[#202a20]">
+                    <h3 className="truncate text-xs font-black text-[#202a20] sm:text-sm">
                       {card.title}
                     </h3>
 
-                    <p className="mt-1 text-[11px] font-medium leading-5 text-[#8a9287]">
+                    <p className="mt-1 text-[10px] font-medium leading-5 text-[#8a9287] sm:text-[11px]">
                       {card.description}
                     </p>
                   </div>
 
                   <ChevronRight
-                    size={17}
+                    size={16}
                     className="mt-1 shrink-0 text-[#c2c9bd] transition group-hover:translate-x-1 group-hover:text-[#315d32]"
                   />
                 </button>
@@ -488,33 +477,33 @@ function Account() {
 
         <section
           id="addresses"
-          className="rounded-[26px] border border-white bg-white shadow-[0_18px_50px_rgba(47,70,39,0.07)]"
+          className="rounded-[22px] border border-white bg-white shadow-[0_18px_50px_rgba(47,70,39,0.07)] sm:rounded-[26px]"
         >
-          <div className="flex flex-col gap-3 border-b border-[#edf0ea] p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-base font-black text-[#202a20]">
+          <div className="flex flex-col gap-3 border-b border-[#edf0ea] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5 md:p-6">
+            <div className="min-w-0">
+              <h2 className="text-sm font-black text-[#202a20] sm:text-base">
                 Your Addresses
               </h2>
 
-              <p className="mt-1 text-[11px] font-medium text-[#8a9287]">
+              <p className="mt-1 text-[10px] font-medium text-[#8a9287] sm:text-[11px]">
                 Manage your delivery addresses
               </p>
             </div>
 
             <button
               onClick={openAddressModal}
-              className="flex items-center justify-center gap-2 rounded-xl border border-[#dceacb] bg-[#eef5e7] px-4 py-2.5 text-xs font-black text-[#315d32] transition hover:bg-[#e1edd7]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#dceacb] bg-[#eef5e7] px-4 py-2.5 text-xs font-black text-[#315d32] transition hover:bg-[#e1edd7] sm:w-auto"
             >
               <Plus size={15} />
               Add New Address
             </button>
           </div>
 
-          <div className="p-5">
+          <div className="p-4 sm:p-5 md:p-6">
             {addresses.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-[#dfe5da] bg-[#fafcf8] p-10 text-center">
+              <div className="rounded-2xl border border-dashed border-[#dfe5da] bg-[#fafcf8] p-8 text-center sm:p-10">
                 <MapPinned
-                  size={36}
+                  size={34}
                   className="mx-auto mb-3 text-[#b4bdb0]"
                 />
 
@@ -522,34 +511,34 @@ function Account() {
                   No saved addresses yet.
                 </p>
 
-                <p className="mt-1 text-[11px] text-[#969e93]">
+                <p className="mt-1 text-[10px] text-[#969e93] sm:text-[11px]">
                   Add an address for fast grocery delivery.
                 </p>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
                 {addresses.map((item) => (
                   <div
                     key={item.id}
-                    className="rounded-2xl border border-[#edf0ea] bg-[#fafcf8] p-5 transition hover:border-[#dceacb] hover:bg-white hover:shadow-sm"
+                    className="min-w-0 rounded-2xl border border-[#edf0ea] bg-[#fafcf8] p-4 transition hover:border-[#dceacb] hover:bg-white hover:shadow-sm sm:p-5"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32]">
+                    <div className="flex min-w-0 items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#dceacb] bg-[#eef5e7] text-[#315d32] sm:h-10 sm:w-10">
                           {item.label?.toLowerCase() === 'work' ? (
-                            <Briefcase size={17} />
+                            <Briefcase size={16} />
                           ) : (
-                            <Home size={17} />
+                            <Home size={16} />
                           )}
                         </div>
 
-                        <div>
-                          <h3 className="text-xs font-black text-[#202a20]">
+                        <div className="min-w-0">
+                          <h3 className="truncate text-xs font-black text-[#202a20]">
                             {item.label || 'Address'}
                           </h3>
 
                           {item.isDefault && (
-                            <span className="text-[9px] font-bold uppercase text-[#4e8b38]">
+                            <span className="text-[8px] font-bold uppercase text-[#4e8b38] sm:text-[9px]">
                               Default address
                             </span>
                           )}
@@ -557,13 +546,13 @@ function Account() {
                       </div>
 
                       {item.isDefault && (
-                        <span className="rounded-full bg-[#e5f2dc] px-2 py-1 text-[9px] font-bold text-[#315d32]">
+                        <span className="shrink-0 rounded-full bg-[#e5f2dc] px-2 py-1 text-[8px] font-bold text-[#315d32] sm:text-[9px]">
                           DEFAULT
                         </span>
                       )}
                     </div>
 
-                    <p className="mt-4 min-h-[65px] text-xs font-medium leading-6 text-[#737c70]">
+                    <p className="mt-4 min-h-0 break-words text-[11px] font-medium leading-6 text-[#737c70] sm:min-h-[65px] sm:text-xs">
                       {[
                         item.line1,
                         item.line2,
@@ -577,10 +566,8 @@ function Account() {
 
                     <div className="mt-4 flex items-center gap-4 border-t border-[#edf0ea] pt-4">
                       <button
-                        onClick={() =>
-                          openEditAddress(item)
-                        }
-                        className="flex items-center gap-1 text-[11px] font-black text-[#315d32] transition hover:text-[#274d29] hover:underline"
+                        onClick={() => openEditAddress(item)}
+                        className="flex items-center gap-1 text-[10px] font-black text-[#315d32] transition hover:text-[#274d29] hover:underline sm:text-[11px]"
                       >
                         <Edit3 size={13} />
                         Edit
@@ -592,7 +579,7 @@ function Account() {
                         onClick={() =>
                           handleDeleteAddress(item.id)
                         }
-                        className="flex items-center gap-1 text-[11px] font-black text-[#b95b52] transition hover:text-[#9f4038] hover:underline"
+                        className="flex items-center gap-1 text-[10px] font-black text-[#b95b52] transition hover:text-[#9f4038] hover:underline sm:text-[11px]"
                       >
                         <Trash2 size={13} />
                         Remove
@@ -608,7 +595,7 @@ function Account() {
         <button
           onClick={handleLogout}
           disabled={loggingOut}
-          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#e8c9c5] bg-[#fff6f4] py-3.5 text-xs font-black text-[#b95b52] transition hover:bg-[#ffebe8] disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#e8c9c5] bg-[#fff6f4] py-3.5 text-xs font-black text-[#b95b52] transition hover:bg-[#ffebe8] disabled:cursor-not-allowed disabled:opacity-60 sm:mt-6"
         >
           <LogOut size={16} />
           {loggingOut ? 'Signing Out...' : 'Sign Out'}
@@ -616,10 +603,10 @@ function Account() {
       </main>
 
       {showAddressModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#1d2b1e]/55 px-4 py-6 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-[30px] border border-white/80 bg-white shadow-[0_30px_100px_rgba(29,43,30,0.25)]">
-            <div className="flex items-center justify-between border-b border-[#edf0ea] px-6 py-4">
-              <h3 className="text-sm font-black uppercase tracking-wider text-[#202a20]">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#1d2b1e]/55 px-3 py-4 backdrop-blur-sm sm:items-center sm:px-4 sm:py-6">
+          <div className="my-auto max-h-[calc(100dvh-32px)] w-full max-w-md overflow-y-auto rounded-[24px] border border-white/80 bg-white shadow-[0_30px_100px_rgba(29,43,30,0.25)] sm:max-h-[calc(100dvh-48px)] sm:rounded-[30px]">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[#edf0ea] bg-white px-4 py-4 sm:px-6">
+              <h3 className="min-w-0 truncate text-xs font-black uppercase tracking-wider text-[#202a20] sm:text-sm">
                 {editingAddressId
                   ? 'Edit Address'
                   : 'Add New Address'}
@@ -627,7 +614,7 @@ function Account() {
 
               <button
                 onClick={closeAddressModal}
-                className="rounded-lg p-1 text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#9aa197] transition hover:bg-[#eef5e7] hover:text-[#315d32]"
               >
                 <X size={18} />
               </button>
@@ -635,7 +622,7 @@ function Account() {
 
             <form
               onSubmit={handleAddressSubmit}
-              className="space-y-3.5 p-6"
+              className="space-y-3 p-4 sm:space-y-3.5 sm:p-6"
             >
               <input
                 name="label"
@@ -662,7 +649,7 @@ function Account() {
                 className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
               />
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <input
                   name="city"
                   value={address.city}
@@ -693,7 +680,7 @@ function Account() {
                 className="w-full rounded-xl border border-[#e0e6dc] bg-[#fafcf8] px-4 py-3 text-xs font-medium text-[#202a20] outline-none transition focus:border-[#5e9742] focus:bg-white focus:ring-4 focus:ring-[#6c9d50]/10"
               />
 
-              <div className="flex gap-3 border-t border-[#edf0ea] pt-4">
+              <div className="flex flex-col gap-2.5 border-t border-[#edf0ea] pt-4 sm:flex-row sm:gap-3">
                 <button
                   type="button"
                   onClick={closeAddressModal}

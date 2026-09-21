@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -10,7 +9,6 @@ import {
   XCircle,
   RotateCcw,
   ChevronRight,
-  ArrowLeft,
   ReceiptText,
   MapPin,
   CreditCard,
@@ -352,8 +350,7 @@ function Orders() {
         !payment.keyId &&
         !payment.providerOrderId
       ) {
-        window.location.href =
-          payment.paymentUrl
+        window.location.href = payment.paymentUrl
         return
       }
 
@@ -619,23 +616,21 @@ function Orders() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f7f8f2] px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-6 h-5 w-32 animate-pulse rounded-full bg-[#e1e7dd]" />
-
-          <div className="mb-7">
-            <div className="h-9 w-48 animate-pulse rounded-[14px] bg-[#e1e7dd]" />
-            <div className="mt-3 h-4 w-72 animate-pulse rounded-full bg-[#e8ede5]" />
+      <div className="min-h-screen bg-[#f7f8f2] px-3 py-4 pb-8 sm:px-5 sm:py-6 lg:px-8">
+        <div className="mx-auto w-full max-w-6xl">
+          <div className="mb-6">
+            <div className="h-9 w-44 animate-pulse rounded-[14px] bg-[#e1e7dd]" />
+            <div className="mt-3 h-4 w-64 max-w-full animate-pulse rounded-full bg-[#e8ede5]" />
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             {[1, 2, 3].map(item => (
               <div
                 key={item}
-                className="animate-pulse rounded-[30px] border border-[#e1e7dd] bg-white p-5 shadow-[0_18px_55px_rgba(47,70,39,0.06)]"
+                className="animate-pulse rounded-[24px] border border-[#e1e7dd] bg-white p-4 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:rounded-[30px] sm:p-5"
               >
-                <div className="h-5 w-48 rounded-full bg-[#e1e7dd]" />
-                <div className="mt-5 h-20 rounded-[20px] bg-[#f7f8f2]" />
+                <div className="h-5 w-48 max-w-full rounded-full bg-[#e1e7dd]" />
+                <div className="mt-5 h-20 rounded-[18px] bg-[#f7f8f2]" />
                 <div className="mt-4 h-10 rounded-[14px] bg-[#f7f8f2]" />
               </div>
             ))}
@@ -646,34 +641,26 @@ function Orders() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f8f2] px-4 py-5 pb-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#f7f8f2] px-3 py-4 pb-8 sm:px-5 sm:py-6 lg:px-8 lg:py-7">
+      <div className="mx-auto w-full max-w-6xl">
 
-        <div className="mb-7">
-          <button
-            onClick={() => navigate(-1)}
-            className="mb-5 inline-flex items-center gap-2 text-xs font-black text-[#8a9287] transition hover:text-[#315d32]"
-          >
-            <ArrowLeft size={17} />
-            Continue Shopping
-          </button>
-
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-[16px] bg-[#315d32] text-white shadow-lg shadow-[#315d32]/20">
-                <ShoppingBag size={22} />
+        <div className="mb-5 sm:mb-7">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] bg-[#315d32] text-white shadow-lg shadow-[#315d32]/20 sm:h-12 sm:w-12 sm:rounded-[16px]">
+                <ShoppingBag size={21} />
               </div>
 
-              <div>
-                <p className="mb-0.5 text-[9px] font-black uppercase tracking-[1.5px] text-[#969e93]">
-                  My Account
+              <div className="min-w-0">
+                <p className="mb-0.5 text-[8px] font-black uppercase tracking-[1.4px] text-[#969e93] sm:text-[9px]">
+                
                 </p>
 
-                <h1 className="text-2xl font-black tracking-tight text-[#202a20] sm:text-3xl">
+                <h1 className="truncate text-2xl font-black tracking-tight text-[#202a20] sm:text-3xl">
                   My Orders
                 </h1>
 
-                <p className="mt-0.5 text-sm text-[#8a9287]">
+                <p className="mt-0.5 text-xs text-[#8a9287] sm:text-sm">
                   Track and manage your orders
                 </p>
               </div>
@@ -681,7 +668,7 @@ function Orders() {
 
             <button
               onClick={() => navigate('/cart')}
-              className="inline-flex items-center justify-center gap-2 rounded-[18px] border border-[#dfe6dc] bg-white px-4 py-3 text-xs font-black text-[#202a20] shadow-sm transition hover:border-[#315d32] hover:bg-[#eef5e7] hover:text-[#315d32]"
+              className="inline-flex min-h-[46px] w-full items-center justify-center gap-2 rounded-[17px] border border-[#dfe6dc] bg-white px-4 py-3 text-xs font-black text-[#202a20] shadow-sm transition hover:border-[#315d32] hover:bg-[#eef5e7] hover:text-[#315d32] sm:w-auto"
             >
               <ShoppingBasket size={18} />
               Cart
@@ -696,12 +683,14 @@ function Orders() {
         </div>
 
         {error && (
-          <div className="mb-5 flex items-center justify-between gap-4 rounded-[18px] border border-red-100 bg-red-50 px-4 py-3 text-xs font-bold text-red-600">
-            <span>{error}</span>
+          <div className="mb-5 flex flex-col gap-3 rounded-[18px] border border-red-100 bg-red-50 px-4 py-3 text-xs font-bold text-red-600 sm:flex-row sm:items-center sm:justify-between">
+            <span className="break-words">
+              {error}
+            </span>
 
             <button
               onClick={loadOrders}
-              className="inline-flex shrink-0 items-center gap-2 rounded-[13px] bg-white px-3 py-2 font-black text-red-600 shadow-sm transition hover:bg-red-50"
+              className="inline-flex min-h-[40px] shrink-0 items-center justify-center gap-2 rounded-[13px] bg-white px-3 py-2 font-black text-red-600 shadow-sm transition hover:bg-red-50"
             >
               <RefreshCw size={14} />
               Retry
@@ -709,7 +698,7 @@ function Orders() {
           </div>
         )}
 
-        <div className="mb-6 grid grid-cols-3 rounded-[22px] border border-[#e1e7dd] bg-white p-1.5 shadow-sm">
+        <div className="mb-5 grid grid-cols-3 gap-1 rounded-[20px] border border-[#e1e7dd] bg-white p-1.5 shadow-sm sm:mb-6 sm:rounded-[22px]">
           {[
             ['all', 'All Orders', orders.length],
             ['active', 'Active', activeOrders.length],
@@ -718,14 +707,17 @@ function Orders() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`rounded-[16px] px-3 py-3 text-xs font-black transition sm:text-sm ${
+              className={`min-w-0 rounded-[14px] px-1.5 py-3 text-[10px] font-black transition sm:rounded-[16px] sm:px-3 sm:text-sm ${
                 activeTab === tab
                   ? 'bg-[#315d32] text-white shadow-lg shadow-[#315d32]/15'
                   : 'text-[#606960] hover:bg-[#eef5e7] hover:text-[#315d32]'
               }`}
             >
-              {label}
-              <span className="ml-1.5 opacity-70">
+              <span className="block truncate sm:inline">
+                {label}
+              </span>
+
+              <span className="ml-1 opacity-70">
                 {count}
               </span>
             </button>
@@ -733,7 +725,7 @@ function Orders() {
         </div>
 
         {visibleOrders.length === 0 ? (
-          <div className="rounded-[30px] border border-[#e1e7dd] bg-white px-6 py-16 text-center shadow-[0_18px_55px_rgba(47,70,39,0.06)]">
+          <div className="rounded-[24px] border border-[#e1e7dd] bg-white px-5 py-12 text-center shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:rounded-[30px] sm:px-6 sm:py-16">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[20px] bg-[#eef5e7] text-[#315d32]">
               <ReceiptText size={29} />
             </div>
@@ -752,24 +744,26 @@ function Orders() {
 
             <button
               onClick={() => navigate('/home')}
-              className="mt-6 inline-flex items-center gap-2 rounded-[17px] bg-[#315d32] px-5 py-3.5 text-xs font-black text-white shadow-lg shadow-[#315d32]/20 transition hover:bg-[#274d29]"
+              className="mt-6 inline-flex min-h-[46px] items-center gap-2 rounded-[17px] bg-[#315d32] px-5 py-3.5 text-xs font-black text-white shadow-lg shadow-[#315d32]/20 transition hover:bg-[#274d29]"
             >
               Start Shopping
               <ChevronRight size={17} />
             </button>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             {visibleOrders.map((order, index) => {
               const orderId = getOrderId(order)
               const status = getOrderStatus(order)
-              const statusConfig = getStatusConfig(status)
+              const statusConfig =
+                getStatusConfig(status)
               const StatusIcon = statusConfig.icon
               const items = getOrderItems(order)
               const total = getOrderTotal(order)
               const date = getOrderDate(order)
               const address = getAddress(order)
-              const paymentMethod = getPaymentMethod(order)
+              const paymentMethod =
+                getPaymentMethod(order)
 
               const canCancel =
                 orderId &&
@@ -784,14 +778,17 @@ function Orders() {
 
               return (
                 <div
-                  key={orderId || `order-${index}`}
-                  className="overflow-hidden rounded-[30px] border border-[#e1e7dd] bg-white shadow-[0_18px_55px_rgba(47,70,39,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_65px_rgba(47,70,39,0.10)]"
+                  key={
+                    orderId ||
+                    `order-${index}`
+                  }
+                  className="w-full overflow-hidden rounded-[24px] border border-[#e1e7dd] bg-white shadow-[0_18px_55px_rgba(47,70,39,0.06)] transition hover:shadow-[0_24px_65px_rgba(47,70,39,0.10)] sm:rounded-[30px]"
                 >
-                  <div className="border-b border-[#edf0ea] px-4 py-5 sm:px-6">
+                  <div className="border-b border-[#edf0ea] px-4 py-4 sm:px-6 sm:py-5">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
+                      <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="text-base font-black text-[#202a20]">
+                          <h2 className="max-w-full break-all text-sm font-black text-[#202a20] sm:text-base">
                             {order?.orderNumber
                               ? `Order #${order.orderNumber}`
                               : orderId
@@ -800,20 +797,22 @@ function Orders() {
                           </h2>
 
                           <span
-                            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-wide ${statusConfig.className}`}
+                            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[8px] font-black uppercase tracking-wide sm:text-[9px] ${statusConfig.className}`}
                           >
                             <StatusIcon size={12} />
                             {statusConfig.label}
                           </span>
                         </div>
 
-                        <div className="mt-2 flex flex-wrap items-center gap-2.5 text-[10px] font-semibold text-[#969e93]">
+                        <div className="mt-2 flex flex-wrap items-center gap-2 text-[9px] font-semibold text-[#969e93] sm:text-[10px]">
                           <span>{formatDate(date)}</span>
 
                           {formatTime(date) && (
                             <>
                               <span>•</span>
-                              <span>{formatTime(date)}</span>
+                              <span>
+                                {formatTime(date)}
+                              </span>
                             </>
                           )}
 
@@ -828,7 +827,7 @@ function Orders() {
                         </div>
                       </div>
 
-                      <div className="rounded-[16px] bg-[#f7f8f2] px-4 py-2.5 text-left sm:text-right">
+                      <div className="w-full rounded-[16px] bg-[#f7f8f2] px-4 py-2.5 sm:w-auto sm:min-w-[150px] sm:text-right">
                         <p className="text-[9px] font-bold uppercase tracking-wide text-[#969e93]">
                           Total Amount
                         </p>
@@ -840,7 +839,7 @@ function Orders() {
                     </div>
                   </div>
 
-                  <div className="px-4 py-5 sm:px-6">
+                  <div className="px-3 py-4 sm:px-6 sm:py-5">
                     <div className="space-y-3">
                       {items
                         .slice(0, 4)
@@ -859,9 +858,9 @@ function Orders() {
                                 item?.cartItemId ||
                                 itemIndex
                               }
-                              className="flex items-center gap-3 rounded-[20px] border border-[#edf0ea] bg-[#f7f8f2] p-3"
+                              className="flex min-w-0 items-center gap-2.5 rounded-[18px] border border-[#edf0ea] bg-[#f7f8f2] p-2.5 sm:gap-3 sm:rounded-[20px] sm:p-3"
                             >
-                              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-[16px] border border-[#e1e7dd] bg-white">
+                              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[14px] border border-[#e1e7dd] bg-white sm:h-16 sm:w-16 sm:rounded-[16px]">
                                 {image ? (
                                   <img
                                     src={image}
@@ -872,24 +871,24 @@ function Orders() {
                                   />
                                 ) : (
                                   <ShoppingBag
-                                    size={24}
+                                    size={22}
                                     className="text-[#315d32]"
                                   />
                                 )}
                               </div>
 
                               <div className="min-w-0 flex-1">
-                                <h3 className="truncate text-sm font-black text-[#202a20]">
+                                <h3 className="line-clamp-2 break-words text-xs font-black leading-5 text-[#202a20] sm:text-sm">
                                   {getItemName(item)}
                                 </h3>
 
-                                <p className="mt-1 text-[10px] font-semibold text-[#969e93]">
+                                <p className="mt-0.5 text-[9px] font-semibold text-[#969e93] sm:mt-1 sm:text-[10px]">
                                   Qty: {quantity}
                                 </p>
                               </div>
 
-                              <div className="text-right">
-                                <p className="text-sm font-black text-[#202a20]">
+                              <div className="shrink-0 text-right">
+                                <p className="text-xs font-black text-[#202a20] sm:text-sm">
                                   ₹{(
                                     price *
                                     quantity
@@ -897,12 +896,8 @@ function Orders() {
                                 </p>
 
                                 {price > 0 && (
-                                  <p className="mt-0.5 text-[9px] font-semibold text-[#969e93]">
-                                    ₹
-                                    {price.toFixed(
-                                      2
-                                    )}{' '}
-                                    each
+                                  <p className="mt-0.5 text-[8px] font-semibold text-[#969e93] sm:text-[9px]">
+                                    ₹{price.toFixed(2)} each
                                   </p>
                                 )}
                               </div>
@@ -920,11 +915,10 @@ function Orders() {
                       )}
                     </div>
 
-                    {(address ||
-                      paymentMethod) && (
+                    {(address || paymentMethod) && (
                       <div className="mt-4 grid gap-3 sm:grid-cols-2">
                         {address && (
-                          <div className="rounded-[20px] border border-[#e1e7dd] bg-white p-4">
+                          <div className="min-w-0 rounded-[18px] border border-[#e1e7dd] bg-white p-3.5 sm:rounded-[20px] sm:p-4">
                             <div className="flex items-start gap-2.5">
                               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[#eef5e7] text-[#315d32]">
                                 <MapPin size={16} />
@@ -935,7 +929,7 @@ function Orders() {
                                   Delivery Address
                                 </p>
 
-                                <p className="mt-1 text-xs font-semibold leading-5 text-[#202a20]">
+                                <p className="mt-1 break-words text-xs font-semibold leading-5 text-[#202a20]">
                                   {typeof address ===
                                   'string'
                                     ? address
@@ -951,18 +945,18 @@ function Orders() {
                         )}
 
                         {paymentMethod && (
-                          <div className="rounded-[20px] border border-[#e1e7dd] bg-white p-4">
+                          <div className="rounded-[18px] border border-[#e1e7dd] bg-white p-3.5 sm:rounded-[20px] sm:p-4">
                             <div className="flex items-center gap-2.5">
                               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[12px] bg-[#eef5e7] text-[#315d32]">
                                 <CreditCard size={16} />
                               </div>
 
-                              <div>
+                              <div className="min-w-0">
                                 <p className="text-[9px] font-black uppercase tracking-wide text-[#969e93]">
                                   Payment Method
                                 </p>
 
-                                <p className="mt-1 text-xs font-black capitalize text-[#202a20]">
+                                <p className="mt-1 break-words text-xs font-black capitalize text-[#202a20]">
                                   {String(
                                     paymentMethod
                                   ).replace(
@@ -977,34 +971,28 @@ function Orders() {
                       </div>
                     )}
 
-                    <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+                    <div className="mt-5 grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-end">
                       {orderId && (
                         <button
                           onClick={() =>
-                            handleViewDetails(
-                              order
-                            )
+                            handleViewDetails(order)
                           }
-                          className="inline-flex items-center justify-center gap-2 rounded-[15px] border border-[#dfe6dc] bg-white px-4 py-3 text-[11px] font-black text-[#606960] transition hover:border-[#315d32] hover:bg-[#eef5e7] hover:text-[#315d32]"
+                          className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[15px] border border-[#dfe6dc] bg-white px-4 py-3 text-[11px] font-black text-[#606960] transition hover:border-[#315d32] hover:bg-[#eef5e7] hover:text-[#315d32] sm:w-auto"
                         >
                           View Details
-                          <ChevronRight
-                            size={16}
-                          />
+                          <ChevronRight size={16} />
                         </button>
                       )}
 
                       {canPay && (
                         <button
                           onClick={() =>
-                            handlePayment(
-                              orderId
-                            )
+                            handlePayment(orderId)
                           }
                           disabled={
                             paying === orderId
                           }
-                          className="inline-flex items-center justify-center gap-2 rounded-[15px] bg-[#315d32] px-4 py-3 text-[11px] font-black text-white shadow-lg shadow-[#315d32]/15 transition hover:bg-[#274d29] disabled:opacity-60"
+                          className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[15px] bg-[#315d32] px-4 py-3 text-[11px] font-black text-white shadow-lg shadow-[#315d32]/15 transition hover:bg-[#274d29] disabled:opacity-60 sm:w-auto"
                         >
                           <WalletCards
                             size={16}
@@ -1032,7 +1020,7 @@ function Orders() {
                             cancelling ===
                             orderId
                           }
-                          className="inline-flex items-center justify-center gap-2 rounded-[15px] border border-red-100 bg-white px-4 py-3 text-[11px] font-black text-red-600 transition hover:bg-red-50 disabled:opacity-60"
+                          className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[15px] border border-red-100 bg-white px-4 py-3 text-[11px] font-black text-red-600 transition hover:bg-red-50 disabled:opacity-60 sm:w-auto"
                         >
                           <Ban size={16} />
                           Cancel Order
@@ -1042,15 +1030,13 @@ function Orders() {
                       {items.length > 0 && (
                         <button
                           onClick={() =>
-                            handleReorder(
-                              order
-                            )
+                            handleReorder(order)
                           }
                           disabled={
                             reordering ===
                             orderId
                           }
-                          className="inline-flex items-center justify-center gap-2 rounded-[15px] bg-[#315d32] px-4 py-3 text-[11px] font-black text-white shadow-lg shadow-[#315d32]/15 transition hover:bg-[#274d29] disabled:cursor-not-allowed disabled:opacity-60"
+                          className="inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[15px] bg-[#315d32] px-4 py-3 text-[11px] font-black text-white shadow-lg shadow-[#315d32]/15 transition hover:bg-[#274d29] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                         >
                           <RotateCcw
                             size={16}
@@ -1077,13 +1063,13 @@ function Orders() {
         )}
 
         {orders.length > 0 && (
-          <div className="mt-6 rounded-[30px] border border-[#e1e7dd] bg-white p-5 shadow-[0_18px_55px_rgba(47,70,39,0.06)]">
+          <div className="mt-5 rounded-[24px] border border-[#e1e7dd] bg-white p-4 shadow-[0_18px_55px_rgba(47,70,39,0.06)] sm:mt-6 sm:rounded-[30px] sm:p-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-[#eef5e7] text-[#315d32]">
                 <PackageCheck size={20} />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-sm font-black text-[#202a20]">
                   Your orders are safe with us
                 </h3>
@@ -1098,18 +1084,16 @@ function Orders() {
       </div>
 
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#202a20]/45 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[30px] border border-[#e1e7dd] bg-white shadow-[0_30px_90px_rgba(47,70,39,0.18)]">
-            <div className="sticky top-0 flex items-center justify-between border-b border-[#edf0ea] bg-white px-5 py-5 sm:px-6">
-              <div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#202a20]/45 p-3 backdrop-blur-sm sm:p-4">
+          <div className="my-auto max-h-[94vh] w-full max-w-2xl overflow-y-auto rounded-[24px] border border-[#e1e7dd] bg-white shadow-[0_30px_90px_rgba(47,70,39,0.18)] sm:max-h-[90vh] sm:rounded-[30px]">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[#edf0ea] bg-white px-4 py-4 sm:px-6 sm:py-5">
+              <div className="min-w-0">
                 <p className="text-[9px] font-black uppercase tracking-[1.2px] text-[#969e93]">
                   Order Details
                 </p>
 
-                <h2 className="mt-1 text-lg font-black text-[#202a20]">
-                  Order #{getOrderId(
-                    selectedOrder
-                  )}
+                <h2 className="mt-1 break-all text-base font-black text-[#202a20] sm:text-lg">
+                  Order #{getOrderId(selectedOrder)}
                 </h2>
 
                 <p className="text-[10px] text-[#8a9287]">
@@ -1121,13 +1105,13 @@ function Orders() {
                 onClick={() =>
                   setSelectedOrder(null)
                 }
-                className="flex h-9 w-9 items-center justify-center rounded-[13px] bg-[#f7f8f2] text-[#606960] transition hover:bg-red-50 hover:text-red-500"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#f7f8f2] text-[#606960] transition hover:bg-red-50 hover:text-red-500"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="p-5 sm:p-6">
+            <div className="p-4 sm:p-6">
               {loadingDetails ? (
                 <div className="py-10 text-center">
                   <RefreshCw
@@ -1137,7 +1121,7 @@ function Orders() {
                 </div>
               ) : (
                 <>
-                  <div className="rounded-[20px] border border-[#dfe9d8] bg-[#eef5e7] p-4">
+                  <div className="rounded-[18px] border border-[#dfe9d8] bg-[#eef5e7] p-4">
                     <p className="text-[9px] font-black uppercase tracking-wide text-[#969e93]">
                       Status
                     </p>
@@ -1156,8 +1140,10 @@ function Orders() {
                       selectedOrder
                     ).map((item, index) => (
                       <div
-                        key={item?.id || index}
-                        className="flex items-center gap-3 rounded-[20px] border border-[#e1e7dd] bg-[#f7f8f2] p-3"
+                        key={
+                          item?.id || index
+                        }
+                        className="flex min-w-0 items-center gap-2.5 rounded-[18px] border border-[#e1e7dd] bg-[#f7f8f2] p-3 sm:gap-3 sm:rounded-[20px]"
                       >
                         <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[14px] border border-[#e1e7dd] bg-white">
                           {getItemImage(item) ? (
@@ -1179,19 +1165,16 @@ function Orders() {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-black text-[#202a20]">
+                          <p className="line-clamp-2 break-words text-xs font-black leading-5 text-[#202a20] sm:text-sm">
                             {getItemName(item)}
                           </p>
 
                           <p className="mt-1 text-[10px] font-semibold text-[#969e93]">
-                            Qty:{' '}
-                            {getItemQuantity(
-                              item
-                            )}
+                            Qty: {getItemQuantity(item)}
                           </p>
                         </div>
 
-                        <p className="text-sm font-black text-[#202a20]">
+                        <p className="shrink-0 text-xs font-black text-[#202a20] sm:text-sm">
                           ₹{(
                             getItemPrice(item) *
                             getItemQuantity(item)
@@ -1202,7 +1185,7 @@ function Orders() {
                   </div>
 
                   <div className="mt-5 rounded-[20px] border border-[#e1e7dd] bg-white p-4">
-                    <div className="flex justify-between text-sm">
+                    <div className="flex items-center justify-between gap-4 text-sm">
                       <span className="text-[#8a9287]">
                         Total
                       </span>
@@ -1222,15 +1205,15 @@ function Orders() {
       )}
 
       {cancelOrderId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#202a20]/45 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md overflow-hidden rounded-[30px] border border-[#e1e7dd] bg-white shadow-[0_30px_90px_rgba(47,70,39,0.18)]">
-            <div className="flex items-center justify-between border-b border-[#edf0ea] px-5 py-5">
-              <div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#202a20]/45 p-3 backdrop-blur-sm sm:p-4">
+          <div className="my-auto w-full max-w-md overflow-hidden rounded-[24px] border border-[#e1e7dd] bg-white shadow-[0_30px_90px_rgba(47,70,39,0.18)] sm:rounded-[30px]">
+            <div className="flex items-center justify-between gap-3 border-b border-[#edf0ea] px-4 py-4 sm:px-5 sm:py-5">
+              <div className="min-w-0">
                 <p className="text-[9px] font-black uppercase tracking-[1.2px] text-[#969e93]">
                   Order Action
                 </p>
 
-                <h2 className="mt-1 text-lg font-black text-[#202a20]">
+                <h2 className="mt-1 text-base font-black text-[#202a20] sm:text-lg">
                   Cancel Order
                 </h2>
               </div>
@@ -1239,13 +1222,13 @@ function Orders() {
                 onClick={() =>
                   setCancelOrderId(null)
                 }
-                className="flex h-9 w-9 items-center justify-center rounded-[13px] bg-[#f7f8f2] text-[#606960] transition hover:bg-red-50 hover:text-red-500"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[13px] bg-[#f7f8f2] text-[#606960] transition hover:bg-red-50 hover:text-red-500"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="p-5">
+            <div className="p-4 sm:p-5">
               <div className="rounded-[18px] bg-red-50 p-4">
                 <p className="text-xs font-bold leading-5 text-red-600">
                   Are you sure you want to cancel this order?
@@ -1262,12 +1245,12 @@ function Orders() {
                 className="mt-4 w-full resize-none rounded-[16px] border border-[#dfe6dc] bg-[#f7f8f2] px-4 py-3 text-sm text-[#202a20] outline-none transition placeholder:text-[#969e93] focus:border-[#315d32] focus:bg-white focus:ring-2 focus:ring-[#315d32]/10"
               />
 
-              <div className="mt-4 flex gap-3">
+              <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <button
                   onClick={() =>
                     setCancelOrderId(null)
                   }
-                  className="flex-1 rounded-[15px] border border-[#dfe6dc] bg-white px-4 py-3 text-xs font-black text-[#606960] transition hover:bg-[#f7f8f2]"
+                  className="min-h-[44px] rounded-[15px] border border-[#dfe6dc] bg-white px-4 py-3 text-xs font-black text-[#606960] transition hover:bg-[#f7f8f2]"
                 >
                   Keep Order
                 </button>
@@ -1277,7 +1260,7 @@ function Orders() {
                   disabled={
                     cancelling === cancelOrderId
                   }
-                  className="flex-1 rounded-[15px] bg-red-500 px-4 py-3 text-xs font-black text-white shadow-lg shadow-red-500/15 transition hover:bg-red-600 disabled:opacity-60"
+                  className="min-h-[44px] rounded-[15px] bg-red-500 px-4 py-3 text-xs font-black text-white shadow-lg shadow-red-500/15 transition hover:bg-red-600 disabled:opacity-60"
                 >
                   {cancelling === cancelOrderId
                     ? 'Cancelling...'

@@ -19,11 +19,7 @@ function Navbar() {
   };
 
   useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = menuOpen ? "hidden" : "";
 
     return () => {
       document.body.style.overflow = "";
@@ -33,9 +29,9 @@ function Navbar() {
   return (
     <>
       <header className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/95 shadow-sm backdrop-blur-md">
-        <div className="mx-auto flex h-[68px] w-full max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:h-[72px] lg:px-8">
-
-          <div className="flex min-w-0 items-center gap-4 lg:gap-8">
+        <div className="mx-auto flex min-h-[64px] w-full max-w-[1400px] items-center justify-between gap-2 px-3 sm:min-h-[68px] sm:px-5 md:px-6 lg:min-h-[72px] lg:px-8">
+          
+          <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-4 lg:gap-8">
             <button
               type="button"
               onClick={() => handleNavigate("/home")}
@@ -47,8 +43,7 @@ function Navbar() {
 
               <div className="min-w-0">
                 <h1 className="truncate text-sm font-black tracking-tight text-gray-900 sm:text-base lg:text-lg">
-                  CD Shopping{" "}
-                  <span className="text-[#16823b]">Hub</span>
+                  CD Shopping <span className="text-[#16823b]">Hub</span>
                 </h1>
 
                 <p className="hidden text-[10px] font-medium text-gray-400 sm:block">
@@ -57,11 +52,11 @@ function Navbar() {
               </div>
             </button>
 
-            <nav className="hidden items-center gap-1 md:flex">
+            <nav className="hidden items-center gap-0.5 lg:flex">
               <button
                 type="button"
                 onClick={() => handleNavigate("/home")}
-                className="relative px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100"
+                className="relative whitespace-nowrap px-2.5 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100 xl:px-3"
               >
                 Groceries
               </button>
@@ -69,7 +64,7 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() => handleNavigate("/staples")}
-                className="relative px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100"
+                className="relative whitespace-nowrap px-2.5 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100 xl:px-3"
               >
                 Staples
               </button>
@@ -77,7 +72,7 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() => handleNavigate("/personal-care")}
-                className="relative px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100"
+                className="relative whitespace-nowrap px-2.5 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100 xl:px-3"
               >
                 Personal Care
               </button>
@@ -85,7 +80,7 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() => handleNavigate("/deals")}
-                className="relative px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100"
+                className="relative whitespace-nowrap px-2.5 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100 xl:px-3"
               >
                 Deals
               </button>
@@ -93,16 +88,16 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() => handleNavigate("/orders")}
-                className="relative px-3 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100"
+                className="relative whitespace-nowrap px-2.5 py-2 text-xs font-semibold text-gray-600 transition-colors hover:text-[#16823b] after:absolute after:bottom-0 after:left-2.5 after:right-2.5 after:h-[2px] after:origin-left after:scale-x-0 after:bg-[#16823b] after:transition-transform hover:after:scale-x-100 xl:px-3"
               >
                 Orders
               </button>
             </nav>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3 lg:gap-4">
-
-            <div className="hidden h-10 w-[200px] items-center gap-2 rounded-xl border border-transparent bg-[#f4f8f4] px-3.5 transition focus-within:border-[#16823b] focus-within:bg-white focus-within:shadow-sm sm:flex lg:w-[280px]">
+          <div className="flex min-w-0 flex-1 items-center justify-end gap-1.5 sm:gap-2 md:gap-2.5 lg:flex-none lg:gap-3 xl:gap-4">
+            
+            <div className="hidden h-9 min-w-0 flex-1 items-center gap-2 rounded-xl bg-[#f4f8f4] px-3 transition focus-within:bg-white focus-within:ring-1 focus-within:ring-[#16823b]/30 sm:flex md:max-w-[300px] lg:h-10 lg:w-[220px] lg:flex-none xl:w-[280px]">
               <Search
                 size={15}
                 strokeWidth={2.2}
@@ -112,21 +107,21 @@ function Navbar() {
               <input
                 type="text"
                 placeholder="Search for groceries..."
-                className="w-full bg-transparent text-xs font-medium text-gray-800 outline-none placeholder:text-gray-400"
+                className="w-full min-w-0 bg-transparent text-xs font-medium text-gray-800 outline-none placeholder:text-gray-400"
               />
             </div>
 
             <button
               type="button"
-              className="hidden items-center gap-1.5 rounded-xl border border-gray-100 bg-gray-50/50 px-3 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-100 lg:flex"
+              className="hidden h-9 items-center gap-1.5 rounded-xl border border-gray-100 bg-gray-50/50 px-2.5 text-xs font-bold text-gray-700 transition hover:bg-gray-100 lg:flex xl:h-10 xl:px-3"
             >
               <MapPin
                 size={15}
                 strokeWidth={2.2}
-                className="text-[#16823b]"
+                className="shrink-0 text-[#16823b]"
               />
 
-              <span className="max-w-[100px] truncate">
+              <span className="max-w-[75px] truncate xl:max-w-[100px]">
                 Location
               </span>
             </button>
@@ -134,26 +129,21 @@ function Navbar() {
             <button
               type="button"
               onClick={() => handleNavigate("/account")}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:h-10 sm:w-10"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:h-10 sm:w-10"
               aria-label="Account"
             >
-              <UserCircle
-                size={20}
-                strokeWidth={2}
-              />
+              <UserCircle size={20} strokeWidth={2} />
             </button>
 
             <button
               type="button"
               onClick={() => handleNavigate("/cart")}
-              className="flex h-9 items-center gap-2 rounded-xl bg-[#16823b] px-3 text-xs font-extrabold text-white shadow-md shadow-green-900/20 transition-all hover:bg-[#116d30] active:scale-95 sm:h-10 sm:px-4"
+              className="flex h-9 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#16823b] px-2.5 text-xs font-extrabold text-white shadow-md shadow-green-900/20 transition-all hover:bg-[#116d30] active:scale-95 sm:h-10 sm:px-3.5 md:px-4"
+              aria-label="Cart"
             >
-              <ShoppingCart
-                size={16}
-                strokeWidth={2.5}
-              />
+              <ShoppingCart size={16} strokeWidth={2.5} />
 
-              <span className="hidden sm:inline">
+              <span className="hidden md:inline">
                 Cart
               </span>
             </button>
@@ -161,42 +151,36 @@ function Navbar() {
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] md:hidden"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:h-10 sm:w-10 lg:hidden"
               aria-label="Open menu"
               aria-expanded={menuOpen}
             >
-              <Menu
-                size={21}
-                strokeWidth={2.3}
-              />
+              <Menu size={21} strokeWidth={2.3} />
             </button>
           </div>
         </div>
       </header>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-[9999] h-[100dvh] w-screen overflow-hidden bg-white md:hidden">
-
+        <div className="fixed inset-0 z-[9999] h-[100dvh] w-screen overflow-hidden bg-white lg:hidden">
           <div className="flex h-full min-h-0 w-full flex-col bg-white">
 
-            <div className="flex h-[68px] shrink-0 items-center justify-between border-b border-gray-100 bg-white px-4 shadow-sm sm:px-6">
-
+            <div className="flex h-[64px] shrink-0 items-center justify-between border-b border-gray-100 bg-white px-3 shadow-sm sm:h-[68px] sm:px-5 md:px-6">
               <button
                 type="button"
                 onClick={() => handleNavigate("/home")}
-                className="group flex items-center gap-2 text-left"
+                className="group flex min-w-0 items-center gap-2 text-left"
               >
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#edf7ef] text-lg font-black text-[#16823b] transition group-hover:scale-105">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#edf7ef] text-lg font-black text-[#16823b] transition group-hover:scale-105 sm:h-10 sm:w-10">
                   🛒
                 </div>
 
-                <div>
-                  <h1 className="text-sm font-black tracking-tight text-gray-900">
-                    CD Shopping{" "}
-                    <span className="text-[#16823b]">Hub</span>
+                <div className="min-w-0">
+                  <h1 className="truncate text-sm font-black tracking-tight text-gray-900 sm:text-base">
+                    CD Shopping <span className="text-[#16823b]">Hub</span>
                   </h1>
 
-                  <p className="text-[9px] font-medium text-gray-400">
+                  <p className="text-[9px] font-medium text-gray-400 sm:text-[10px]">
                     Fresh & Fast Delivery
                   </p>
                 </div>
@@ -205,19 +189,16 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gray-50 text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:h-10 sm:w-10"
                 aria-label="Close menu"
               >
-                <X
-                  size={21}
-                  strokeWidth={2.3}
-                />
+                <X size={21} strokeWidth={2.3} />
               </button>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto bg-white px-4 py-4 sm:px-6">
-
-              <div className="mb-4 flex h-11 w-full items-center gap-2 rounded-xl bg-[#f4f8f4] px-3.5">
+            <div className="min-h-0 flex-1 overflow-y-auto bg-white px-3 py-4 sm:px-5 md:px-6">
+              
+              <div className="mb-4 flex h-11 w-full items-center gap-2 rounded-xl bg-[#f4f8f4] px-3.5 sm:h-12">
                 <Search
                   size={16}
                   strokeWidth={2.2}
@@ -227,16 +208,15 @@ function Navbar() {
                 <input
                   type="text"
                   placeholder="Search for groceries..."
-                  className="w-full bg-transparent text-xs font-medium text-gray-800 outline-none placeholder:text-gray-400"
+                  className="w-full bg-transparent text-xs font-medium text-gray-800 outline-none placeholder:text-gray-400 sm:text-sm"
                 />
               </div>
 
               <nav className="flex flex-col">
-
                 <button
                   type="button"
                   onClick={() => handleNavigate("/home")}
-                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:py-4"
                 >
                   Groceries
                 </button>
@@ -244,7 +224,7 @@ function Navbar() {
                 <button
                   type="button"
                   onClick={() => handleNavigate("/staples")}
-                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:py-4"
                 >
                   Staples
                 </button>
@@ -252,7 +232,7 @@ function Navbar() {
                 <button
                   type="button"
                   onClick={() => handleNavigate("/personal-care")}
-                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:py-4"
                 >
                   Personal Care
                 </button>
@@ -260,7 +240,7 @@ function Navbar() {
                 <button
                   type="button"
                   onClick={() => handleNavigate("/deals")}
-                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:py-4"
                 >
                   Deals
                 </button>
@@ -268,7 +248,7 @@ function Navbar() {
                 <button
                   type="button"
                   onClick={() => handleNavigate("/orders")}
-                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                  className="rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:py-4"
                 >
                   Orders
                 </button>
@@ -278,32 +258,34 @@ function Navbar() {
                 <button
                   type="button"
                   onClick={() => handleNavigate("/account")}
-                  className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                  className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:py-4"
                 >
-                  <UserCircle
-                    size={18}
-                    strokeWidth={2}
-                  />
-
+                  <UserCircle size={18} strokeWidth={2} />
                   Account
                 </button>
 
                 <button
                   type="button"
-                  className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b]"
+                  className="flex items-center gap-3 rounded-xl px-3 py-3.5 text-left text-sm font-medium text-gray-700 transition hover:bg-[#edf7ef] hover:text-[#16823b] sm:py-4"
                 >
                   <MapPin
                     size={18}
                     strokeWidth={2}
                     className="text-[#16823b]"
                   />
-
                   Location
                 </button>
 
+                <button
+                  type="button"
+                  onClick={() => handleNavigate("/cart")}
+                  className="mt-2 flex items-center gap-3 rounded-xl bg-[#16823b] px-3 py-3.5 text-left text-sm font-bold text-white transition hover:bg-[#116d30] sm:py-4"
+                >
+                  <ShoppingCart size={18} strokeWidth={2.3} />
+                  Cart
+                </button>
               </nav>
             </div>
-
           </div>
         </div>
       )}
@@ -312,3 +294,4 @@ function Navbar() {
 }
 
 export default Navbar;
+

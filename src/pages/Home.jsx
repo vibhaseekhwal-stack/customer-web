@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
@@ -10,7 +11,7 @@ import {
 const HERO_BANNERS = [
   {
     image:
-      'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1800&q=90',
+      'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1800&q=90',
     badge: 'Fresh & Healthy',
     title: 'Fresh Groceries\nDelivered to Your Door',
     subtitle:
@@ -26,7 +27,7 @@ const HERO_BANNERS = [
   },
   {
     image:
-      'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=1800&q=90',
+      'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1800&q=90',
     badge: 'Everyday Essentials',
     title: 'Daily Staples\nStocked & Ready',
     subtitle:
@@ -110,7 +111,6 @@ function Home() {
         setProducts(activeProducts)
       } catch (err) {
         console.error('Home API error:', err)
-
         setError(
           err?.message || 'Unable to load home data'
         )
@@ -124,13 +124,11 @@ function Home() {
 
   const handleCategoryClick = (category) => {
     if (!category?.id) return
-
     navigate(`/category/${category.id}`)
   }
 
   const handleProductClick = (product) => {
     if (!product?.id) return
-
     navigate(`/product/${product.id}`)
   }
 
@@ -177,11 +175,10 @@ function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-[#315d32]/20 border-t-[#315d32]" />
-
-          <p className="text-xs font-bold uppercase tracking-wider text-[#8a9287]">
+          <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#315d32]/20 border-t-[#315d32] sm:h-12 sm:w-12" />
+          <p className="text-center text-[10px] font-bold uppercase tracking-wider text-[#8a9287] sm:text-xs">
             Loading fresh groceries...
           </p>
         </div>
@@ -191,17 +188,17 @@ function Home() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-5">
-        <div className="w-full max-w-md rounded-[30px] border border-[#e1e7dd] bg-white p-8 text-center shadow-[0_25px_70px_rgba(47,70,39,0.09)]">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-[20px] bg-red-50 text-xl font-black text-red-500">
+      <div className="flex min-h-screen items-center justify-center bg-[#f7f8f2] px-4">
+        <div className="w-full max-w-md rounded-[26px] border border-[#e1e7dd] bg-white p-6 text-center shadow-[0_25px_70px_rgba(47,70,39,0.09)] sm:rounded-[30px] sm:p-8">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-[18px] bg-red-50 text-xl font-black text-red-500 sm:h-16 sm:w-16 sm:rounded-[20px]">
             !
           </div>
 
-          <h2 className="mt-5 text-lg font-black text-[#202a20]">
+          <h2 className="mt-5 text-base font-black text-[#202a20] sm:text-lg">
             Something went wrong
           </h2>
 
-          <p className="mt-2 text-sm text-[#8a9287]">
+          <p className="mt-2 text-xs leading-relaxed text-[#8a9287] sm:text-sm">
             {error}
           </p>
         </div>
@@ -210,9 +207,9 @@ function Home() {
   }
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f7f8f2] pb-20 text-[#202a20]">
-      <section className="w-full pt-0">
-        <div className="relative w-full overflow-hidden bg-[#202a20] shadow-[0_15px_45px_rgba(47,70,39,0.12)]">
+    <main className="min-h-screen overflow-x-hidden bg-[#f7f8f2] pb-16 text-[#202a20] sm:pb-20">
+      <section className="w-full">
+        <div className="hidden overflow-hidden bg-[#202a20] shadow-[0_15px_45px_rgba(47,70,39,0.12)] sm:block">
           <div
             className="flex transition-transform duration-700 ease-out"
             style={{
@@ -227,31 +224,31 @@ function Home() {
                 <img
                   src={banner.image}
                   alt="Fresh groceries banner"
-                  className="h-[340px] w-full object-cover brightness-[0.82] sm:h-[420px] lg:h-[500px]"
+                  className="h-[330px] w-full object-cover brightness-[0.82] md:h-[410px] lg:h-[500px]"
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-r from-[#202a20]/90 via-[#202a20]/60 to-[#202a20]/15" />
 
                 <div className="absolute inset-0 flex items-center">
-                  <div className="mx-auto w-full max-w-[1400px] px-6 sm:px-10 lg:px-16">
+                  <div className="mx-auto w-full max-w-[1400px] px-6 md:px-10 lg:px-16">
                     <div className="max-w-xl">
-                      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/95 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider text-[#315d32] shadow-lg">
+                      <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/95 px-3.5 py-1.5 text-[9px] font-black uppercase tracking-wider text-[#315d32] shadow-lg md:text-[10px]">
                         <span className="h-2 w-2 animate-pulse rounded-full bg-[#315d32]" />
                         {banner.badge}
                       </div>
 
-                      <h1 className="max-w-lg whitespace-pre-line text-2xl font-black leading-[1.18] tracking-tight text-white drop-shadow-lg sm:text-4xl lg:text-5xl">
+                      <h1 className="max-w-lg whitespace-pre-line text-3xl font-black leading-[1.18] tracking-tight text-white drop-shadow-lg md:text-4xl lg:text-5xl">
                         {banner.title}
                       </h1>
 
-                      <p className="mt-3.5 max-w-md text-xs leading-relaxed text-white/75 drop-shadow sm:text-sm">
+                      <p className="mt-3 max-w-md text-xs leading-relaxed text-white/75 drop-shadow md:text-sm">
                         {banner.subtitle}
                       </p>
 
                       <button
                         type="button"
                         onClick={() =>
-                          navigate('/categories')
+                          navigate('/category/all')
                         }
                         className="mt-6 rounded-[16px] bg-[#315d32] px-7 py-3.5 text-xs font-black text-white shadow-xl shadow-black/20 transition-all hover:bg-[#274d29] active:scale-95"
                       >
@@ -264,7 +261,7 @@ function Home() {
             ))}
           </div>
 
-          <div className="absolute bottom-5 right-8 z-10 flex gap-2">
+          <div className="absolute bottom-5 right-6 z-10 flex gap-2 md:right-8">
             {HERO_BANNERS.map((_, index) => (
               <button
                 key={index}
@@ -280,16 +277,80 @@ function Home() {
             ))}
           </div>
         </div>
+
+        <div className="relative overflow-hidden bg-[#17351f] sm:hidden">
+          <div
+            className="flex transition-transform duration-700 ease-out"
+            style={{
+              transform: `translateX(-${currentSlide * 100}%)`,
+            }}
+          >
+            {HERO_BANNERS.map((banner, index) => (
+              <div
+                key={index}
+                className="relative min-w-full flex-shrink-0"
+              >
+                <img
+                  src={banner.image}
+                  alt="Fresh groceries"
+                  className="h-[245px] w-full object-cover"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-[#17351f] via-[#17351f]/65 to-transparent" />
+
+                <div className="absolute inset-x-0 bottom-0 px-4 pb-7">
+                  <div className="mb-2 inline-flex rounded-full bg-white px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-[#315d32]">
+                    {banner.badge}
+                  </div>
+
+                  <h1 className="max-w-[310px] whitespace-pre-line text-[25px] font-black leading-[1.08] tracking-tight text-white">
+                    {banner.title}
+                  </h1>
+
+                  <p className="mt-2 max-w-[300px] text-[10px] leading-relaxed text-white/75">
+                    {banner.subtitle}
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate('/category/all')
+                    }
+                    className="mt-4 rounded-[12px] bg-white px-5 py-2.5 text-[10px] font-black text-[#315d32] shadow-lg active:scale-95"
+                  >
+                    Shop Now →
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="absolute bottom-3 right-4 z-10 flex gap-1.5">
+            {HERO_BANNERS.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => setCurrentSlide(index)}
+                className={`h-1.5 rounded-full transition-all ${
+                  currentSlide === index
+                    ? 'w-6 bg-white'
+                    : 'w-1.5 bg-white/50'
+                }`}
+                aria-label={`Slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
       </section>
 
-      <section className="mx-auto max-w-[1400px] px-3 pt-10 sm:px-5 lg:px-8">
+      <section className="mx-auto max-w-[1400px] px-3 pt-7 sm:px-5 sm:pt-9 lg:px-8 lg:pt-10">
         <SectionHeading
           title="Shop by Category"
           action="View All"
           onAction={() => navigate('/categories')}
         />
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
           {displayCategories.map((category, idx) => (
             <CategoryCard
               key={category.id || idx}
@@ -307,11 +368,11 @@ function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1400px] px-3 pt-10 sm:px-5 lg:px-8">
+      <section className="mx-auto max-w-[1400px] px-3 pt-8 sm:px-5 sm:pt-10 lg:px-8">
         <SectionHeading title="Best Deals" />
 
         {bestDeals.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-4">
             {bestDeals.map((product, idx) => (
               <ProductCard
                 key={product.id}
@@ -342,14 +403,14 @@ function SectionHeading({
   onAction,
 }) {
   return (
-    <div className="mb-5 flex items-end justify-between gap-3">
-      <div>
-        <h2 className="text-xl font-black tracking-tight text-[#202a20] sm:text-2xl">
+    <div className="mb-4 flex items-end justify-between gap-3 sm:mb-5">
+      <div className="min-w-0">
+        <h2 className="text-lg font-black tracking-tight text-[#202a20] sm:text-xl md:text-2xl">
           {title}
         </h2>
 
         {subtitle && (
-          <p className="mt-1 text-[10px] text-[#969e93] sm:text-xs">
+          <p className="mt-1 text-[9px] text-[#969e93] sm:text-xs">
             {subtitle}
           </p>
         )}
@@ -359,7 +420,7 @@ function SectionHeading({
         <button
           type="button"
           onClick={onAction}
-          className="shrink-0 rounded-full bg-[#eef5e7] px-4 py-2 text-xs font-black text-[#315d32] transition-all hover:bg-[#315d32] hover:text-white active:scale-95"
+          className="shrink-0 rounded-full bg-[#eef5e7] px-3.5 py-2 text-[10px] font-black text-[#315d32] transition-all hover:bg-[#315d32] hover:text-white active:scale-95 sm:px-4 sm:text-xs"
         >
           {action}
         </button>
@@ -377,9 +438,9 @@ function CategoryCard({
     <button
       type="button"
       onClick={onClick}
-      className="group flex min-h-[150px] flex-col items-center justify-between rounded-[24px] border border-[#e1e7dd] bg-white p-5 text-center shadow-[0_8px_25px_rgba(47,70,39,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-[#315d32]/30 hover:shadow-[0_15px_35px_rgba(47,70,39,0.09)]"
+      className="group flex min-h-[135px] flex-col items-center justify-between rounded-[20px] border border-[#e1e7dd] bg-white p-3.5 text-center shadow-[0_6px_20px_rgba(47,70,39,0.045)] transition-all duration-300 hover:-translate-y-1 hover:border-[#315d32]/30 hover:shadow-[0_15px_35px_rgba(47,70,39,0.09)] sm:min-h-[150px] sm:rounded-[24px] sm:p-5"
     >
-      <div className="mb-4 flex h-16 w-16 items-center justify-center overflow-hidden rounded-[20px] bg-[#eef5e7] text-2xl transition group-hover:bg-[#e3efd9]">
+      <div className="mb-3 flex h-14 w-14 items-center justify-center overflow-hidden rounded-[17px] bg-[#eef5e7] text-xl transition group-hover:bg-[#e3efd9] sm:mb-4 sm:h-16 sm:w-16 sm:rounded-[20px] sm:text-2xl">
         {category?.imageUrl ? (
           <img
             src={category.imageUrl}
@@ -391,7 +452,7 @@ function CategoryCard({
         )}
       </div>
 
-      <span className="line-clamp-1 text-xs font-black text-[#202a20] transition group-hover:text-[#315d32]">
+      <span className="line-clamp-2 text-[10px] font-black leading-tight text-[#202a20] transition group-hover:text-[#315d32] sm:text-xs">
         {category?.name}
       </span>
     </button>
@@ -430,7 +491,6 @@ function ProductCard({
 
     try {
       setAdding(true)
-
       await addToCart(cheapest.id, 1)
 
       alert(
@@ -453,7 +513,6 @@ function ProductCard({
   )
 
   const mrp = Number(cheapest?.mrp || 0)
-
   const hasDiscount = mrp > sellingPrice
 
   const discountPct = hasDiscount
@@ -469,47 +528,47 @@ function ProductCard({
   return (
     <article
       onClick={onClick}
-      className="group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-[24px] border border-[#e1e7dd] bg-white p-3.5 shadow-[0_8px_25px_rgba(47,70,39,0.05)] transition-all duration-300 hover:-translate-y-1 hover:border-[#315d32]/30 hover:shadow-[0_16px_35px_rgba(47,70,39,0.1)]"
+      className="group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-[18px] border border-[#e1e7dd] bg-white p-2.5 shadow-[0_6px_20px_rgba(47,70,39,0.045)] transition-all duration-300 hover:-translate-y-1 hover:border-[#315d32]/30 hover:shadow-[0_16px_35px_rgba(47,70,39,0.1)] sm:rounded-[24px] sm:p-3.5"
     >
       {hasDiscount && (
-        <div className="absolute left-3 top-3 z-10 rounded-full bg-[#315d32] px-2.5 py-1 text-[9px] font-black uppercase text-white shadow-sm">
+        <div className="absolute left-2.5 top-2.5 z-10 rounded-full bg-[#315d32] px-2 py-1 text-[8px] font-black uppercase text-white shadow-sm sm:left-3 sm:top-3 sm:px-2.5 sm:text-[9px]">
           {discountPct}% OFF
         </div>
       )}
 
-      <div className="relative mx-auto mt-2 flex h-40 w-full items-center justify-center overflow-hidden rounded-[18px] bg-[#f7f8f2]">
+      <div className="relative mx-auto mt-1.5 flex h-[125px] w-full items-center justify-center overflow-hidden rounded-[15px] bg-[#f7f8f2] sm:mt-2 sm:h-40 sm:rounded-[18px]">
         <img
           src={
             product?.imageUrl || fallbackImage
           }
           alt={product?.name}
           loading="lazy"
-          className="h-36 w-36 object-contain transition duration-300 group-hover:scale-105"
+          className="h-28 w-28 object-contain transition duration-300 group-hover:scale-105 sm:h-36 sm:w-36"
         />
       </div>
 
-      <div className="mt-3 flex flex-grow flex-col justify-between">
+      <div className="mt-2.5 flex flex-grow flex-col justify-between sm:mt-3">
         <div>
-          <h3 className="line-clamp-2 min-h-[36px] text-xs font-black leading-relaxed text-[#202a20]">
+          <h3 className="line-clamp-2 min-h-[32px] text-[10px] font-black leading-relaxed text-[#202a20] sm:min-h-[36px] sm:text-xs">
             {product?.name}
           </h3>
 
           <div className="mt-1">
-            <span className="text-[11px] font-medium text-[#969e93]">
+            <span className="text-[9px] font-medium text-[#969e93] sm:text-[11px]">
               {cheapest?.weight} {cheapest?.unit}
             </span>
           </div>
         </div>
 
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-black text-[#315d32]">
+        <div className="mt-3 flex items-center justify-between gap-2 sm:mt-4">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1">
+              <span className="text-xs font-black text-[#315d32] sm:text-sm">
                 ₹{sellingPrice.toFixed(0)}
               </span>
 
               {hasDiscount && (
-                <span className="text-[10px] font-normal text-[#969e93] line-through">
+                <span className="text-[8px] font-normal text-[#969e93] line-through sm:text-[10px]">
                   ₹{mrp.toFixed(0)}
                 </span>
               )}
@@ -517,7 +576,7 @@ function ProductCard({
           </div>
 
           {!anyAvailable ? (
-            <span className="rounded-[10px] bg-red-50 px-2.5 py-1 text-[10px] font-black text-red-500">
+            <span className="shrink-0 rounded-[9px] bg-red-50 px-2 py-1 text-[8px] font-black text-red-500 sm:rounded-[10px] sm:px-2.5 sm:text-[10px]">
               Out
             </span>
           ) : (
@@ -525,7 +584,7 @@ function ProductCard({
               type="button"
               onClick={handleAddToCart}
               disabled={adding}
-              className="flex h-9 w-9 items-center justify-center rounded-[12px] border-2 border-[#315d32] bg-white text-lg font-black text-[#315d32] shadow-sm transition-all hover:bg-[#315d32] hover:text-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] border-2 border-[#315d32] bg-white text-base font-black text-[#315d32] shadow-sm transition-all hover:bg-[#315d32] hover:text-white active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 sm:h-9 sm:w-9 sm:rounded-[12px] sm:text-lg"
               aria-label="Add item"
             >
               {adding ? '...' : '+'}
@@ -539,12 +598,12 @@ function ProductCard({
 
 function EmptyState({ text }) {
   return (
-    <div className="rounded-[24px] border border-dashed border-[#d8dfd4] bg-white py-14 text-center shadow-sm">
+    <div className="rounded-[20px] border border-dashed border-[#d8dfd4] bg-white py-12 text-center shadow-sm sm:rounded-[24px] sm:py-14">
       <div className="text-3xl text-[#d0d8ce]">
         🛒
       </div>
 
-      <p className="mt-3 text-sm font-semibold text-[#8a9287]">
+      <p className="mt-3 text-xs font-semibold text-[#8a9287] sm:text-sm">
         {text}
       </p>
     </div>
@@ -552,3 +611,4 @@ function EmptyState({ text }) {
 }
 
 export default Home
+

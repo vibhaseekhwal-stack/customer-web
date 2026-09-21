@@ -376,19 +376,19 @@ function OrderDetail() {
   const renderTimeline = () => {
     if (order.status === 'CANCELLED') {
       return (
-        <div className="rounded-xl border border-red-100 bg-red-50 p-4">
+        <div className="rounded-xl border border-red-100 bg-red-50 p-3.5 sm:p-4">
           <div className="flex items-start gap-3">
             <XCircle
               size={21}
               className="mt-0.5 shrink-0 text-red-600"
             />
 
-            <div>
+            <div className="min-w-0">
               <p className="text-sm font-bold text-red-700">
                 Order Cancelled
               </p>
 
-              <p className="mt-1 text-xs leading-5 text-red-600">
+              <p className="mt-1 break-words text-xs leading-5 text-red-600">
                 {order.cancelReason ||
                   'This order was cancelled by the customer.'}
               </p>
@@ -426,7 +426,7 @@ function OrderDetail() {
           return (
             <div
               key={step}
-              className="relative flex items-center gap-3"
+              className="relative flex min-w-0 items-center gap-3"
             >
               {index <
                 steps.length - 1 && (
@@ -449,7 +449,7 @@ function OrderDetail() {
               />
 
               <span
-                className={`text-sm ${
+                className={`min-w-0 break-words text-sm ${
                   isCurrent
                     ? 'font-bold text-[#172019]'
                     : done
@@ -462,7 +462,7 @@ function OrderDetail() {
               </span>
 
               {isCurrent && (
-                <span className="ml-auto rounded-full bg-[#f4f8f4] px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#16823b]">
+                <span className="ml-auto shrink-0 rounded-full bg-[#f4f8f4] px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-[#16823b] sm:px-2.5 sm:text-[10px]">
                   Current
                 </span>
               )}
@@ -475,16 +475,14 @@ function OrderDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f7faf7] px-4 py-6">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-6 h-10 w-32 animate-pulse rounded-xl bg-gray-200" />
+      <div className="min-h-screen overflow-x-hidden bg-[#f7faf7] px-3 py-4 sm:px-5 sm:py-6">
+        <div className="mx-auto w-full max-w-6xl">
+          <div className="mb-5 h-10 w-32 animate-pulse rounded-xl bg-gray-200" />
 
-          <div className="animate-pulse rounded-2xl border border-[#dce8de] bg-white p-6">
+          <div className="animate-pulse rounded-2xl border border-[#dce8de] bg-white p-4 sm:p-6">
             <div className="h-7 w-52 rounded bg-gray-200" />
-            <div className="mt-3 h-4 w-64 rounded bg-gray-100" />
-
-            <div className="mt-8 h-28 rounded-xl bg-gray-100" />
-
+            <div className="mt-3 h-4 w-64 max-w-full rounded bg-gray-100" />
+            <div className="mt-7 h-28 rounded-xl bg-gray-100" />
             <div className="mt-5 h-40 rounded-xl bg-gray-100" />
           </div>
         </div>
@@ -494,8 +492,8 @@ function OrderDetail() {
 
   if (error && !order) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f7faf7] px-4">
-        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-7 text-center shadow-sm">
+      <div className="flex min-h-screen items-center justify-center overflow-x-hidden bg-[#f7faf7] px-4">
+        <div className="w-full max-w-md rounded-2xl border border-red-100 bg-white p-5 text-center shadow-sm sm:p-7">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-red-50 text-red-600">
             <XCircle size={28} />
           </div>
@@ -504,7 +502,7 @@ function OrderDetail() {
             Unable to load order
           </h2>
 
-          <p className="mt-2 text-sm text-red-600">
+          <p className="mt-2 break-words text-sm text-red-600">
             {error}
           </p>
 
@@ -512,7 +510,7 @@ function OrderDetail() {
             onClick={() =>
               navigate('/orders')
             }
-            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#16823b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#116d30]"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#16823b] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#116d30] sm:w-auto"
           >
             <ArrowLeft size={17} />
             Back to Orders
@@ -533,38 +531,40 @@ function OrderDetail() {
     getStatusIcon(order.status)
 
   return (
-    <div className="min-h-screen bg-[#f7faf7] pb-10">
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#f7faf7] pb-8 sm:pb-10">
       <header className="sticky top-0 z-40 border-b border-[#dce8de] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-14 w-full max-w-6xl items-center px-3 py-2 sm:min-h-16 sm:px-5 lg:px-8">
           <button
             onClick={() =>
               navigate('/orders')
             }
-            className="mr-3 flex h-10 w-10 items-center justify-center rounded-xl text-gray-600 transition hover:bg-[#f4f8f4] hover:text-[#16823b]"
+            className="mr-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-gray-600 transition hover:bg-[#f4f8f4] hover:text-[#16823b] sm:mr-3 sm:h-10 sm:w-10"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={19} />
           </button>
 
-          <div>
-            <p className="text-xs font-medium text-gray-500">
+          <div className="min-w-0">
+            <p className="text-[10px] font-medium text-gray-500 sm:text-xs">
               My Orders
             </p>
 
-            <h1 className="text-lg font-bold text-[#172019]">
+            <h1 className="truncate text-base font-bold text-[#172019] sm:text-lg">
               Order Details
             </h1>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      <main className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-5 sm:py-6 lg:px-8">
         {error && (
-          <div className="mb-5 flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            <span>{error}</span>
+          <div className="mb-4 flex flex-col items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-700 sm:flex-row sm:items-center sm:justify-between sm:px-4">
+            <span className="min-w-0 break-words">
+              {error}
+            </span>
 
             <button
               onClick={loadOrder}
-              className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-white px-3 py-2 font-semibold text-red-700 shadow-sm"
+              className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-white px-3 py-2 font-semibold text-red-700 shadow-sm sm:w-auto"
             >
               <RefreshCw size={15} />
               Retry
@@ -572,19 +572,19 @@ function OrderDetail() {
           </div>
         )}
 
-        <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-          <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#16823b] text-white shadow-sm">
-                <ReceiptText size={21} />
+        <div className="mb-5 flex flex-col gap-4 sm:mb-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#16823b] text-white shadow-sm sm:h-11 sm:w-11">
+                <ReceiptText size={20} />
               </div>
 
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight text-[#172019]">
+              <div className="min-w-0">
+                <h2 className="break-all text-xl font-bold tracking-tight text-[#172019] sm:text-2xl">
                   Order #{orderNumber}
                 </h2>
 
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-[10px] text-gray-500 sm:text-xs">
                   Placed on {formatDate(order.createdAt)}
                 </p>
               </div>
@@ -592,40 +592,42 @@ function OrderDetail() {
           </div>
 
           <span
-            className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-2 text-xs font-bold ${getStatusClasses(
+            className={`inline-flex w-fit max-w-full items-center gap-2 rounded-full border px-3 py-2 text-[10px] font-bold sm:text-xs ${getStatusClasses(
               order.status
             )}`}
           >
-            <StatusIcon size={15} />
-            {STATUS_LABELS[
-              order.status
-            ] || order.status}
+            <StatusIcon size={14} />
+            <span className="break-words">
+              {STATUS_LABELS[
+                order.status
+              ] || order.status}
+            </span>
           </span>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
-          <div className="space-y-5">
+        <div className="grid w-full min-w-0 grid-cols-1 gap-4 md:gap-5 lg:grid-cols-[minmax(0,1fr)_340px] xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0 space-y-4 sm:space-y-5">
             {isPendingPayment && (
               <section className="overflow-hidden rounded-2xl border border-red-200 bg-white shadow-sm">
-                <div className="bg-red-50 px-5 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-red-600 shadow-sm">
-                      <WalletCards size={20} />
+                <div className="bg-red-50 px-4 py-3.5 sm:px-5 sm:py-4">
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-red-600 shadow-sm sm:h-10 sm:w-10">
+                      <WalletCards size={19} />
                     </div>
 
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="text-sm font-bold text-red-700">
                         Payment Pending
                       </h3>
 
-                      <p className="mt-0.5 text-xs text-red-600">
+                      <p className="mt-0.5 break-words text-[10px] leading-5 text-red-600 sm:text-xs">
                         Complete your UPI payment to confirm this order.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-5">
+                <div className="p-4 sm:p-5">
                   <button
                     onClick={
                       handlePayment
@@ -650,18 +652,18 @@ function OrderDetail() {
               </section>
             )}
 
-            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm sm:p-6">
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
-                  <PackageCheck size={20} />
+            <section className="min-w-0 rounded-2xl border border-[#dce8de] bg-white p-4 shadow-sm sm:p-6">
+              <div className="mb-4 flex items-center gap-3 sm:mb-5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b] sm:h-10 sm:w-10">
+                  <PackageCheck size={19} />
                 </div>
 
-                <div>
-                  <h3 className="text-base font-bold text-[#172019]">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-[#172019] sm:text-base">
                     Order Status
                   </h3>
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-[10px] text-gray-500 sm:text-xs">
                     Track your order progress
                   </p>
                 </div>
@@ -670,14 +672,14 @@ function OrderDetail() {
               {renderTimeline()}
             </section>
 
-            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm sm:p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <div>
-                  <h3 className="text-base font-bold text-[#172019]">
+            <section className="min-w-0 rounded-2xl border border-[#dce8de] bg-white p-4 shadow-sm sm:p-6">
+              <div className="mb-4 flex items-center justify-between gap-3 sm:mb-5">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-[#172019] sm:text-base">
                     Order Items
                   </h3>
 
-                  <p className="mt-0.5 text-xs text-gray-500">
+                  <p className="mt-0.5 text-[10px] text-gray-500 sm:text-xs">
                     {items.length} item
                     {items.length !== 1
                       ? 's'
@@ -686,8 +688,8 @@ function OrderDetail() {
                 </div>
 
                 <ShoppingBag
-                  size={20}
-                  className="text-[#16823b]"
+                  size={19}
+                  className="shrink-0 text-[#16823b]"
                 />
               </div>
 
@@ -732,29 +734,29 @@ function OrderDetail() {
                           item?.id ||
                           index
                         }
-                        className="flex items-center gap-3 rounded-xl bg-[#f7faf7] p-3"
+                        className="flex min-w-0 items-center gap-2.5 rounded-xl bg-[#f7faf7] p-2.5 sm:gap-3 sm:p-3"
                       >
-                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-white sm:h-16 sm:w-16">
                           {image ? (
                             <img
                               src={image}
                               alt={name}
-                              className="h-full w-full object-cover"
+                              className="h-full w-full object-contain"
                             />
                           ) : (
                             <ShoppingBag
-                              size={23}
+                              size={21}
                               className="text-[#16823b]"
                             />
                           )}
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <h4 className="truncate text-sm font-bold text-[#172019]">
+                          <h4 className="break-words text-xs font-bold leading-5 text-[#172019] sm:text-sm">
                             {name}
                           </h4>
 
-                          <p className="mt-1 text-xs text-gray-500">
+                          <p className="mt-0.5 break-words text-[10px] text-gray-500 sm:mt-1 sm:text-xs">
                             {item?.weight
                               ? `${item.weight}${item.unit || ''} × `
                               : ''}
@@ -762,14 +764,14 @@ function OrderDetail() {
                           </p>
 
                           {price > 0 && (
-                            <p className="mt-1 text-xs text-gray-400">
+                            <p className="mt-0.5 text-[10px] text-gray-400 sm:mt-1 sm:text-xs">
                               ₹{price.toFixed(2)} each
                             </p>
                           )}
                         </div>
 
-                        <div className="text-right">
-                          <p className="text-sm font-bold text-[#172019]">
+                        <div className="shrink-0 text-right">
+                          <p className="text-xs font-bold text-[#172019] sm:text-sm">
                             ₹
                             {lineTotal.toFixed(
                               2
@@ -784,41 +786,41 @@ function OrderDetail() {
             </section>
           </div>
 
-          <div className="space-y-5">
-            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm">
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
-                  <ReceiptText size={20} />
+          <div className="min-w-0 space-y-4 sm:space-y-5">
+            <section className="min-w-0 rounded-2xl border border-[#dce8de] bg-white p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex items-center gap-3 sm:mb-5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b] sm:h-10 sm:w-10">
+                  <ReceiptText size={19} />
                 </div>
 
-                <div>
-                  <h3 className="text-base font-bold text-[#172019]">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-[#172019] sm:text-base">
                     Payment Summary
                   </h3>
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-[10px] text-gray-500 sm:text-xs">
                     Order amount breakdown
                   </p>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <div className="flex justify-between text-sm">
+                <div className="flex items-center justify-between gap-4 text-sm">
                   <span className="text-gray-500">
                     Items
                   </span>
 
-                  <span className="font-medium text-[#172019]">
+                  <span className="shrink-0 font-medium text-[#172019]">
                     ₹{subtotal.toFixed(2)}
                   </span>
                 </div>
 
-                <div className="flex justify-between text-sm">
+                <div className="flex items-center justify-between gap-4 text-sm">
                   <span className="text-gray-500">
                     Delivery Fee
                   </span>
 
-                  <span className="font-medium text-[#172019]">
+                  <span className="shrink-0 font-medium text-[#172019]">
                     {deliveryFee > 0
                       ? `₹${deliveryFee.toFixed(2)}`
                       : 'FREE'}
@@ -827,36 +829,36 @@ function OrderDetail() {
 
                 <div className="my-3 h-px bg-[#dce8de]" />
 
-                <div className="flex items-end justify-between">
-                  <span className="text-base font-bold text-[#172019]">
+                <div className="flex items-end justify-between gap-4">
+                  <span className="text-sm font-bold text-[#172019] sm:text-base">
                     Total
                   </span>
 
-                  <span className="text-2xl font-bold text-[#16823b]">
+                  <span className="shrink-0 text-xl font-bold text-[#16823b] sm:text-2xl">
                     ₹{total.toFixed(2)}
                   </span>
                 </div>
               </div>
             </section>
 
-            <section className="rounded-2xl border border-[#dce8de] bg-white p-5 shadow-sm">
-              <div className="mb-5 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b]">
-                  <MapPin size={20} />
+            <section className="min-w-0 rounded-2xl border border-[#dce8de] bg-white p-4 shadow-sm sm:p-5">
+              <div className="mb-4 flex items-center gap-3 sm:mb-5">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f4f8f4] text-[#16823b] sm:h-10 sm:w-10">
+                  <MapPin size={19} />
                 </div>
 
-                <div>
-                  <h3 className="text-base font-bold text-[#172019]">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-bold text-[#172019] sm:text-base">
                     Delivery & Payment
                   </h3>
 
-                  <p className="text-xs text-gray-500">
+                  <p className="text-[10px] text-gray-500 sm:text-xs">
                     Order fulfillment details
                   </p>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div className="rounded-xl bg-[#f7faf7] p-3">
                   <div className="flex items-start gap-3">
                     <MapPin
@@ -864,12 +866,12 @@ function OrderDetail() {
                       className="mt-0.5 shrink-0 text-[#16823b]"
                     />
 
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-gray-500 sm:text-xs">
                         Fulfillment
                       </p>
 
-                      <p className="mt-1 text-sm font-bold text-[#172019]">
+                      <p className="mt-1 break-words text-xs font-bold text-[#172019] sm:text-sm">
                         {order.fulfillmentMethod ===
                         'DELIVERY'
                           ? 'Home Delivery'
@@ -877,7 +879,7 @@ function OrderDetail() {
                       </p>
 
                       {getAddress && (
-                        <p className="mt-1 text-xs leading-5 text-gray-500">
+                        <p className="mt-1 break-words text-[10px] leading-5 text-gray-500 sm:text-xs">
                           {getAddress}
                         </p>
                       )}
@@ -886,18 +888,18 @@ function OrderDetail() {
                 </div>
 
                 <div className="rounded-xl bg-[#f7faf7] p-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-start gap-3">
                     <CreditCard
                       size={18}
-                      className="shrink-0 text-[#16823b]"
+                      className="mt-0.5 shrink-0 text-[#16823b]"
                     />
 
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-semibold text-gray-500 sm:text-xs">
                         Payment Method
                       </p>
 
-                      <p className="mt-1 text-sm font-bold capitalize text-[#172019]">
+                      <p className="mt-1 break-words text-xs font-bold capitalize text-[#172019] sm:text-sm">
                         {getPaymentText}
                       </p>
                     </div>
@@ -907,18 +909,18 @@ function OrderDetail() {
             </section>
 
             {canCancel && (
-              <section className="rounded-2xl border border-red-100 bg-white p-5 shadow-sm">
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-50 text-red-600">
-                    <Ban size={19} />
+              <section className="rounded-2xl border border-red-100 bg-white p-4 shadow-sm sm:p-5">
+                <div className="mb-4 flex items-start gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 sm:h-10 sm:w-10">
+                    <Ban size={18} />
                   </div>
 
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="text-sm font-bold text-[#172019]">
                       Cancel Order
                     </h3>
 
-                    <p className="text-xs text-gray-500">
+                    <p className="mt-0.5 break-words text-[10px] leading-5 text-gray-500 sm:text-xs">
                       You can cancel this order at this stage.
                     </p>
                   </div>
@@ -941,15 +943,15 @@ function OrderDetail() {
       </main>
 
       {showCancelModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <div>
-                <h2 className="text-lg font-bold text-[#172019]">
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 backdrop-blur-sm sm:items-center sm:p-4">
+          <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-2xl sm:max-w-md sm:rounded-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-4 py-3.5 sm:px-5 sm:py-4">
+              <div className="min-w-0">
+                <h2 className="text-base font-bold text-[#172019] sm:text-lg">
                   Cancel Order
                 </h2>
 
-                <p className="mt-0.5 text-xs text-gray-500">
+                <p className="mt-0.5 break-all text-[10px] text-gray-500 sm:text-xs">
                   Order #{orderNumber}
                 </p>
               </div>
@@ -960,19 +962,19 @@ function OrderDetail() {
                     false
                   )
                 }
-                className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg p-2 text-gray-500 transition hover:bg-gray-100"
               >
-                <X size={20} />
+                <X size={19} />
               </button>
             </div>
 
-            <div className="p-5">
-              <div className="rounded-xl border border-red-100 bg-red-50 p-4">
-                <p className="text-sm font-semibold text-red-700">
+            <div className="p-4 sm:p-5">
+              <div className="rounded-xl border border-red-100 bg-red-50 p-3.5 sm:p-4">
+                <p className="break-words text-sm font-semibold text-red-700">
                   Are you sure you want to cancel this order?
                 </p>
 
-                <p className="mt-1 text-xs leading-5 text-red-600">
+                <p className="mt-1 break-words text-[10px] leading-5 text-red-600 sm:text-xs">
                   This action may not be reversible.
                 </p>
               </div>
@@ -986,10 +988,10 @@ function OrderDetail() {
                 }
                 placeholder="Enter cancellation reason"
                 rows={4}
-                className="mt-4 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm text-[#172019] outline-none transition placeholder:text-gray-400 focus:border-[#16823b] focus:ring-2 focus:ring-[#16823b]/10"
+                className="mt-4 w-full resize-none rounded-xl border border-gray-200 px-3.5 py-3 text-sm text-[#172019] outline-none transition placeholder:text-gray-400 focus:border-[#16823b] focus:ring-2 focus:ring-[#16823b]/10 sm:px-4"
               />
 
-              <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   onClick={() => {
                     setShowCancelModal(
@@ -997,7 +999,7 @@ function OrderDetail() {
                     )
                     setCancelReason('')
                   }}
-                  className="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                  className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
                 >
                   Keep Order
                 </button>
@@ -1007,7 +1009,7 @@ function OrderDetail() {
                     handleCancel
                   }
                   disabled={cancelling}
-                  className="flex-1 rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-xl bg-red-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {cancelling
                     ? 'Cancelling...'
