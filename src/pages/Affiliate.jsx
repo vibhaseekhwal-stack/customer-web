@@ -149,9 +149,12 @@ function Affiliate() {
   const [showPayout, setShowPayout] = useState(false)
 
   const [motivation, setMotivation] = useState('')
-  const [channel, setChannel] = useState('')
-  const [amount, setAmount] = useState('')
+  const [primaryChannel, setPrimaryChannel] = useState('')
+  const [channelUrl, setChannelUrl] = useState('')
+  const [audienceSize, setAudienceSize] = useState('')
   const [upiId, setUpiId] = useState('')
+  const [upiName, setUpiName] = useState('')
+  const [amount, setAmount] = useState('')
 
   const loadAffiliate = async () => {
     setLoading(true)
@@ -206,13 +209,23 @@ function Affiliate() {
   const handleApply = async (event) => {
     event.preventDefault()
 
-    if (!motivation.trim()) {
-      setError('Please enter your motivation.')
+    if (!primaryChannel.trim()) {
+      setError('Please select your preferred channel.')
       return
     }
 
-    if (!channel) {
-      setError('Please select your preferred channel.')
+    if (primaryChannel.trim().length < 2) {
+      setError('Preferred channel must be at least 2 characters.')
+      return
+    }
+
+    if (primaryChannel.trim().length > 50) {
+      setError('Preferred channel must be 50 characters or less.')
+      return
+    }
+
+    if (motivation.trim().length < 20) {
+      setError('Motivation must be at least 20 characters.')
       return
     }
 
@@ -220,15 +233,37 @@ function Affiliate() {
     setError('')
 
     try {
-      const data = await applyAffiliate({
+      const payload = {
+        primaryChannel: primaryChannel.trim(),
         motivation: motivation.trim(),
-        channel,
-      })
+      }
+
+      if (channelUrl.trim()) {
+        payload.channelUrl = channelUrl.trim()
+      }
+
+      if (audienceSize.trim()) {
+        payload.audienceSize = audienceSize.trim()
+      }
+
+      if (upiId.trim()) {
+        payload.upiId = upiId.trim()
+      }
+
+      if (upiName.trim()) {
+        payload.upiName = upiName.trim()
+      }
+
+      const data = await applyAffiliate(payload)
 
       setAffiliate(data || affiliate)
       setShowApplication(false)
       setMotivation('')
-      setChannel('')
+      setPrimaryChannel('')
+      setChannelUrl('')
+      setAudienceSize('')
+      setUpiId('')
+      setUpiName('')
       setSuccess('Affiliate application submitted successfully.')
       await loadAffiliate()
     } catch (err) {
@@ -387,10 +422,18 @@ function Affiliate() {
       {showApplication && (
         <ApplicationModal
           motivation={motivation}
-          channel={channel}
+          primaryChannel={primaryChannel}
+          channelUrl={channelUrl}
+          audienceSize={audienceSize}
+          upiId={upiId}
+          upiName={upiName}
           submitting={submitting}
           onMotivationChange={setMotivation}
-          onChannelChange={setChannel}
+          onPrimaryChannelChange={setPrimaryChannel}
+          onChannelUrlChange={setChannelUrl}
+          onAudienceSizeChange={setAudienceSize}
+          onUpiIdChange={setUpiId}
+          onUpiNameChange={setUpiName}
           onClose={() => {
             if (!submitting) {
               setShowApplication(false)
@@ -1002,6 +1045,7 @@ function StatusBadge({ status }) {
     PAID: 'bg-green-50 text-green-700',
     COMPLETED: 'bg-green-50 text-green-700',
     PENDING: 'bg-amber-50 text-amber-700',
+    REQUESTED: 'bg-amber-50 text-amber-700',
     PROCESSING: 'bg-blue-50 text-blue-700',
     REJECTED: 'bg-red-50 text-red-700',
     FAILED: 'bg-red-50 text-red-700',
@@ -1056,16 +1100,24 @@ function EmptyState({ icon: Icon, title, text }) {
 
 function ApplicationModal({
   motivation,
-  channel,
+  primaryChannel,
+  channelUrl,
+  audienceSize,
+  upiId,
+  upiName,
   submitting,
   onMotivationChange,
-  onChannelChange,
+  onPrimaryChannelChange,
+  onChannelUrlChange,
+  onAudienceSizeChange,
+  onUpiIdChange,
+  onUpiNameChange,
   onClose,
   onSubmit,
 }) {
   return (
     <ModalOverlay onClose={onClose}>
-      <div className="w-full max-w-lg rounded-[26px] bg-white shadow-2xl overflow-hidden">
+      <div className="w-full max-w-lg max-h-[90vh] rounded-[26px] bg-white shadow-2xl overflow-hidden">
         <div className="px-6 py-5 border-b border-[#edf1eb] flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold text-[#1f3322]">
@@ -1086,21 +1138,10 @@ function ApplicationModal({
           </button>
         </div>
 
-        <form onSubmit={onSubmit} className="p-6 space-y-5">
-          <div>
-            <label className="block text-sm font-medium text-[#263c29]">
-              Why do you want to become an affiliate?
-            </label>
-
-            <textarea
-              value={motivation}
-              onChange={(event) => onMotivationChange(event.target.value)}
-              rows={5}
-              placeholder="Tell us about your audience and how you plan to promote products..."
-              className="mt-2 w-full rounded-xl border border-[#dce5da] bg-white px-4 py-3 text-sm text-[#263c29] outline-none transition focus:border-[#315d32] focus:ring-2 focus:ring-[#315d32]/10 resize-none"
-            />
-          </div>
-
+        <form
+          onSubmit={onSubmit}
+          className="p-6 space-y-5 overflow-y-auto max-h-[calc(90vh-90px)]"
+        >
           <div>
             <label className="block text-sm font-medium text-[#263c29]">
               Preferred channel
@@ -1108,8 +1149,10 @@ function ApplicationModal({
 
             <div className="relative mt-2">
               <select
-                value={channel}
-                onChange={(event) => onChannelChange(event.target.value)}
+                value={primaryChannel}
+                onChange={(event) =>
+                  onPrimaryChannelChange(event.target.value)
+                }
                 className="w-full appearance-none rounded-xl border border-[#dce5da] bg-white px-4 py-3 pr-10 text-sm text-[#263c29] outline-none transition focus:border-[#315d32] focus:ring-2 focus:ring-[#315d32]/10"
               >
                 <option value="">Select channel</option>
@@ -1122,6 +1165,90 @@ function ApplicationModal({
               </select>
 
               <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#263c29]">
+              Channel URL
+            </label>
+
+            <input
+              type="url"
+              value={channelUrl}
+              onChange={(event) => onChannelUrlChange(event.target.value)}
+              placeholder="https://instagram.com/yourprofile"
+              className="mt-2 w-full rounded-xl border border-[#dce5da] bg-white px-4 py-3 text-sm text-[#263c29] outline-none transition focus:border-[#315d32] focus:ring-2 focus:ring-[#315d32]/10"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-[#263c29]">
+              Audience Size
+            </label>
+
+            <input
+              type="number"
+              min="0"
+              value={audienceSize}
+              onChange={(event) => onAudienceSizeChange(event.target.value)}
+              placeholder="e.g. 5000"
+              className="mt-2 w-full rounded-xl border border-[#dce5da] bg-white px-4 py-3 text-sm text-[#263c29] outline-none transition focus:border-[#315d32] focus:ring-2 focus:ring-[#315d32]/10"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <label className="block text-sm font-medium text-[#263c29]">
+                Why do you want to become an affiliate?
+              </label>
+
+              <span
+                className={`text-xs ${
+                  motivation.length < 20
+                    ? 'text-gray-400'
+                    : 'text-[#315d32]'
+                }`}
+              >
+                {motivation.length}/20+
+              </span>
+            </div>
+
+            <textarea
+              value={motivation}
+              onChange={(event) => onMotivationChange(event.target.value)}
+              rows={5}
+              minLength={20}
+              placeholder="Tell us about your audience and how you plan to promote products..."
+              className="mt-2 w-full rounded-xl border border-[#dce5da] bg-white px-4 py-3 text-sm text-[#263c29] outline-none transition focus:border-[#315d32] focus:ring-2 focus:ring-[#315d32]/10 resize-none"
+            />
+          </div>
+
+          <div className="rounded-2xl border border-[#e4ebe1] bg-[#f8faf7] p-4">
+            <p className="text-sm font-semibold text-[#263c29]">
+              Payout Details
+            </p>
+
+            <p className="mt-1 text-xs text-gray-500">
+              You can add your UPI details now or update them later.
+            </p>
+
+            <div className="mt-4 space-y-3">
+              <input
+                type="text"
+                value={upiId}
+                onChange={(event) => onUpiIdChange(event.target.value)}
+                placeholder="UPI ID e.g. name@upi"
+                className="w-full rounded-xl border border-[#dce5da] bg-white px-4 py-3 text-sm text-[#263c29] outline-none transition focus:border-[#315d32] focus:ring-2 focus:ring-[#315d32]/10"
+              />
+
+              <input
+                type="text"
+                value={upiName}
+                onChange={(event) => onUpiNameChange(event.target.value)}
+                placeholder="UPI account name"
+                className="w-full rounded-xl border border-[#dce5da] bg-white px-4 py-3 text-sm text-[#263c29] outline-none transition focus:border-[#315d32] focus:ring-2 focus:ring-[#315d32]/10"
+              />
             </div>
           </div>
 
