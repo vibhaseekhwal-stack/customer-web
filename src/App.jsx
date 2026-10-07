@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 
 import Navbar from './components/Navbar/Navbar'
@@ -19,6 +19,9 @@ import OrderDetail from './pages/OrderDetail'
 import Staples from './pages/Staples'
 import PersonalCare from './pages/PersonalCare'
 import Deals from './pages/Deals'
+import Affiliate from './pages/Affiliate'
+
+import { captureReferralFromUrl } from './utils/affiliateReferral'
 
 function AppLayout() {
   return (
@@ -35,6 +38,10 @@ function AppLayout() {
 }
 
 function App() {
+  useEffect(() => {
+    captureReferralFromUrl()
+  }, [])
+
   return (
     <Routes>
       <Route
@@ -116,6 +123,11 @@ function App() {
         <Route
           path="/deals"
           element={<Deals />}
+        />
+
+        <Route
+          path="/affiliate"
+          element={<Affiliate />}
         />
       </Route>
     </Routes>

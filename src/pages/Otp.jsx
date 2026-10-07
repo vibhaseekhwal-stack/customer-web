@@ -6,6 +6,8 @@ import {
   verifyOtp,
 } from '../services/api'
 
+import { getReferralCode } from '../utils/affiliateReferral'
+
 const PENDING_PHONE_KEY = 'grocery_pending_otp_phone'
 const DEV_OTP_KEY = 'grocery_dev_otp_hint'
 
@@ -45,7 +47,7 @@ function Otp() {
     }
 
     const timer = setInterval(() => {
-      setSecondsLeft((current) => {
+      setSecondsLeft(current => {
         if (current <= 1) {
           clearInterval(timer)
           return 0
@@ -83,6 +85,17 @@ function Otp() {
       setVerifying(true)
 
       const data = await verifyOtp(phone, trimmedCode)
+
+      const referralCode =
+        sessionStorage.getItem('affiliate_pending_referral') ||
+        getReferralCode()
+
+      if (referralCode) {
+        sessionStorage.setItem(
+          'affiliate_pending_referral',
+          referralCode
+        )
+      }
 
       console.log('OTP verification response:', data)
 
@@ -170,7 +183,6 @@ function Otp() {
 
         <div className="flex min-h-full w-full items-center justify-center px-3 py-3 sm:px-5 sm:py-5 lg:px-8">
 
-          {/* SAME AS LOGIN */}
           <div className="w-full max-w-[980px]">
 
             <div className="mb-3 flex justify-center sm:mb-4">
@@ -191,7 +203,6 @@ function Otp() {
               </div>
             </div>
 
-            {/* SAME AS LOGIN: width columns + min-height */}
             <div className="grid w-full overflow-hidden rounded-[26px] border border-white/80 bg-white/90 shadow-[0_20px_70px_rgba(47,70,39,0.10)] backdrop-blur-xl sm:rounded-[32px] md:min-h-[500px] md:grid-cols-[1fr_370px] lg:min-h-[520px] lg:grid-cols-[1fr_400px] lg:rounded-[36px]">
 
               <div className="relative hidden overflow-hidden bg-[#315d32] md:block">
@@ -225,7 +236,7 @@ function Otp() {
                   </p>
 
                   <div className="mt-6 flex gap-2">
-                    {[1, 2, 3, 4, 5, 6].map((item) => (
+                    {[1, 2, 3, 4, 5, 6].map(item => (
                       <div
                         key={item}
                         className="h-9 w-8 rounded-lg border border-white/10 bg-white/10"
@@ -245,7 +256,6 @@ function Otp() {
                 </div>
               </div>
 
-              {/* CHANGED: compact right panel so nothing gets cut */}
               <div className="flex items-center bg-white px-5 py-5 sm:px-8 md:min-h-0 md:px-7 lg:px-9">
                 <div className="mx-auto w-full max-w-[390px]">
 
@@ -261,7 +271,6 @@ function Otp() {
                     Change number
                   </button>
 
-                  {/* CHANGED: icon box hata diya, heading compact */}
                   <div className="mb-3">
                     <h2 className="text-[24px] font-bold leading-tight text-[#202a20] sm:text-[26px]">
                       Verify your number
@@ -311,7 +320,7 @@ function Otp() {
                     >
                       <input
                         value={code}
-                        onChange={(event) => {
+                        onChange={event => {
                           const value = event.target.value
                             .replace(/\D/g, '')
                             .slice(0, 6)
@@ -352,7 +361,6 @@ function Otp() {
                     </button>
                   </form>
 
-                  {/* CHANGED: resend ek line me */}
                   <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5 text-center">
                     <span className="text-[10px] text-[#9ba39a]">
                       Didn't receive the code?

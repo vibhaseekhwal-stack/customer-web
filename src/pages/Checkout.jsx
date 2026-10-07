@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -9,6 +8,7 @@ import {
   placeOrder,
   startOrderPayment,
 } from '../services/api'
+import { getReferralCode } from '../utils/affiliateReferral'
 import {
   Truck,
   Store,
@@ -216,12 +216,21 @@ function Checkout() {
     try {
       setPlacingOrder(true)
 
+      const referralCode =
+        sessionStorage.getItem('affiliate_pending_referral') ||
+        getReferralCode()
+
       const payload = {
         fulfillmentMethod,
         paymentMethod,
         ...(fulfillmentMethod === 'DELIVERY'
           ? {
               addressId: selectedAddressId,
+            }
+          : {}),
+        ...(referralCode
+          ? {
+              referralCode,
             }
           : {}),
       }
@@ -261,6 +270,8 @@ function Checkout() {
           return
         }
       }
+
+      sessionStorage.removeItem('affiliate_pending_referral')
 
       navigate(`/confirmation?orderId=${orderId}`)
     } catch (err) {
@@ -885,14 +896,12 @@ function Checkout() {
                   className="group mt-5 flex h-12 w-full items-center justify-between rounded-[17px] bg-[#315d32] px-4 text-xs font-black text-white shadow-lg shadow-[#315d32]/20 transition hover:-translate-y-0.5 hover:bg-[#274d29] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 sm:h-[52px] sm:rounded-[18px] sm:px-5 sm:text-sm"
                 >
                   {placingOrder ? (
-                    <>
-                      <span className="flex items-center gap-2">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                        {paymentMethod === 'UPI'
-                          ? 'Redirecting...'
-                          : 'Placing Order...'}
-                      </span>
-                    </>
+                    <span className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                      {paymentMethod === 'UPI'
+                        ? 'Redirecting...'
+                        : 'Placing Order...'}
+                    </span>
                   ) : (
                     <>
                       <span>Place Order</span>
@@ -1101,4 +1110,3 @@ function Checkout() {
 }
 
 export default Checkout
-

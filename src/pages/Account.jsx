@@ -30,6 +30,7 @@ import {
   Home,
   Briefcase,
   MapPinned,
+  HandCoins,
 } from 'lucide-react'
 
 function Account() {
@@ -277,6 +278,12 @@ function Account() {
       } currently in your cart`,
       icon: ShoppingCart,
       action: () => navigate('/cart'),
+    },
+    {
+      title: 'Affiliate Programme',
+      description: 'Earn rewards by referring friends and family',
+      icon: HandCoins,
+      action: () => navigate('/affiliate'),
     },
   ]
 
